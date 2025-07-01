@@ -76,19 +76,19 @@
 .table th {
     border-top: none;
     font-weight: 600;
-    background-color: var(--bs-dark);
-    color: var(--bs-light);
+    background-color: var(--bs-primary);
+    color: var(--bs-white);
 }
 
 /* Card enhancements */
 .card {
-    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
-    border: 1px solid rgba(255, 255, 255, 0.125);
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(0, 0, 0, 0.125);
 }
 
 .card-header {
-    background-color: rgba(255, 255, 255, 0.03);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.125);
+    background-color: rgba(13, 110, 253, 0.1);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.125);
 }
 
 /* Status badges */
@@ -98,15 +98,15 @@
 
 /* Modal enhancements */
 .modal-content {
-    border: 1px solid rgba(255, 255, 255, 0.125);
+    border: 1px solid rgba(0, 0, 0, 0.125);
 }
 
 .modal-header {
-    border-bottom: 1px solid rgba(255, 255, 255, 0.125);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.125);
 }
 
 .modal-footer {
-    border-top: 1px solid rgba(255, 255, 255, 0.125);
+    border-top: 1px solid rgba(0, 0, 0, 0.125);
 }
 
 /* Form enhancements */
@@ -171,7 +171,7 @@
 }
 
 .list-group-item:hover {
-    background-color: rgba(255, 255, 255, 0.1) !important;
+    background-color: rgba(13, 110, 253, 0.1) !important;
     transform: translateX(5px);
 }
 
@@ -293,7 +293,7 @@ canvas {
 
 /* Hover effects for interactive elements */
 .table tbody tr:hover {
-    background-color: rgba(255, 255, 255, 0.05);
+    background-color: rgba(13, 110, 253, 0.1);
     cursor: pointer;
 }
 
