@@ -13,7 +13,7 @@ function initializeEquipmentCalendar() {
         },
         height: 'auto',
         locale: 'ko',
-        firstDay: 1, // Monday
+        firstDay: 0, // Sunday first
         dayHeaderFormat: { weekday: 'short' },
         dayCellContent: function(arg) {
             return arg.dayNumberText.replace('일', '');

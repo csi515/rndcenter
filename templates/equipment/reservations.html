@@ -109,10 +109,21 @@
         text-decoration: none !important;
     }
     
-    /* Hide day names and show only numbers */
+    /* Day header styling */
     .fc-col-header-cell {
         font-weight: 600;
-        color: #666;
+        color: #000 !important;
+    }
+    
+    /* Sunday header - red color */
+    .fc-col-header-cell:first-child {
+        color: #dc3545 !important;
+    }
+    
+    /* Day header text */
+    .fc-col-header-cell-cushion {
+        color: inherit;
+        text-decoration: none !important;
     }
 </style>
 {% endblock %}
