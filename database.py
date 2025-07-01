@@ -1,0 +1,286 @@
+from datetime import datetime
+from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy.orm import DeclarativeBase
+
+class Base(DeclarativeBase):
+    pass
+
+db = SQLAlchemy(model_class=Base)
+
+def init_db(app):
+    """Initialize database with app context"""
+    db.init_app(app)
+    with app.app_context():
+        db.create_all()
+
+class Project(db.Model):
+    __tablename__ = 'projects'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    project_id = db.Column(db.String(50), unique=True, nullable=False)
+    name = db.Column(db.String(200), nullable=False)
+    description = db.Column(db.Text)
+    leader = db.Column(db.String(100))
+    department = db.Column(db.String(100))
+    start_date = db.Column(db.Date)
+    end_date = db.Column(db.Date)
+    budget = db.Column(db.Numeric(15, 2))
+    status = db.Column(db.String(50), default='진행중')
+    progress = db.Column(db.Integer, default=0)
+    created_date = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_date = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+class Researcher(db.Model):
+    __tablename__ = 'researchers'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    employee_id = db.Column(db.String(50), unique=True, nullable=False)
+    name = db.Column(db.String(100), nullable=False)
+    position = db.Column(db.String(100))
+    department = db.Column(db.String(100))
+    specialization = db.Column(db.String(200))
+    email = db.Column(db.String(200))
+    phone = db.Column(db.String(50))
+    hire_date = db.Column(db.Date)
+    status = db.Column(db.String(50), default='재직')
+    created_date = db.Column(db.DateTime, default=datetime.utcnow)
+
+class Schedule(db.Model):
+    __tablename__ = 'schedules'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    researcher_name = db.Column(db.String(100))
+    project_name = db.Column(db.String(200))
+    task = db.Column(db.String(500), nullable=False)
+    start_date = db.Column(db.Date)
+    end_date = db.Column(db.Date)
+    start_time = db.Column(db.Time)
+    end_time = db.Column(db.Time)
+    status = db.Column(db.String(50), default='예정')
+    notes = db.Column(db.Text)
+    created_date = db.Column(db.DateTime, default=datetime.utcnow)
+
+class WeeklySchedule(db.Model):
+    __tablename__ = 'weekly_schedules'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    schedule_id = db.Column(db.String(100), unique=True, nullable=False)
+    week = db.Column(db.Integer, nullable=False)  # 1-5 for week number
+    month = db.Column(db.Integer, nullable=False)  # 1-12
+    year = db.Column(db.Integer, nullable=False)
+    task = db.Column(db.String(500), nullable=False)
+    researcher = db.Column(db.String(100))
+    project = db.Column(db.String(200))
+    priority = db.Column(db.String(50), default='보통')
+    notes = db.Column(db.Text)
+    created_date = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_date = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+class Patent(db.Model):
+    __tablename__ = 'patents'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    patent_id = db.Column(db.String(50), unique=True, nullable=False)
+    title = db.Column(db.String(500), nullable=False)
+    inventors = db.Column(db.Text)
+    applicant = db.Column(db.String(200))
+    application_date = db.Column(db.Date)
+    application_number = db.Column(db.String(100))
+    publication_date = db.Column(db.Date)
+    publication_number = db.Column(db.String(100))
+    grant_date = db.Column(db.Date)
+    patent_number = db.Column(db.String(100))
+    status = db.Column(db.String(50))
+    field = db.Column(db.String(200))
+    abstract = db.Column(db.Text)
+    claims = db.Column(db.Text)
+    priority_date = db.Column(db.Date)
+    priority_number = db.Column(db.String(100))
+    created_date = db.Column(db.DateTime, default=datetime.utcnow)
+
+class Equipment(db.Model):
+    __tablename__ = 'equipment'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    equipment_id = db.Column(db.String(50), unique=True, nullable=False)
+    name = db.Column(db.String(200), nullable=False)
+    category = db.Column(db.String(100))
+    manufacturer = db.Column(db.String(200))
+    model = db.Column(db.String(200))
+    serial_number = db.Column(db.String(200))
+    location = db.Column(db.String(200))
+    purchase_date = db.Column(db.Date)
+    purchase_price = db.Column(db.Numeric(15, 2))
+    status = db.Column(db.String(50), default='사용가능')
+    manager = db.Column(db.String(100))
+    maintenance_date = db.Column(db.Date)
+    warranty_expiry = db.Column(db.Date)
+    specifications = db.Column(db.Text)
+    created_date = db.Column(db.DateTime, default=datetime.utcnow)
+
+class Reservation(db.Model):
+    __tablename__ = 'reservations'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    equipment_name = db.Column(db.String(200), nullable=False)
+    reserver = db.Column(db.String(100), nullable=False)
+    purpose = db.Column(db.String(500))
+    start_date = db.Column(db.Date, nullable=False)
+    end_date = db.Column(db.Date, nullable=False)
+    start_time = db.Column(db.Time)
+    end_time = db.Column(db.Time)
+    status = db.Column(db.String(50), default='예약')
+    notes = db.Column(db.Text)
+    created_date = db.Column(db.DateTime, default=datetime.utcnow)
+
+class UsageLog(db.Model):
+    __tablename__ = 'usage_logs'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    equipment_name = db.Column(db.String(200), nullable=False)
+    user = db.Column(db.String(100), nullable=False)
+    usage_date = db.Column(db.Date, nullable=False)
+    start_time = db.Column(db.Time)
+    end_time = db.Column(db.Time)
+    purpose = db.Column(db.String(500))
+    condition_before = db.Column(db.String(200))
+    condition_after = db.Column(db.String(200))
+    issues = db.Column(db.Text)
+    created_date = db.Column(db.DateTime, default=datetime.utcnow)
+
+class InventoryItem(db.Model):
+    __tablename__ = 'inventory'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    item_id = db.Column(db.String(50), unique=True, nullable=False)
+    name = db.Column(db.String(200), nullable=False)
+    category = db.Column(db.String(100))
+    location = db.Column(db.String(200))
+    quantity = db.Column(db.Integer, default=0)
+    unit = db.Column(db.String(50))
+    min_quantity = db.Column(db.Integer, default=0)
+    supplier = db.Column(db.String(200))
+    unit_price = db.Column(db.Numeric(10, 2))
+    expiry_date = db.Column(db.Date)
+    lot_number = db.Column(db.String(100))
+    storage_condition = db.Column(db.String(200))
+    last_updated = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_date = db.Column(db.DateTime, default=datetime.utcnow)
+
+class PurchaseRequest(db.Model):
+    __tablename__ = 'purchase_requests'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    request_id = db.Column(db.String(50), unique=True, nullable=False)
+    requester = db.Column(db.String(100), nullable=False)
+    item_name = db.Column(db.String(200), nullable=False)
+    quantity = db.Column(db.Integer, nullable=False)
+    unit_price = db.Column(db.Numeric(10, 2))
+    total_price = db.Column(db.Numeric(15, 2))
+    supplier = db.Column(db.String(200))
+    category = db.Column(db.String(100))
+    urgency = db.Column(db.String(50))
+    reason = db.Column(db.Text)
+    budget_code = db.Column(db.String(100))
+    status = db.Column(db.String(50), default='요청')
+    request_date = db.Column(db.Date, nullable=False)
+    notes = db.Column(db.Text)
+    created_date = db.Column(db.DateTime, default=datetime.utcnow)
+
+class Communication(db.Model):
+    __tablename__ = 'communications'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    comm_id = db.Column(db.String(50), unique=True, nullable=False)
+    category = db.Column(db.String(100), nullable=False)
+    title = db.Column(db.String(500), nullable=False)
+    content = db.Column(db.Text)
+    author = db.Column(db.String(100))
+    views = db.Column(db.Integer, default=0)
+    status = db.Column(db.String(50), default='공개')
+    question_type = db.Column(db.String(100))
+    urgency = db.Column(db.String(50))
+    created_date = db.Column(db.DateTime, default=datetime.utcnow)
+
+class Contact(db.Model):
+    __tablename__ = 'contacts'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    contact_id = db.Column(db.String(50), unique=True, nullable=False)
+    name = db.Column(db.String(100), nullable=False)
+    company = db.Column(db.String(200))
+    position = db.Column(db.String(100))
+    department = db.Column(db.String(100))
+    phone = db.Column(db.String(50))
+    email = db.Column(db.String(200))
+    address = db.Column(db.Text)
+    category = db.Column(db.String(100))
+    relationship = db.Column(db.String(100))
+    notes = db.Column(db.Text)
+    created_date = db.Column(db.DateTime, default=datetime.utcnow)
+
+class Chemical(db.Model):
+    __tablename__ = 'chemicals'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    chem_id = db.Column(db.String(50), unique=True, nullable=False)
+    chemical_name = db.Column(db.String(200), nullable=False)
+    cas_number = db.Column(db.String(50))
+    manufacturer = db.Column(db.String(200))
+    hazard_class = db.Column(db.String(50))
+    storage_condition = db.Column(db.String(200))
+    flash_point = db.Column(db.String(50))
+    exposure_limit = db.Column(db.String(100))
+    first_aid = db.Column(db.Text)
+    disposal_method = db.Column(db.Text)
+    msds_file_link = db.Column(db.String(500))
+    location = db.Column(db.String(200))
+    quantity = db.Column(db.String(100))
+    expiry_date = db.Column(db.Date)
+    created_date = db.Column(db.DateTime, default=datetime.utcnow)
+
+class Accident(db.Model):
+    __tablename__ = 'accidents'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    incident_date = db.Column(db.Date, nullable=False)
+    location = db.Column(db.String(200))
+    involved_person = db.Column(db.String(100))
+    incident_type = db.Column(db.String(100))
+    severity = db.Column(db.String(50))
+    description = db.Column(db.Text)
+    immediate_action = db.Column(db.Text)
+    follow_up = db.Column(db.Text)
+    prevention = db.Column(db.Text)
+    reporter = db.Column(db.String(100))
+    status = db.Column(db.String(50), default='조사중')
+    created_date = db.Column(db.DateTime, default=datetime.utcnow)
+
+class SafetyEducation(db.Model):
+    __tablename__ = 'safety_education'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(200), nullable=False)
+    description = db.Column(db.Text)
+    trainer = db.Column(db.String(100))
+    participants = db.Column(db.Text)
+    education_date = db.Column(db.Date, nullable=False)
+    duration = db.Column(db.String(50))
+    location = db.Column(db.String(200))
+    materials = db.Column(db.Text)
+    status = db.Column(db.String(50), default='계획')
+    created_date = db.Column(db.DateTime, default=datetime.utcnow)
+
+class SafetyProcedure(db.Model):
+    __tablename__ = 'safety_procedures'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(200), nullable=False)
+    category = db.Column(db.String(100))
+    description = db.Column(db.Text)
+    steps = db.Column(db.Text)
+    responsible_person = db.Column(db.String(100))
+    review_date = db.Column(db.Date)
+    version = db.Column(db.String(20), default='1.0')
+    status = db.Column(db.String(50), default='유효')
+    created_date = db.Column(db.DateTime, default=datetime.utcnow)

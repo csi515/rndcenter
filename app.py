@@ -2,6 +2,7 @@ import os
 import logging
 from flask import Flask
 from werkzeug.middleware.proxy_fix import ProxyFix
+from database import db, init_db
 
 # Configure logging
 logging.basicConfig(level=logging.DEBUG)
@@ -10,6 +11,17 @@ logging.basicConfig(level=logging.DEBUG)
 app = Flask(__name__)
 app.secret_key = os.environ.get("SESSION_SECRET", "dev-secret-key-for-rd-center")
 app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
+
+# Configure the database
+app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DATABASE_URL", "sqlite:///rd_center.db")
+app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
+    "pool_recycle": 300,
+    "pool_pre_ping": True,
+}
+app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+
+# Initialize database
+init_db(app)
 
 # Import and register blueprints
 from routes.dashboard import dashboard_bp

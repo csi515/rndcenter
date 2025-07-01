@@ -2,16 +2,17 @@
 class WeeklyScheduleManager {
     constructor() {
         this.currentDate = new Date();
-        this.schedules = this.loadSchedules();
+        this.schedules = {};
         this.draggedElement = null;
         this.draggedFromWeek = null;
         
         this.init();
     }
 
-    init() {
+    async init() {
         this.updateMonthDisplay();
         this.updateWeekDates();
+        this.schedules = await this.loadSchedules();
         this.renderSchedules();
         this.bindEvents();
         this.initSortable();
@@ -92,18 +93,34 @@ class WeeklyScheduleManager {
     }
 
     // Schedule Management
-    loadSchedules() {
-        const key = `schedules_${this.currentDate.getFullYear()}_${this.currentDate.getMonth() + 1}`;
-        const saved = localStorage.getItem(key);
+    async loadSchedules() {
+        const year = this.currentDate.getFullYear();
+        const month = this.currentDate.getMonth() + 1;
         
-        if (saved) {
-            return JSON.parse(saved);
-        } else {
-            // Return sample data for current month (January 2025)
-            if (this.currentDate.getFullYear() === 2025 && this.currentDate.getMonth() === 0) {
-                return this.getSampleSchedules();
+        try {
+            const response = await fetch(`/research/api/weekly-schedule/${year}/${month}`);
+            if (response.ok) {
+                const data = await response.json();
+                return data;
+            } else {
+                console.error('Failed to load schedules from server');
+                // Fallback to localStorage for backward compatibility
+                const key = `schedules_${year}_${month}`;
+                const saved = localStorage.getItem(key);
+                
+                if (saved) {
+                    return JSON.parse(saved);
+                } else if (year === 2025 && month === 1) {
+                    return this.getSampleSchedules();
+                }
+                return {};
             }
-            return {};
+        } catch (error) {
+            console.error('Error loading schedules:', error);
+            // Fallback to localStorage
+            const key = `schedules_${year}_${month}`;
+            const saved = localStorage.getItem(key);
+            return saved ? JSON.parse(saved) : {};
         }
     }
     
@@ -164,6 +181,7 @@ class WeeklyScheduleManager {
     }
 
     saveSchedules() {
+        // Keep localStorage as backup
         const key = `schedules_${this.currentDate.getFullYear()}_${this.currentDate.getMonth() + 1}`;
         localStorage.setItem(key, JSON.stringify(this.schedules));
     }
@@ -172,76 +190,173 @@ class WeeklyScheduleManager {
         return 'schedule_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
     }
 
-    addSchedule(week, scheduleData) {
-        const id = this.generateId();
+    async addSchedule(week, scheduleData) {
+        const year = this.currentDate.getFullYear();
+        const month = this.currentDate.getMonth() + 1;
         
-        if (!this.schedules[week]) {
-            this.schedules[week] = [];
-        }
-        
-        this.schedules[week].push({
-            id: id,
+        const requestData = {
+            week: parseInt(week),
+            month: month,
+            year: year,
             task: scheduleData.task,
             researcher: scheduleData.researcher || '',
             project: scheduleData.project || '',
             priority: scheduleData.priority || '보통',
-            notes: scheduleData.notes || '',
-            createdAt: new Date().toISOString()
-        });
+            notes: scheduleData.notes || ''
+        };
         
-        this.saveSchedules();
-        this.renderSchedules();
-        
-        return id;
-    }
-
-    updateSchedule(id, week, scheduleData) {
-        // Find and update schedule
-        for (let weekNum in this.schedules) {
-            const scheduleIndex = this.schedules[weekNum].findIndex(s => s.id === id);
-            if (scheduleIndex !== -1) {
-                this.schedules[weekNum][scheduleIndex] = {
-                    ...this.schedules[weekNum][scheduleIndex],
-                    ...scheduleData,
-                    updatedAt: new Date().toISOString()
-                };
-                break;
+        try {
+            const response = await fetch('/research/api/weekly-schedule/add', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(requestData)
+            });
+            
+            if (response.ok) {
+                const result = await response.json();
+                if (result.success) {
+                    // Reload schedules to update UI
+                    this.schedules = await this.loadSchedules();
+                    this.renderSchedules();
+                    return result.schedule.id;
+                }
             }
+            throw new Error('Failed to add schedule');
+        } catch (error) {
+            console.error('Error adding schedule:', error);
+            // Fallback to local storage
+            const id = this.generateId();
+            
+            if (!this.schedules[week]) {
+                this.schedules[week] = [];
+            }
+            
+            this.schedules[week].push({
+                id: id,
+                task: scheduleData.task,
+                researcher: scheduleData.researcher || '',
+                project: scheduleData.project || '',
+                priority: scheduleData.priority || '보통',
+                notes: scheduleData.notes || '',
+                createdAt: new Date().toISOString()
+            });
+            
+            this.saveSchedules();
+            this.renderSchedules();
+            return id;
         }
-        
-        this.saveSchedules();
-        this.renderSchedules();
     }
 
-    deleteSchedule(id) {
-        for (let week in this.schedules) {
-            this.schedules[week] = this.schedules[week].filter(s => s.id !== id);
+    async updateSchedule(id, week, scheduleData) {
+        try {
+            const response = await fetch(`/research/api/weekly-schedule/update/${id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(scheduleData)
+            });
+            
+            if (response.ok) {
+                const result = await response.json();
+                if (result.success) {
+                    // Reload schedules to update UI
+                    this.schedules = await this.loadSchedules();
+                    this.renderSchedules();
+                    return;
+                }
+            }
+            throw new Error('Failed to update schedule');
+        } catch (error) {
+            console.error('Error updating schedule:', error);
+            // Fallback to local update
+            for (let weekNum in this.schedules) {
+                const scheduleIndex = this.schedules[weekNum].findIndex(s => s.id === id);
+                if (scheduleIndex !== -1) {
+                    this.schedules[weekNum][scheduleIndex] = {
+                        ...this.schedules[weekNum][scheduleIndex],
+                        ...scheduleData,
+                        updatedAt: new Date().toISOString()
+                    };
+                    break;
+                }
+            }
+            this.saveSchedules();
+            this.renderSchedules();
         }
-        
-        this.saveSchedules();
-        this.renderSchedules();
     }
 
-    moveSchedule(id, fromWeek, toWeek) {
+    async deleteSchedule(id) {
+        try {
+            const response = await fetch(`/research/api/weekly-schedule/delete/${id}`, {
+                method: 'DELETE'
+            });
+            
+            if (response.ok) {
+                const result = await response.json();
+                if (result.success) {
+                    // Reload schedules to update UI
+                    this.schedules = await this.loadSchedules();
+                    this.renderSchedules();
+                    return;
+                }
+            }
+            throw new Error('Failed to delete schedule');
+        } catch (error) {
+            console.error('Error deleting schedule:', error);
+            // Fallback to local deletion
+            for (let week in this.schedules) {
+                this.schedules[week] = this.schedules[week].filter(s => s.id !== id);
+            }
+            this.saveSchedules();
+            this.renderSchedules();
+        }
+    }
+
+    async moveSchedule(id, fromWeek, toWeek) {
         if (fromWeek === toWeek) return;
         
-        // Find schedule
-        const scheduleIndex = this.schedules[fromWeek].findIndex(s => s.id === id);
-        if (scheduleIndex === -1) return;
-        
-        const schedule = this.schedules[fromWeek][scheduleIndex];
-        
-        // Remove from old week
-        this.schedules[fromWeek].splice(scheduleIndex, 1);
-        
-        // Add to new week
-        if (!this.schedules[toWeek]) {
-            this.schedules[toWeek] = [];
+        try {
+            const response = await fetch(`/research/api/weekly-schedule/move/${id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ week: parseInt(toWeek) })
+            });
+            
+            if (response.ok) {
+                const result = await response.json();
+                if (result.success) {
+                    // Reload schedules to update UI
+                    this.schedules = await this.loadSchedules();
+                    this.renderSchedules();
+                    return;
+                }
+            }
+            throw new Error('Failed to move schedule');
+        } catch (error) {
+            console.error('Error moving schedule:', error);
+            // Fallback to local move
+            const scheduleIndex = this.schedules[fromWeek].findIndex(s => s.id === id);
+            if (scheduleIndex === -1) return;
+            
+            const schedule = this.schedules[fromWeek][scheduleIndex];
+            
+            // Remove from old week
+            this.schedules[fromWeek].splice(scheduleIndex, 1);
+            
+            // Add to new week
+            if (!this.schedules[toWeek]) {
+                this.schedules[toWeek] = [];
+            }
+            this.schedules[toWeek].push(schedule);
+            
+            this.saveSchedules();
+            this.renderSchedules();
         }
-        this.schedules[toWeek].push(schedule);
-        
-        this.saveSchedules();
-        this.renderSchedules();
     }
 
     // Rendering
@@ -317,19 +432,19 @@ class WeeklyScheduleManager {
     // Event Binding
     bindEvents() {
         // Month navigation
-        document.getElementById('prevMonth').addEventListener('click', () => {
+        document.getElementById('prevMonth').addEventListener('click', async () => {
             this.currentDate.setMonth(this.currentDate.getMonth() - 1);
-            this.schedules = this.loadSchedules();
             this.updateMonthDisplay();
             this.updateWeekDates();
+            this.schedules = await this.loadSchedules();
             this.renderSchedules();
         });
 
-        document.getElementById('nextMonth').addEventListener('click', () => {
+        document.getElementById('nextMonth').addEventListener('click', async () => {
             this.currentDate.setMonth(this.currentDate.getMonth() + 1);
-            this.schedules = this.loadSchedules();
             this.updateMonthDisplay();
             this.updateWeekDates();
+            this.schedules = await this.loadSchedules();
             this.renderSchedules();
         });
 
@@ -476,7 +591,7 @@ class WeeklyScheduleManager {
     }
 
     // Form Handlers
-    handleAddSchedule(e) {
+    async handleAddSchedule(e) {
         const formData = new FormData(e.target);
         const week = formData.get('week');
         const scheduleData = {
@@ -487,17 +602,21 @@ class WeeklyScheduleManager {
             notes: formData.get('notes')
         };
         
-        this.addSchedule(week, scheduleData);
-        
-        // Close modal
-        const modal = bootstrap.Modal.getInstance(document.getElementById('addScheduleModal'));
-        modal.hide();
-        
-        // Show success message
-        this.showNotification('일정이 추가되었습니다.', 'success');
+        try {
+            await this.addSchedule(week, scheduleData);
+            
+            // Close modal
+            const modal = bootstrap.Modal.getInstance(document.getElementById('addScheduleModal'));
+            modal.hide();
+            
+            // Show success message
+            this.showNotification('일정이 추가되었습니다.', 'success');
+        } catch (error) {
+            this.showNotification('일정 추가 중 오류가 발생했습니다.', 'error');
+        }
     }
 
-    handleEditSchedule(e) {
+    async handleEditSchedule(e) {
         const formData = new FormData(e.target);
         const id = formData.get('id');
         const week = formData.get('week');
@@ -509,28 +628,36 @@ class WeeklyScheduleManager {
             notes: formData.get('notes')
         };
         
-        this.updateSchedule(id, week, scheduleData);
-        
-        // Close modal
-        const modal = bootstrap.Modal.getInstance(document.getElementById('editScheduleModal'));
-        modal.hide();
-        
-        // Show success message
-        this.showNotification('일정이 수정되었습니다.', 'success');
-    }
-
-    handleDeleteSchedule() {
-        const id = document.getElementById('editScheduleId').value;
-        
-        if (confirm('정말로 이 일정을 삭제하시겠습니까?')) {
-            this.deleteSchedule(id);
+        try {
+            await this.updateSchedule(id, week, scheduleData);
             
             // Close modal
             const modal = bootstrap.Modal.getInstance(document.getElementById('editScheduleModal'));
             modal.hide();
             
             // Show success message
-            this.showNotification('일정이 삭제되었습니다.', 'success');
+            this.showNotification('일정이 수정되었습니다.', 'success');
+        } catch (error) {
+            this.showNotification('일정 수정 중 오류가 발생했습니다.', 'error');
+        }
+    }
+
+    async handleDeleteSchedule() {
+        const id = document.getElementById('editScheduleId').value;
+        
+        if (confirm('정말로 이 일정을 삭제하시겠습니까?')) {
+            try {
+                await this.deleteSchedule(id);
+                
+                // Close modal
+                const modal = bootstrap.Modal.getInstance(document.getElementById('editScheduleModal'));
+                modal.hide();
+                
+                // Show success message
+                this.showNotification('일정이 삭제되었습니다.', 'success');
+            } catch (error) {
+                this.showNotification('일정 삭제 중 오류가 발생했습니다.', 'error');
+            }
         }
     }
 

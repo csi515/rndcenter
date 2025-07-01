@@ -119,6 +119,12 @@ This is a Flask-based web application designed for managing a Research & Develop
 
 ## Changelog
 - July 01, 2025. Initial setup
+- July 01, 2025. Added PostgreSQL database integration
+  - Created comprehensive database models for all system entities
+  - Implemented Weekly Schedule API with full CRUD operations
+  - Updated weekly schedule frontend to use database instead of localStorage
+  - Maintained backward compatibility with localStorage as fallback
+  - All schedule data now persists in PostgreSQL with proper error handling
 
 ## User Preferences
 Preferred communication style: Simple, everyday language.
