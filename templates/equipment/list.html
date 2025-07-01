@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+
+{% block title %}장비 목록 - R&D 센터 관리시스템{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2><i class="fas fa-tools"></i> 장비 목록</h2>
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addEquipmentModal">
+                <i class="fas fa-plus"></i> 장비 추가
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Equipment Table -->
+<div class="card">
+    <div class="card-header">
+        <h5 class="mb-0">등록된 장비</h5>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>장비명</th>
+                        <th>모델</th>
+                        <th>제조사</th>
+                        <th>위치</th>
+                        <th>상태</th>
+                        <th>구매일</th>
+                        <th>최근 점검일</th>
+                        <th>액션</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for equip in equipment %}
+                    <tr>
+                        <td>{{ equip.name }}</td>
+                        <td>{{ equip.model }}</td>
+                        <td>{{ equip.manufacturer }}</td>
+                        <td>{{ equip.location }}</td>
+                        <td>
+                            <span class="badge {% if equip.status == '사용 가능' %}bg-success{% elif equip.status == '점검 중' %}bg-warning{% else %}bg-danger{% endif %}">
+                                {{ equip.status }}
+                            </span>
+                        </td>
+                        <td>{{ equip.purchase_date }}</td>
+                        <td>{{ equip.maintenance_date }}</td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-primary">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-danger">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Add Equipment Modal -->
+<div class="modal fade" id="addEquipmentModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <form method="POST" action="{{ url_for('equipment.add_equipment') }}">
+                <div class="modal-header">
+                    <h5 class="modal-title">장비 추가</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">장비명 *</label>
+                            <input type="text" class="form-control" name="name" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">모델</label>
+                            <input type="text" class="form-control" name="model">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">제조사</label>
+                            <input type="text" class="form-control" name="manufacturer">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">위치</label>
+                            <input type="text" class="form-control" name="location">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">상태</label>
+                            <select class="form-select" name="status">
+                                <option value="사용 가능">사용 가능</option>
+                                <option value="점검 중">점검 중</option>
+                                <option value="수리 중">수리 중</option>
+                                <option value="사용 불가">사용 불가</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">구매일</label>
+                            <input type="date" class="form-control" name="purchase_date">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">최근 점검일</label>
+                        <input type="date" class="form-control" name="maintenance_date">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">비고</label>
+                        <textarea class="form-control" name="notes" rows="3"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+                    <button type="submit" class="btn btn-primary">추가</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

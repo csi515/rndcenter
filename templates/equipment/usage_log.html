@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+
+{% block title %}사용일지 - R&D 센터 관리시스템{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2><i class="fas fa-clipboard-list"></i> 사용일지</h2>
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addUsageLogModal">
+                <i class="fas fa-plus"></i> 일지 작성
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Usage Log Table -->
+<div class="card">
+    <div class="card-header">
+        <h5 class="mb-0">장비 사용 기록</h5>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>장비명</th>
+                        <th>사용자</th>
+                        <th>사용일</th>
+                        <th>시작 시간</th>
+                        <th>종료 시간</th>
+                        <th>목적</th>
+                        <th>특이사항</th>
+                        <th>액션</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for log in usage_logs %}
+                    <tr>
+                        <td>{{ log.equipment_name }}</td>
+                        <td>{{ log.user_name }}</td>
+                        <td>{{ log.usage_date }}</td>
+                        <td>{{ log.start_time }}</td>
+                        <td>{{ log.end_time }}</td>
+                        <td>{{ log.purpose }}</td>
+                        <td>{{ log.issues or '없음' }}</td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-primary" title="보기">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-secondary" title="수정">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Add Usage Log Modal -->
+<div class="modal fade" id="addUsageLogModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <form method="POST" action="{{ url_for('equipment.add_usage_log') }}">
+                <div class="modal-header">
+                    <h5 class="modal-title">사용일지 작성</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">장비명 *</label>
+                            <input type="text" class="form-control" name="equipment_name" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">사용자명 *</label>
+                            <input type="text" class="form-control" name="user_name" required>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">사용일 *</label>
+                            <input type="date" class="form-control" name="usage_date" required>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">시작 시간 *</label>
+                            <input type="time" class="form-control" name="start_time" required>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">종료 시간 *</label>
+                            <input type="time" class="form-control" name="end_time" required>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">사용 목적</label>
+                        <textarea class="form-control" name="purpose" rows="3" required></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">작업 내용</label>
+                        <textarea class="form-control" name="notes" rows="3"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">특이사항 / 문제점</label>
+                        <textarea class="form-control" name="issues" rows="3" placeholder="장비 이상, 오류 등이 있었다면 기록해주세요"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+                    <button type="submit" class="btn btn-primary">저장</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

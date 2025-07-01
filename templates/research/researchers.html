@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+
+{% block title %}연구원 관리 - R&D 센터 관리시스템{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2><i class="fas fa-users"></i> 연구원 관리</h2>
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addResearcherModal">
+                <i class="fas fa-plus"></i> 연구원 추가
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Researchers Table -->
+<div class="card">
+    <div class="card-header">
+        <h5 class="mb-0">연구원 목록</h5>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>이름</th>
+                        <th>이메일</th>
+                        <th>역할</th>
+                        <th>부서</th>
+                        <th>입사일</th>
+                        <th>참여 프로젝트</th>
+                        <th>액션</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for researcher in researchers %}
+                    <tr>
+                        <td>{{ researcher.name }}</td>
+                        <td>{{ researcher.email }}</td>
+                        <td>{{ researcher.role }}</td>
+                        <td>{{ researcher.department }}</td>
+                        <td>{{ researcher.join_date }}</td>
+                        <td>{{ researcher.projects }}</td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-primary">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-danger">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Add Researcher Modal -->
+<div class="modal fade" id="addResearcherModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <form method="POST" action="{{ url_for('research.add_researcher') }}">
+                <div class="modal-header">
+                    <h5 class="modal-title">연구원 추가</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">이름 *</label>
+                            <input type="text" class="form-control" name="name" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">이메일 *</label>
+                            <input type="email" class="form-control" name="email" required>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">역할</label>
+                            <select class="form-select" name="role">
+                                <option value="연구원">연구원</option>
+                                <option value="선임연구원">선임연구원</option>
+                                <option value="책임연구원">책임연구원</option>
+                                <option value="연구소장">연구소장</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">부서</label>
+                            <input type="text" class="form-control" name="department">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">입사일</label>
+                        <input type="date" class="form-control" name="join_date">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">참여 프로젝트</label>
+                        <input type="text" class="form-control" name="projects" placeholder="프로젝트명을 쉼표로 구분">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+                    <button type="submit" class="btn btn-primary">추가</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

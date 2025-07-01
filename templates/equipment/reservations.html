@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+
+{% block title %}장비 예약 - R&D 센터 관리시스템{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2><i class="fas fa-calendar-check"></i> 장비 예약</h2>
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addReservationModal">
+                <i class="fas fa-plus"></i> 예약 추가
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Reservations Table -->
+<div class="card">
+    <div class="card-header">
+        <h5 class="mb-0">예약 현황</h5>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>장비명</th>
+                        <th>예약자</th>
+                        <th>예약일</th>
+                        <th>시작 시간</th>
+                        <th>종료 시간</th>
+                        <th>목적</th>
+                        <th>상태</th>
+                        <th>액션</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for reservation in reservations %}
+                    <tr>
+                        <td>{{ reservation.equipment_name }}</td>
+                        <td>{{ reservation.user_name }}</td>
+                        <td>{{ reservation.reservation_date }}</td>
+                        <td>{{ reservation.start_time }}</td>
+                        <td>{{ reservation.end_time }}</td>
+                        <td>{{ reservation.purpose }}</td>
+                        <td>
+                            <span class="badge {% if reservation.status == '예약됨' %}bg-primary{% elif reservation.status == '사용중' %}bg-success{% else %}bg-secondary{% endif %}">
+                                {{ reservation.status }}
+                            </span>
+                        </td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-success" title="사용 완료">
+                                <i class="fas fa-check"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-danger" title="취소">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Add Reservation Modal -->
+<div class="modal fade" id="addReservationModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="POST" action="{{ url_for('equipment.add_reservation') }}">
+                <div class="modal-header">
+                    <h5 class="modal-title">장비 예약</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">장비 선택 *</label>
+                        <select class="form-select" name="equipment_name" required>
+                            <option value="">장비를 선택하세요</option>
+                            {% for equip in equipment %}
+                            {% if equip.status == '사용 가능' %}
+                            <option value="{{ equip.name }}">{{ equip.name }} ({{ equip.location }})</option>
+                            {% endif %}
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">예약자명 *</label>
+                        <input type="text" class="form-control" name="user_name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">예약일 *</label>
+                        <input type="date" class="form-control" name="reservation_date" required>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">시작 시간 *</label>
+                            <input type="time" class="form-control" name="start_time" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">종료 시간 *</label>
+                            <input type="time" class="form-control" name="end_time" required>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">사용 목적</label>
+                        <textarea class="form-control" name="purpose" rows="3"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+                    <button type="submit" class="btn btn-primary">예약</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

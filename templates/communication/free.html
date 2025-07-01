@@ -1,0 +1,172 @@
+{% extends "base.html" %}
+
+{% block title %}자유소통 - R&D 센터 관리시스템{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2><i class="fas fa-comment-dots"></i> 자유소통</h2>
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addPostModal">
+                <i class="fas fa-plus"></i> 새 글 작성
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Posts List -->
+<div class="card">
+    <div class="card-header">
+        <h5 class="mb-0">게시글 목록</h5>
+    </div>
+    <div class="card-body">
+        {% if posts %}
+            {% for post in posts %}
+            <div class="card mb-3">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div class="flex-grow-1">
+                            <h6 class="card-title">{{ post.title }}</h6>
+                            <p class="card-text">{{ post.content[:100] }}{% if post.content|length > 100 %}...{% endif %}</p>
+                            <small class="text-muted">
+                                <i class="fas fa-user"></i> {{ post.author }} 
+                                <i class="fas fa-clock ms-3"></i> {{ post.created_date }}
+                                <i class="fas fa-eye ms-3"></i> {{ post.views }}회
+                            </small>
+                        </div>
+                        <div class="ms-3">
+                            <button class="btn btn-sm btn-outline-primary" onclick="viewPost({{ post|tojson }})">
+                                <i class="fas fa-eye"></i> 보기
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="text-center py-5">
+                <i class="fas fa-comments fa-3x text-muted mb-3"></i>
+                <h5 class="text-muted">아직 게시글이 없습니다</h5>
+                <p class="text-muted">첫 번째 글을 작성해보세요!</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Community Guidelines -->
+<div class="card mt-4">
+    <div class="card-header">
+        <h5 class="mb-0"><i class="fas fa-info-circle"></i> 커뮤니티 가이드라인</h5>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-3">
+                <div class="text-center">
+                    <i class="fas fa-heart fa-2x text-danger mb-2"></i>
+                    <h6>상호 존중</h6>
+                    <p class="text-muted">서로를 존중하고 배려하는 마음으로 소통해요</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="text-center">
+                    <i class="fas fa-handshake fa-2x text-success mb-2"></i>
+                    <h6>건설적 대화</h6>
+                    <p class="text-muted">건설적이고 생산적인 대화를 나누어요</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="text-center">
+                    <i class="fas fa-share-alt fa-2x text-info mb-2"></i>
+                    <h6>정보 공유</h6>
+                    <p class="text-muted">유용한 정보와 경험을 공유해요</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="text-center">
+                    <i class="fas fa-shield-alt fa-2x text-warning mb-2"></i>
+                    <h6>개인정보 보호</h6>
+                    <p class="text-muted">개인정보 보호를 위해 익명으로 활동해요</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Post Modal -->
+<div class="modal fade" id="addPostModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <form method="POST" action="{{ url_for('communication.add_free_post') }}">
+                <div class="modal-header">
+                    <h5 class="modal-title">새 글 작성</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-8 mb-3">
+                            <label class="form-label">제목 *</label>
+                            <input type="text" class="form-control" name="title" required placeholder="제목을 입력하세요">
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">작성자</label>
+                            <input type="text" class="form-control" name="author" placeholder="익명" value="익명">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">내용 *</label>
+                        <textarea class="form-control" name="content" rows="8" required placeholder="내용을 입력하세요"></textarea>
+                    </div>
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i>
+                        <strong>알림:</strong> 모든 게시글은 익명으로 게시되며, 상호 존중하는 마음으로 소통해주세요.
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+                    <button type="submit" class="btn btn-primary">게시하기</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- View Post Modal -->
+<div class="modal fade" id="viewPostModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="postTitle"></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <small class="text-muted" id="postMeta"></small>
+                </div>
+                <div id="postContent"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+                <button type="button" class="btn btn-outline-primary">
+                    <i class="fas fa-reply"></i> 답글 작성
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function viewPost(post) {
+    document.getElementById('postTitle').textContent = post.title;
+    document.getElementById('postMeta').innerHTML = `
+        <i class="fas fa-user"></i> ${post.author} 
+        <i class="fas fa-clock ms-3"></i> ${post.created_date}
+        <i class="fas fa-eye ms-3"></i> ${post.views}회
+    `;
+    document.getElementById('postContent').innerHTML = `<p>${post.content.replace(/\n/g, '<br>')}</p>`;
+    
+    new bootstrap.Modal(document.getElementById('viewPostModal')).show();
+}
+</script>
+{% endblock %}

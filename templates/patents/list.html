@@ -1,0 +1,224 @@
+{% extends "base.html" %}
+
+{% block title %}특허 목록 - R&D 센터 관리시스템{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2><i class="fas fa-certificate"></i> 특허 목록</h2>
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addPatentModal">
+                <i class="fas fa-plus"></i> 특허 추가
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Patents Table -->
+<div class="card">
+    <div class="card-header">
+        <h5 class="mb-0">등록된 특허</h5>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>특허명</th>
+                        <th>출원번호</th>
+                        <th>출원일</th>
+                        <th>상태</th>
+                        <th>발명자</th>
+                        <th>특허청</th>
+                        <th>링크</th>
+                        <th>액션</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for patent in patents %}
+                    <tr>
+                        <td>{{ patent.title }}</td>
+                        <td>{{ patent.application_number }}</td>
+                        <td>{{ patent.application_date }}</td>
+                        <td>
+                            <span class="badge {% if patent.status == '등록' %}bg-success{% elif patent.status == '출원' %}bg-warning{% else %}bg-info{% endif %}">
+                                {{ patent.status }}
+                            </span>
+                        </td>
+                        <td>{{ patent.inventors }}</td>
+                        <td>{{ patent.patent_office }}</td>
+                        <td>
+                            {% if patent.link %}
+                            <a href="{{ patent.link }}" target="_blank" class="btn btn-sm btn-outline-info">
+                                <i class="fas fa-external-link-alt"></i>
+                            </a>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-primary" onclick="editPatent({{ loop.index0 }}, {{ patent|tojson }})">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <a href="{{ url_for('patents.delete_patent', index=loop.index0) }}" 
+                               class="btn btn-sm btn-outline-danger" 
+                               onclick="return confirm('정말 삭제하시겠습니까?')">
+                                <i class="fas fa-trash"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Add Patent Modal -->
+<div class="modal fade" id="addPatentModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <form method="POST" action="{{ url_for('patents.add_patent') }}">
+                <div class="modal-header">
+                    <h5 class="modal-title">특허 추가</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">특허명 *</label>
+                        <input type="text" class="form-control" name="title" required>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">출원번호</label>
+                            <input type="text" class="form-control" name="application_number">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">출원일</label>
+                            <input type="date" class="form-control" name="application_date">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">상태</label>
+                            <select class="form-select" name="status">
+                                <option value="출원">출원</option>
+                                <option value="심사중">심사중</option>
+                                <option value="등록">등록</option>
+                                <option value="거절">거절</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">특허청</label>
+                            <select class="form-select" name="patent_office">
+                                <option value="특허청">한국 특허청</option>
+                                <option value="USPTO">미국 특허청</option>
+                                <option value="EPO">유럽 특허청</option>
+                                <option value="JPO">일본 특허청</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">발명자</label>
+                        <input type="text" class="form-control" name="inventors" placeholder="발명자명을 쉼표로 구분">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">설명</label>
+                        <textarea class="form-control" name="description" rows="3"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">관련 링크</label>
+                        <input type="url" class="form-control" name="link" placeholder="http://">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+                    <button type="submit" class="btn btn-primary">추가</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Patent Modal -->
+<div class="modal fade" id="editPatentModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <form method="POST" id="editPatentForm">
+                <div class="modal-header">
+                    <h5 class="modal-title">특허 수정</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">특허명 *</label>
+                        <input type="text" class="form-control" name="title" id="editTitle" required>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">출원번호</label>
+                            <input type="text" class="form-control" name="application_number" id="editApplicationNumber">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">출원일</label>
+                            <input type="date" class="form-control" name="application_date" id="editApplicationDate">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">상태</label>
+                            <select class="form-select" name="status" id="editStatus">
+                                <option value="출원">출원</option>
+                                <option value="심사중">심사중</option>
+                                <option value="등록">등록</option>
+                                <option value="거절">거절</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">특허청</label>
+                            <select class="form-select" name="patent_office" id="editPatentOffice">
+                                <option value="특허청">한국 특허청</option>
+                                <option value="USPTO">미국 특허청</option>
+                                <option value="EPO">유럽 특허청</option>
+                                <option value="JPO">일본 특허청</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">발명자</label>
+                        <input type="text" class="form-control" name="inventors" id="editInventors" placeholder="발명자명을 쉼표로 구분">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">설명</label>
+                        <textarea class="form-control" name="description" id="editDescription" rows="3"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">관련 링크</label>
+                        <input type="url" class="form-control" name="link" id="editLink" placeholder="http://">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+                    <button type="submit" class="btn btn-primary">수정</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function editPatent(index, patent) {
+    document.getElementById('editPatentForm').action = `/patents/update/${index}`;
+    document.getElementById('editTitle').value = patent.title || '';
+    document.getElementById('editApplicationNumber').value = patent.application_number || '';
+    document.getElementById('editApplicationDate').value = patent.application_date || '';
+    document.getElementById('editStatus').value = patent.status || '';
+    document.getElementById('editPatentOffice').value = patent.patent_office || '';
+    document.getElementById('editInventors').value = patent.inventors || '';
+    document.getElementById('editDescription').value = patent.description || '';
+    document.getElementById('editLink').value = patent.link || '';
+    
+    new bootstrap.Modal(document.getElementById('editPatentModal')).show();
+}
+</script>
+{% endblock %}

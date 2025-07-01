@@ -1,0 +1,466 @@
+{% extends "base.html" %}
+
+{% block title %}명함 관리 - R&D 센터 관리시스템{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2><i class="fas fa-address-card"></i> 명함 관리</h2>
+            <div>
+                <button class="btn btn-success me-2" onclick="exportCSV()">
+                    <i class="fas fa-download"></i> CSV 내보내기
+                </button>
+                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addContactModal">
+                    <i class="fas fa-plus"></i> 명함 추가
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Search and Filter -->
+<div class="card mb-4">
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="input-group">
+                    <input type="text" class="form-control" id="searchInput" placeholder="이름, 회사명, 이메일로 검색...">
+                    <button class="btn btn-outline-secondary" type="button">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <select class="form-select" id="categoryFilter">
+                    <option value="">전체 카테고리</option>
+                    <option value="협력업체">협력업체</option>
+                    <option value="고객사">고객사</option>
+                    <option value="연구기관">연구기관</option>
+                    <option value="정부기관">정부기관</option>
+                    <option value="기타">기타</option>
+                </select>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Contacts Table -->
+<div class="card">
+    <div class="card-header">
+        <h5 class="mb-0">연락처 목록</h5>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-striped" id="contactsTable">
+                <thead>
+                    <tr>
+                        <th>이름</th>
+                        <th>회사</th>
+                        <th>직책</th>
+                        <th>부서</th>
+                        <th>전화번호</th>
+                        <th>이메일</th>
+                        <th>카테고리</th>
+                        <th>관계</th>
+                        <th>액션</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for contact in contacts %}
+                    <tr>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <div class="avatar-circle me-2">
+                                    {{ contact.name[0] if contact.name else 'N' }}
+                                </div>
+                                <strong>{{ contact.name }}</strong>
+                            </div>
+                        </td>
+                        <td>{{ contact.company }}</td>
+                        <td>{{ contact.position }}</td>
+                        <td>{{ contact.department }}</td>
+                        <td>
+                            {% if contact.phone %}
+                            <a href="tel:{{ contact.phone }}" class="text-decoration-none">
+                                <i class="fas fa-phone text-success"></i> {{ contact.phone }}
+                            </a>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if contact.email %}
+                            <a href="mailto:{{ contact.email }}" class="text-decoration-none">
+                                <i class="fas fa-envelope text-primary"></i> {{ contact.email }}
+                            </a>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <span class="badge {% if contact.category == '협력업체' %}bg-success{% elif contact.category == '고객사' %}bg-primary{% elif contact.category == '연구기관' %}bg-info{% else %}bg-secondary{% endif %}">
+                                {{ contact.category }}
+                            </span>
+                        </td>
+                        <td>{{ contact.relationship }}</td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-primary" onclick="viewContact({{ contact|tojson }})">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-secondary" onclick="editContact({{ loop.index0 }}, {{ contact|tojson }})">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <a href="{{ url_for('external.delete_contact', index=loop.index0) }}" 
+                               class="btn btn-sm btn-outline-danger" 
+                               onclick="return confirm('정말 삭제하시겠습니까?')">
+                                <i class="fas fa-trash"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Statistics Cards -->
+<div class="row mt-4">
+    <div class="col-lg-3 col-md-6 mb-3">
+        <div class="card bg-primary text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h6 class="card-title">총 연락처</h6>
+                        <h3 class="mb-0">{{ contacts|length }}</h3>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-address-book fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-6 mb-3">
+        <div class="card bg-success text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h6 class="card-title">협력업체</h6>
+                        <h3 class="mb-0">{{ contacts|selectattr('category', 'equalto', '협력업체')|list|length }}</h3>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-handshake fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-6 mb-3">
+        <div class="card bg-info text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h6 class="card-title">고객사</h6>
+                        <h3 class="mb-0">{{ contacts|selectattr('category', 'equalto', '고객사')|list|length }}</h3>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-building fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-6 mb-3">
+        <div class="card bg-warning text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h6 class="card-title">연구기관</h6>
+                        <h3 class="mb-0">{{ contacts|selectattr('category', 'equalto', '연구기관')|list|length }}</h3>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-university fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Contact Modal -->
+<div class="modal fade" id="addContactModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <form method="POST" action="{{ url_for('external.add_contact') }}">
+                <div class="modal-header">
+                    <h5 class="modal-title">명함 추가</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">이름 *</label>
+                            <input type="text" class="form-control" name="name" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">회사명 *</label>
+                            <input type="text" class="form-control" name="company" required>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">직책</label>
+                            <input type="text" class="form-control" name="position">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">부서</label>
+                            <input type="text" class="form-control" name="department">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">전화번호</label>
+                            <input type="tel" class="form-control" name="phone" placeholder="010-1234-5678">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">이메일</label>
+                            <input type="email" class="form-control" name="email">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">주소</label>
+                        <input type="text" class="form-control" name="address">
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">카테고리</label>
+                            <select class="form-select" name="category">
+                                <option value="협력업체">협력업체</option>
+                                <option value="고객사">고객사</option>
+                                <option value="연구기관">연구기관</option>
+                                <option value="정부기관">정부기관</option>
+                                <option value="기타">기타</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">관계</label>
+                            <input type="text" class="form-control" name="relationship" placeholder="예: 주요 고객, 연구 파트너">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">비고</label>
+                        <textarea class="form-control" name="notes" rows="3"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+                    <button type="submit" class="btn btn-primary">추가</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Contact Modal -->
+<div class="modal fade" id="editContactModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <form method="POST" id="editContactForm">
+                <div class="modal-header">
+                    <h5 class="modal-title">명함 수정</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">이름 *</label>
+                            <input type="text" class="form-control" name="name" id="editName" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">회사명 *</label>
+                            <input type="text" class="form-control" name="company" id="editCompany" required>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">직책</label>
+                            <input type="text" class="form-control" name="position" id="editPosition">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">부서</label>
+                            <input type="text" class="form-control" name="department" id="editDepartment">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">전화번호</label>
+                            <input type="tel" class="form-control" name="phone" id="editPhone">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">이메일</label>
+                            <input type="email" class="form-control" name="email" id="editEmail">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">주소</label>
+                        <input type="text" class="form-control" name="address" id="editAddress">
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">카테고리</label>
+                            <select class="form-select" name="category" id="editCategory">
+                                <option value="협력업체">협력업체</option>
+                                <option value="고객사">고객사</option>
+                                <option value="연구기관">연구기관</option>
+                                <option value="정부기관">정부기관</option>
+                                <option value="기타">기타</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">관계</label>
+                            <input type="text" class="form-control" name="relationship" id="editRelationship">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">비고</label>
+                        <textarea class="form-control" name="notes" id="editNotes" rows="3"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+                    <button type="submit" class="btn btn-primary">수정</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- View Contact Modal -->
+<div class="modal fade" id="viewContactModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">연락처 상세</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div id="contactDetails"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+                <button type="button" class="btn btn-primary" onclick="printContact()">
+                    <i class="fas fa-print"></i> 인쇄
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function editContact(index, contact) {
+    document.getElementById('editContactForm').action = `/external/contacts/update/${index}`;
+    document.getElementById('editName').value = contact.name || '';
+    document.getElementById('editCompany').value = contact.company || '';
+    document.getElementById('editPosition').value = contact.position || '';
+    document.getElementById('editDepartment').value = contact.department || '';
+    document.getElementById('editPhone').value = contact.phone || '';
+    document.getElementById('editEmail').value = contact.email || '';
+    document.getElementById('editAddress').value = contact.address || '';
+    document.getElementById('editCategory').value = contact.category || '';
+    document.getElementById('editRelationship').value = contact.relationship || '';
+    document.getElementById('editNotes').value = contact.notes || '';
+    
+    new bootstrap.Modal(document.getElementById('editContactModal')).show();
+}
+
+function viewContact(contact) {
+    const categoryClass = contact.category === '협력업체' ? 'success' : contact.category === '고객사' ? 'primary' : contact.category === '연구기관' ? 'info' : 'secondary';
+    
+    const details = `
+        <div class="text-center mb-4">
+            <div class="avatar-circle-large mx-auto mb-3">
+                ${contact.name ? contact.name[0] : 'N'}
+            </div>
+            <h4>${contact.name}</h4>
+            <p class="text-muted">${contact.position} at ${contact.company}</p>
+            <span class="badge bg-${categoryClass}">${contact.category}</span>
+        </div>
+        <div class="row mb-2">
+            <div class="col-4"><strong>부서:</strong></div>
+            <div class="col-8">${contact.department || '미등록'}</div>
+        </div>
+        <div class="row mb-2">
+            <div class="col-4"><strong>전화:</strong></div>
+            <div class="col-8">
+                ${contact.phone ? `<a href="tel:${contact.phone}">${contact.phone}</a>` : '미등록'}
+            </div>
+        </div>
+        <div class="row mb-2">
+            <div class="col-4"><strong>이메일:</strong></div>
+            <div class="col-8">
+                ${contact.email ? `<a href="mailto:${contact.email}">${contact.email}</a>` : '미등록'}
+            </div>
+        </div>
+        <div class="row mb-2">
+            <div class="col-4"><strong>주소:</strong></div>
+            <div class="col-8">${contact.address || '미등록'}</div>
+        </div>
+        <div class="row mb-2">
+            <div class="col-4"><strong>관계:</strong></div>
+            <div class="col-8">${contact.relationship || '미등록'}</div>
+        </div>
+        ${contact.notes ? `
+        <div class="row mb-2">
+            <div class="col-4"><strong>비고:</strong></div>
+            <div class="col-8">${contact.notes}</div>
+        </div>
+        ` : ''}
+    `;
+    
+    document.getElementById('contactDetails').innerHTML = details;
+    new bootstrap.Modal(document.getElementById('viewContactModal')).show();
+}
+
+function exportCSV() {
+    window.location.href = '/external/contacts/export';
+}
+
+function printContact() {
+    window.print();
+}
+
+// Search functionality
+document.getElementById('searchInput').addEventListener('keyup', function() {
+    const searchTerm = this.value.toLowerCase();
+    filterTable();
+});
+
+// Category filter
+document.getElementById('categoryFilter').addEventListener('change', function() {
+    filterTable();
+});
+
+function filterTable() {
+    const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+    const selectedCategory = document.getElementById('categoryFilter').value;
+    const tableRows = document.querySelectorAll('#contactsTable tbody tr');
+    
+    tableRows.forEach(row => {
+        const text = row.textContent.toLowerCase();
+        const categoryCell = row.cells[6].textContent;
+        
+        let showRow = true;
+        
+        if (searchTerm && !text.includes(searchTerm)) {
+            showRow = false;
+        }
+        
+        if (selectedCategory && !categoryCell.includes(selectedCategory)) {
+            showRow = false;
+        }
+        
+        row.style.display = showRow ? '' : 'none';
+    });
+}
+</script>
+{% endblock %}

@@ -1,0 +1,220 @@
+{% extends "base.html" %}
+
+{% block title %}사고관리 - R&D 센터 관리시스템{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2><i class="fas fa-exclamation-triangle"></i> 사고관리</h2>
+            <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#addAccidentModal">
+                <i class="fas fa-plus"></i> 사고 보고
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Accidents Table -->
+<div class="card">
+    <div class="card-header">
+        <h5 class="mb-0">사고 보고서 목록</h5>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>발생일시</th>
+                        <th>발생장소</th>
+                        <th>사고 내용</th>
+                        <th>심각도</th>
+                        <th>관련자</th>
+                        <th>상태</th>
+                        <th>보고자</th>
+                        <th>액션</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for accident in accidents %}
+                    <tr>
+                        <td>{{ accident.incident_date }}</td>
+                        <td>{{ accident.location }}</td>
+                        <td>{{ accident.description[:50] }}{% if accident.description|length > 50 %}...{% endif %}</td>
+                        <td>
+                            <span class="badge {% if accident.severity == '경미' %}bg-success{% elif accident.severity == '보통' %}bg-warning{% else %}bg-danger{% endif %}">
+                                {{ accident.severity }}
+                            </span>
+                        </td>
+                        <td>{{ accident.involved_person }}</td>
+                        <td>
+                            <span class="badge {% if accident.status == '완료' %}bg-success{% elif accident.status == '진행중' %}bg-warning{% else %}bg-info{% endif %}">
+                                {{ accident.status }}
+                            </span>
+                        </td>
+                        <td>{{ accident.reporter }}</td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-primary" onclick="viewAccident({{ accident|tojson }})">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-secondary">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Add Accident Modal -->
+<div class="modal fade" id="addAccidentModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <form method="POST" action="{{ url_for('safety.add_accident') }}">
+                <div class="modal-header">
+                    <h5 class="modal-title">사고 보고서 작성</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">발생일시 *</label>
+                            <input type="datetime-local" class="form-control" name="incident_date" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">발생장소 *</label>
+                            <input type="text" class="form-control" name="location" required>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">심각도 *</label>
+                            <select class="form-select" name="severity" required>
+                                <option value="">선택하세요</option>
+                                <option value="경미">경미</option>
+                                <option value="보통">보통</option>
+                                <option value="심각">심각</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">관련자</label>
+                            <input type="text" class="form-control" name="involved_person">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">사고 내용 *</label>
+                        <textarea class="form-control" name="description" rows="4" required placeholder="사고의 상세한 내용을 기록하세요"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">사고 원인 (추정)</label>
+                        <textarea class="form-control" name="cause" rows="3" placeholder="사고 발생 원인을 분석하여 기록하세요"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">조치 사항</label>
+                        <textarea class="form-control" name="action_taken" rows="3" placeholder="즉시 취한 조치사항을 기록하세요"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">예방 대책</label>
+                        <textarea class="form-control" name="prevention_measures" rows="3" placeholder="향후 동일한 사고 방지를 위한 대책을 기록하세요"></textarea>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">처리 상태</label>
+                            <select class="form-select" name="status">
+                                <option value="조사중">조사중</option>
+                                <option value="진행중">진행중</option>
+                                <option value="완료">완료</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">보고자 *</label>
+                            <input type="text" class="form-control" name="reporter" required>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+                    <button type="submit" class="btn btn-danger">보고서 제출</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- View Accident Modal -->
+<div class="modal fade" id="viewAccidentModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">사고 보고서 상세</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div id="accidentDetails"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+                <button type="button" class="btn btn-primary">인쇄</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function viewAccident(accident) {
+    const severityClass = accident.severity === '경미' ? 'success' : accident.severity === '보통' ? 'warning' : 'danger';
+    const statusClass = accident.status === '완료' ? 'success' : accident.status === '진행중' ? 'warning' : 'info';
+    
+    const details = `
+        <div class="row mb-3">
+            <div class="col-6"><strong>발생일시:</strong></div>
+            <div class="col-6">${accident.incident_date}</div>
+        </div>
+        <div class="row mb-3">
+            <div class="col-6"><strong>발생장소:</strong></div>
+            <div class="col-6">${accident.location}</div>
+        </div>
+        <div class="row mb-3">
+            <div class="col-6"><strong>심각도:</strong></div>
+            <div class="col-6"><span class="badge bg-${severityClass}">${accident.severity}</span></div>
+        </div>
+        <div class="row mb-3">
+            <div class="col-6"><strong>관련자:</strong></div>
+            <div class="col-6">${accident.involved_person || '없음'}</div>
+        </div>
+        <div class="row mb-3">
+            <div class="col-6"><strong>상태:</strong></div>
+            <div class="col-6"><span class="badge bg-${statusClass}">${accident.status}</span></div>
+        </div>
+        <div class="row mb-3">
+            <div class="col-6"><strong>보고자:</strong></div>
+            <div class="col-6">${accident.reporter}</div>
+        </div>
+        <hr>
+        <div class="mb-3">
+            <strong>사고 내용:</strong>
+            <p class="mt-2">${accident.description}</p>
+        </div>
+        <div class="mb-3">
+            <strong>사고 원인:</strong>
+            <p class="mt-2">${accident.cause || '미입력'}</p>
+        </div>
+        <div class="mb-3">
+            <strong>조치 사항:</strong>
+            <p class="mt-2">${accident.action_taken || '미입력'}</p>
+        </div>
+        <div class="mb-3">
+            <strong>예방 대책:</strong>
+            <p class="mt-2">${accident.prevention_measures || '미입력'}</p>
+        </div>
+    `;
+    
+    document.getElementById('accidentDetails').innerHTML = details;
+    new bootstrap.Modal(document.getElementById('viewAccidentModal')).show();
+}
+</script>
+{% endblock %}

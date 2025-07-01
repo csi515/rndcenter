@@ -1,0 +1,309 @@
+{% extends "base.html" %}
+
+{% block title %}안전 Q&A - R&D 센터 관리시스템{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2><i class="fas fa-question-circle"></i> 안전 Q&A</h2>
+            <button class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#addQuestionModal">
+                <i class="fas fa-plus"></i> 질문하기
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Filter Tabs -->
+<div class="card mb-4">
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-6">
+                <h6 class="mb-3">질문 유형별 필터</h6>
+                <div class="btn-group" role="group">
+                    <input type="radio" class="btn-check" name="typeFilter" id="allTypes" autocomplete="off" checked>
+                    <label class="btn btn-outline-primary" for="allTypes">전체</label>
+                    
+                    <input type="radio" class="btn-check" name="typeFilter" id="general" autocomplete="off">
+                    <label class="btn btn-outline-info" for="general">일반</label>
+                    
+                    <input type="radio" class="btn-check" name="typeFilter" id="emergency" autocomplete="off">
+                    <label class="btn btn-outline-danger" for="emergency">응급</label>
+                    
+                    <input type="radio" class="btn-check" name="typeFilter" id="equipment" autocomplete="off">
+                    <label class="btn btn-outline-success" for="equipment">장비</label>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <h6 class="mb-3">답변 상태별 필터</h6>
+                <div class="btn-group" role="group">
+                    <input type="radio" class="btn-check" name="statusFilter" id="allStatus" autocomplete="off" checked>
+                    <label class="btn btn-outline-primary" for="allStatus">전체</label>
+                    
+                    <input type="radio" class="btn-check" name="statusFilter" id="waiting" autocomplete="off">
+                    <label class="btn btn-outline-warning" for="waiting">답변대기</label>
+                    
+                    <input type="radio" class="btn-check" name="statusFilter" id="answered" autocomplete="off">
+                    <label class="btn btn-outline-success" for="answered">답변완료</label>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Q&A List -->
+<div class="card">
+    <div class="card-header">
+        <h5 class="mb-0">질문 목록</h5>
+    </div>
+    <div class="card-body">
+        {% if posts %}
+            {% for post in posts %}
+            <div class="card mb-3" data-type="{{ post.question_type }}" data-status="{{ post.status }}">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div class="flex-grow-1">
+                            <div class="d-flex align-items-center mb-2">
+                                <h6 class="card-title mb-0">{{ post.title }}</h6>
+                                <span class="badge {% if post.question_type == '응급' %}bg-danger{% elif post.question_type == '장비' %}bg-success{% else %}bg-info{% endif %} ms-2">
+                                    {{ post.question_type }}
+                                </span>
+                                <span class="badge {% if post.urgency == '긴급' %}bg-danger{% elif post.urgency == '보통' %}bg-primary{% else %}bg-secondary{% endif %} ms-2">
+                                    {{ post.urgency }}
+                                </span>
+                                <span class="badge {% if post.status == '답변완료' %}bg-success{% else %}bg-warning{% endif %} ms-2">
+                                    {{ post.status }}
+                                </span>
+                            </div>
+                            <p class="card-text">{{ post.content[:100] }}{% if post.content|length > 100 %}...{% endif %}</p>
+                            <small class="text-muted">
+                                <i class="fas fa-user"></i> {{ post.author }} 
+                                <i class="fas fa-clock ms-3"></i> {{ post.created_date }}
+                                <i class="fas fa-eye ms-3"></i> {{ post.views }}회
+                            </small>
+                        </div>
+                        <div class="ms-3">
+                            <button class="btn btn-sm btn-outline-primary" onclick="viewQuestion({{ post|tojson }})">
+                                <i class="fas fa-eye"></i> 보기
+                            </button>
+                            {% if post.status == '답변대기' %}
+                            <button class="btn btn-sm btn-outline-success">
+                                <i class="fas fa-reply"></i> 답변
+                            </button>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="text-center py-5">
+                <i class="fas fa-question-circle fa-3x text-muted mb-3"></i>
+                <h5 class="text-muted">아직 질문이 없습니다</h5>
+                <p class="text-muted">안전과 관련된 궁금한 점을 질문해보세요!</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- FAQ Section -->
+<div class="card mt-4">
+    <div class="card-header">
+        <h5 class="mb-0"><i class="fas fa-lightbulb"></i> 자주 묻는 질문 (FAQ)</h5>
+    </div>
+    <div class="card-body">
+        <div class="accordion" id="faqAccordion">
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">
+                        화재 발생 시 대응 절차는?
+                    </button>
+                </h2>
+                <div id="faq1" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                    <div class="accordion-body">
+                        1. 즉시 화재경보를 울린다<br>
+                        2. 119에 신고한다<br>
+                        3. 안전한 장소로 대피한다<br>
+                        4. 소화기를 이용하여 초기 진압을 시도한다 (안전한 경우에만)
+                    </div>
+                </div>
+            </div>
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq2">
+                        화학물질 누출 시 대응방법은?
+                    </button>
+                </h2>
+                <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                    <div class="accordion-body">
+                        1. 누출 지역을 격리한다<br>
+                        2. 적절한 개인보호장비를 착용한다<br>
+                        3. MSDS를 확인하여 적절한 처리방법을 따른다<br>
+                        4. 환기를 실시한다<br>
+                        5. 안전관리자에게 즉시 보고한다
+                    </div>
+                </div>
+            </div>
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq3">
+                        실험실 출입 시 주의사항은?
+                    </button>
+                </h2>
+                <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                    <div class="accordion-body">
+                        1. 적절한 실험복과 보호장비를 착용한다<br>
+                        2. 실험 전 안전수칙을 숙지한다<br>
+                        3. 실험 후 정리정돈을 철저히 한다<br>
+                        4. 폐기물은 분리수거 규정에 따라 처리한다<br>
+                        5. 이상 상황 발생 시 즉시 보고한다
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Question Modal -->
+<div class="modal fade" id="addQuestionModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <form method="POST" action="{{ url_for('communication.add_safety_qa') }}">
+                <div class="modal-header">
+                    <h5 class="modal-title">안전 질문하기</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-8 mb-3">
+                            <label class="form-label">제목 *</label>
+                            <input type="text" class="form-control" name="title" required placeholder="질문 제목을 입력하세요">
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">작성자</label>
+                            <input type="text" class="form-control" name="author" placeholder="익명" value="익명">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">질문 유형 *</label>
+                            <select class="form-select" name="question_type" required>
+                                <option value="">선택하세요</option>
+                                <option value="일반">일반 안전 문의</option>
+                                <option value="응급">응급상황 대응</option>
+                                <option value="장비">장비 안전</option>
+                                <option value="화학물질">화학물질 안전</option>
+                                <option value="기타">기타</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">긴급도</label>
+                            <select class="form-select" name="urgency">
+                                <option value="보통">보통</option>
+                                <option value="긴급">긴급</option>
+                                <option value="낮음">낮음</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">질문 내용 *</label>
+                        <textarea class="form-control" name="content" rows="8" required placeholder="구체적인 상황과 질문 내용을 자세히 설명해주세요"></textarea>
+                    </div>
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <strong>응급상황인 경우</strong> 즉시 119에 신고하고 안전관리자에게 연락하세요.
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+                    <button type="submit" class="btn btn-warning">질문 등록</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- View Question Modal -->
+<div class="modal fade" id="viewQuestionModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="questionTitle"></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3" id="questionMeta"></div>
+                <div id="questionContent"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+                <button type="button" class="btn btn-warning">
+                    <i class="fas fa-reply"></i> 답변하기
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function viewQuestion(post) {
+    const typeClass = post.question_type === '응급' ? 'danger' : post.question_type === '장비' ? 'success' : 'info';
+    const urgencyClass = post.urgency === '긴급' ? 'danger' : post.urgency === '보통' ? 'primary' : 'secondary';
+    const statusClass = post.status === '답변완료' ? 'success' : 'warning';
+    
+    document.getElementById('questionTitle').textContent = post.title;
+    document.getElementById('questionMeta').innerHTML = `
+        <span class="badge bg-${typeClass}">${post.question_type}</span>
+        <span class="badge bg-${urgencyClass} ms-1">${post.urgency}</span>
+        <span class="badge bg-${statusClass} ms-1">${post.status}</span>
+        <br><br>
+        <small class="text-muted">
+            <i class="fas fa-user"></i> ${post.author} 
+            <i class="fas fa-clock ms-3"></i> ${post.created_date}
+            <i class="fas fa-eye ms-3"></i> ${post.views}회
+        </small>
+    `;
+    document.getElementById('questionContent').innerHTML = `<p>${post.content.replace(/\n/g, '<br>')}</p>`;
+    
+    new bootstrap.Modal(document.getElementById('viewQuestionModal')).show();
+}
+
+// Type filter
+document.querySelectorAll('input[name="typeFilter"]').forEach(radio => {
+    radio.addEventListener('change', filterQuestions);
+});
+
+// Status filter
+document.querySelectorAll('input[name="statusFilter"]').forEach(radio => {
+    radio.addEventListener('change', filterQuestions);
+});
+
+function filterQuestions() {
+    const selectedType = document.querySelector('input[name="typeFilter"]:checked').id;
+    const selectedStatus = document.querySelector('input[name="statusFilter"]:checked').id;
+    const cards = document.querySelectorAll('.card[data-type]');
+    
+    cards.forEach(card => {
+        const type = card.dataset.type;
+        const status = card.dataset.status;
+        
+        let showCard = true;
+        
+        if (selectedType !== 'allTypes') {
+            if (selectedType === 'general' && type !== '일반') showCard = false;
+            if (selectedType === 'emergency' && type !== '응급') showCard = false;
+            if (selectedType === 'equipment' && type !== '장비') showCard = false;
+        }
+        
+        if (selectedStatus !== 'allStatus') {
+            if (selectedStatus === 'waiting' && status !== '답변대기') showCard = false;
+            if (selectedStatus === 'answered' && status !== '답변완료') showCard = false;
+        }
+        
+        card.style.display = showCard ? '' : 'none';
+    });
+}
+</script>
+{% endblock %}

@@ -1,0 +1,529 @@
+{% extends "base.html" %}
+
+{% block title %}MSDS 관리 - R&D 센터 관리시스템{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2><i class="fas fa-flask"></i> MSDS 및 화학물질 관리</h2>
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addMsdsModal">
+                <i class="fas fa-plus"></i> 화학물질 추가
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Search and Filter -->
+<div class="card mb-4">
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="input-group">
+                    <input type="text" class="form-control" id="searchInput" placeholder="화학물질명, CAS 번호로 검색...">
+                    <button class="btn btn-outline-secondary" type="button">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <select class="form-select" id="hazardFilter">
+                    <option value="">전체 위험등급</option>
+                    <option value="1급">1급 (매우 위험)</option>
+                    <option value="2급">2급 (위험)</option>
+                    <option value="3급">3급 (보통)</option>
+                    <option value="4급">4급 (낮음)</option>
+                </select>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- MSDS Table -->
+<div class="card">
+    <div class="card-header">
+        <h5 class="mb-0">화학물질 목록</h5>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-striped" id="msdsTable">
+                <thead>
+                    <tr>
+                        <th>화학물질명</th>
+                        <th>CAS 번호</th>
+                        <th>제조사</th>
+                        <th>위험등급</th>
+                        <th>보관조건</th>
+                        <th>인화점</th>
+                        <th>보관위치</th>
+                        <th>수량</th>
+                        <th>유통기한</th>
+                        <th>MSDS</th>
+                        <th>액션</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for msds in msds_list %}
+                    <tr>
+                        <td>
+                            <strong>{{ msds.chemical_name }}</strong>
+                        </td>
+                        <td>
+                            <code>{{ msds.cas_number }}</code>
+                        </td>
+                        <td>{{ msds.manufacturer }}</td>
+                        <td>
+                            <span class="badge {% if msds.hazard_class == '1급' %}bg-danger{% elif msds.hazard_class == '2급' %}bg-warning{% elif msds.hazard_class == '3급' %}bg-info{% else %}bg-success{% endif %}">
+                                {{ msds.hazard_class }}
+                            </span>
+                        </td>
+                        <td>{{ msds.storage_condition }}</td>
+                        <td>{{ msds.flash_point or '미측정' }}</td>
+                        <td>{{ msds.location or '미지정' }}</td>
+                        <td>{{ msds.quantity or '-' }}</td>
+                        <td>
+                            {% if msds.expiry_date %}
+                                {% set expiry = msds.expiry_date %}
+                                {% if expiry < '2024-08-01' %}
+                                <span class="text-danger">{{ expiry }}</span>
+                                {% else %}
+                                {{ expiry }}
+                                {% endif %}
+                            {% else %}
+                                -
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if msds.msds_file_link %}
+                            <a href="{{ msds.msds_file_link }}" target="_blank" class="btn btn-sm btn-outline-info">
+                                <i class="fas fa-file-pdf"></i>
+                            </a>
+                            {% else %}
+                            <span class="text-muted">없음</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-primary" onclick="viewMsds({{ msds|tojson }})">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-secondary" onclick="editMsds({{ loop.index0 }}, {{ msds|tojson }})">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Safety Info -->
+<div class="row mt-4">
+    <div class="col-lg-3 col-md-6 mb-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <i class="fas fa-fire fa-3x text-danger mb-3"></i>
+                <h6>인화성 물질</h6>
+                <h3 class="text-danger">{{ msds_list|selectattr('hazard_class', 'equalto', '1급')|list|length }}</h3>
+                <p class="text-muted">1급 위험물질</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-6 mb-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <i class="fas fa-skull-crossbones fa-3x text-warning mb-3"></i>
+                <h6>독성 물질</h6>
+                <h3 class="text-warning">{{ msds_list|selectattr('hazard_class', 'equalto', '2급')|list|length }}</h3>
+                <p class="text-muted">2급 위험물질</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-6 mb-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <i class="fas fa-exclamation-triangle fa-3x text-info mb-3"></i>
+                <h6>일반 위험</h6>
+                <h3 class="text-info">{{ msds_list|selectattr('hazard_class', 'equalto', '3급')|list|length }}</h3>
+                <p class="text-muted">3급 위험물질</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-6 mb-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <i class="fas fa-check-circle fa-3x text-success mb-3"></i>
+                <h6>안전 물질</h6>
+                <h3 class="text-success">{{ msds_list|selectattr('hazard_class', 'equalto', '4급')|list|length }}</h3>
+                <p class="text-muted">4급 위험물질</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Safety Guidelines -->
+<div class="card mt-4">
+    <div class="card-header">
+        <h5 class="mb-0"><i class="fas fa-shield-alt"></i> 화학물질 안전 가이드라인</h5>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-3">
+                <div class="text-center">
+                    <i class="fas fa-eye fa-2x text-info mb-2"></i>
+                    <h6>사용 전 확인</h6>
+                    <p class="text-muted">MSDS 내용을 반드시 숙지하고 사용하세요</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="text-center">
+                    <i class="fas fa-hard-hat fa-2x text-warning mb-2"></i>
+                    <h6>보호장비 착용</h6>
+                    <p class="text-muted">적절한 개인보호장비를 착용하세요</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="text-center">
+                    <i class="fas fa-wind fa-2x text-success mb-2"></i>
+                    <h6>환기 유지</h6>
+                    <p class="text-muted">충분한 환기를 유지하며 작업하세요</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="text-center">
+                    <i class="fas fa-recycle fa-2x text-primary mb-2"></i>
+                    <h6>안전한 폐기</h6>
+                    <p class="text-muted">폐기물은 규정에 따라 안전하게 처리하세요</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add MSDS Modal -->
+<div class="modal fade" id="addMsdsModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <form method="POST" action="{{ url_for('chemical.add_msds') }}">
+                <div class="modal-header">
+                    <h5 class="modal-title">화학물질 추가</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-8 mb-3">
+                            <label class="form-label">화학물질명 *</label>
+                            <input type="text" class="form-control" name="chemical_name" required>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">CAS 번호</label>
+                            <input type="text" class="form-control" name="cas_number" placeholder="예: 67-64-1">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">제조사 *</label>
+                            <input type="text" class="form-control" name="manufacturer" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">위험등급 *</label>
+                            <select class="form-select" name="hazard_class" required>
+                                <option value="">선택하세요</option>
+                                <option value="1급">1급 (매우 위험)</option>
+                                <option value="2급">2급 (위험)</option>
+                                <option value="3급">3급 (보통)</option>
+                                <option value="4급">4급 (낮음)</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">보관조건</label>
+                            <input type="text" class="form-control" name="storage_condition" placeholder="예: 냉장보관, 건조한 곳">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">인화점 (°C)</label>
+                            <input type="text" class="form-control" name="flash_point" placeholder="예: 13°C">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">노출한계</label>
+                            <input type="text" class="form-control" name="exposure_limit" placeholder="예: TWA 500 ppm">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">보관위치</label>
+                            <input type="text" class="form-control" name="location" placeholder="예: 화학물질 보관실 A-1">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">수량</label>
+                            <input type="text" class="form-control" name="quantity" placeholder="예: 500ml, 1kg">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">유통기한</label>
+                            <input type="date" class="form-control" name="expiry_date">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">응급처치</label>
+                        <textarea class="form-control" name="first_aid" rows="3" placeholder="눈/피부 접촉, 흡입, 섭취 시 응급처치 방법"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">폐기방법</label>
+                        <textarea class="form-control" name="disposal_method" rows="2" placeholder="안전한 폐기 방법"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">MSDS 파일 링크</label>
+                        <input type="url" class="form-control" name="msds_file_link" placeholder="https://">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+                    <button type="submit" class="btn btn-primary">추가</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Edit MSDS Modal -->
+<div class="modal fade" id="editMsdsModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <form method="POST" id="editMsdsForm">
+                <div class="modal-header">
+                    <h5 class="modal-title">화학물질 수정</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-8 mb-3">
+                            <label class="form-label">화학물질명 *</label>
+                            <input type="text" class="form-control" name="chemical_name" id="editChemicalName" required>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">CAS 번호</label>
+                            <input type="text" class="form-control" name="cas_number" id="editCasNumber">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">제조사 *</label>
+                            <input type="text" class="form-control" name="manufacturer" id="editManufacturer" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">위험등급 *</label>
+                            <select class="form-select" name="hazard_class" id="editHazardClass" required>
+                                <option value="">선택하세요</option>
+                                <option value="1급">1급 (매우 위험)</option>
+                                <option value="2급">2급 (위험)</option>
+                                <option value="3급">3급 (보통)</option>
+                                <option value="4급">4급 (낮음)</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">보관조건</label>
+                            <input type="text" class="form-control" name="storage_condition" id="editStorageCondition">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">인화점 (°C)</label>
+                            <input type="text" class="form-control" name="flash_point" id="editFlashPoint">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">노출한계</label>
+                            <input type="text" class="form-control" name="exposure_limit" id="editExposureLimit">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">보관위치</label>
+                            <input type="text" class="form-control" name="location" id="editLocation">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">수량</label>
+                            <input type="text" class="form-control" name="quantity" id="editQuantity">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">유통기한</label>
+                            <input type="date" class="form-control" name="expiry_date" id="editExpiryDate">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">응급처치</label>
+                        <textarea class="form-control" name="first_aid" id="editFirstAid" rows="3"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">폐기방법</label>
+                        <textarea class="form-control" name="disposal_method" id="editDisposalMethod" rows="2"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">MSDS 파일 링크</label>
+                        <input type="url" class="form-control" name="msds_file_link" id="editMsdsFileLink">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+                    <button type="submit" class="btn btn-primary">수정</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- View MSDS Modal -->
+<div class="modal fade" id="viewMsdsModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">화학물질 상세 정보</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div id="msdsDetails"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+                <button type="button" class="btn btn-info" id="openMsdsLink" style="display: none;">
+                    <i class="fas fa-external-link-alt"></i> MSDS 파일 열기
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function editMsds(index, msds) {
+    document.getElementById('editMsdsForm').action = `/chemical/msds/update/${index}`;
+    document.getElementById('editChemicalName').value = msds.chemical_name || '';
+    document.getElementById('editCasNumber').value = msds.cas_number || '';
+    document.getElementById('editManufacturer').value = msds.manufacturer || '';
+    document.getElementById('editHazardClass').value = msds.hazard_class || '';
+    document.getElementById('editStorageCondition').value = msds.storage_condition || '';
+    document.getElementById('editFlashPoint').value = msds.flash_point || '';
+    document.getElementById('editExposureLimit').value = msds.exposure_limit || '';
+    document.getElementById('editLocation').value = msds.location || '';
+    document.getElementById('editQuantity').value = msds.quantity || '';
+    document.getElementById('editExpiryDate').value = msds.expiry_date || '';
+    document.getElementById('editFirstAid').value = msds.first_aid || '';
+    document.getElementById('editDisposalMethod').value = msds.disposal_method || '';
+    document.getElementById('editMsdsFileLink').value = msds.msds_file_link || '';
+    
+    new bootstrap.Modal(document.getElementById('editMsdsModal')).show();
+}
+
+function viewMsds(msds) {
+    const hazardClass = msds.hazard_class;
+    const hazardColor = hazardClass === '1급' ? 'danger' : hazardClass === '2급' ? 'warning' : hazardClass === '3급' ? 'info' : 'success';
+    
+    const details = `
+        <div class="row mb-3">
+            <div class="col-4"><strong>화학물질명:</strong></div>
+            <div class="col-8"><h5>${msds.chemical_name}</h5></div>
+        </div>
+        <div class="row mb-3">
+            <div class="col-4"><strong>CAS 번호:</strong></div>
+            <div class="col-8"><code>${msds.cas_number || '미등록'}</code></div>
+        </div>
+        <div class="row mb-3">
+            <div class="col-4"><strong>제조사:</strong></div>
+            <div class="col-8">${msds.manufacturer}</div>
+        </div>
+        <div class="row mb-3">
+            <div class="col-4"><strong>위험등급:</strong></div>
+            <div class="col-8"><span class="badge bg-${hazardColor}">${msds.hazard_class}</span></div>
+        </div>
+        <div class="row mb-3">
+            <div class="col-4"><strong>보관조건:</strong></div>
+            <div class="col-8">${msds.storage_condition || '미지정'}</div>
+        </div>
+        <div class="row mb-3">
+            <div class="col-4"><strong>인화점:</strong></div>
+            <div class="col-8">${msds.flash_point || '미측정'}</div>
+        </div>
+        <div class="row mb-3">
+            <div class="col-4"><strong>노출한계:</strong></div>
+            <div class="col-8">${msds.exposure_limit || '미지정'}</div>
+        </div>
+        <div class="row mb-3">
+            <div class="col-4"><strong>보관위치:</strong></div>
+            <div class="col-8">${msds.location || '미지정'}</div>
+        </div>
+        <div class="row mb-3">
+            <div class="col-4"><strong>현재수량:</strong></div>
+            <div class="col-8">${msds.quantity || '미등록'}</div>
+        </div>
+        <div class="row mb-3">
+            <div class="col-4"><strong>유통기한:</strong></div>
+            <div class="col-8">${msds.expiry_date || '없음'}</div>
+        </div>
+        ${msds.first_aid ? `
+        <hr>
+        <div class="mb-3">
+            <strong><i class="fas fa-first-aid text-danger"></i> 응급처치:</strong>
+            <p class="mt-2">${msds.first_aid}</p>
+        </div>
+        ` : ''}
+        ${msds.disposal_method ? `
+        <div class="mb-3">
+            <strong><i class="fas fa-recycle text-success"></i> 폐기방법:</strong>
+            <p class="mt-2">${msds.disposal_method}</p>
+        </div>
+        ` : ''}
+    `;
+    
+    document.getElementById('msdsDetails').innerHTML = details;
+    
+    const openMsdsBtn = document.getElementById('openMsdsLink');
+    if (msds.msds_file_link) {
+        openMsdsBtn.style.display = 'inline-block';
+        openMsdsBtn.onclick = () => window.open(msds.msds_file_link, '_blank');
+    } else {
+        openMsdsBtn.style.display = 'none';
+    }
+    
+    new bootstrap.Modal(document.getElementById('viewMsdsModal')).show();
+}
+
+// Search functionality
+document.getElementById('searchInput').addEventListener('keyup', function() {
+    filterTable();
+});
+
+// Hazard filter
+document.getElementById('hazardFilter').addEventListener('change', function() {
+    filterTable();
+});
+
+function filterTable() {
+    const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+    const selectedHazard = document.getElementById('hazardFilter').value;
+    const tableRows = document.querySelectorAll('#msdsTable tbody tr');
+    
+    tableRows.forEach(row => {
+        const text = row.textContent.toLowerCase();
+        const hazardCell = row.cells[3].textContent;
+        
+        let showRow = true;
+        
+        if (searchTerm && !text.includes(searchTerm)) {
+            showRow = false;
+        }
+        
+        if (selectedHazard && !hazardCell.includes(selectedHazard)) {
+            showRow = false;
+        }
+        
+        row.style.display = showRow ? '' : 'none';
+    });
+}
+</script>
+{% endblock %}

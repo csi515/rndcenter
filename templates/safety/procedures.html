@@ -1,0 +1,294 @@
+{% extends "base.html" %}
+
+{% block title %}작업절차서 및 위험성평가 - R&D 센터 관리시스템{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2><i class="fas fa-file-alt"></i> 작업절차서 및 위험성평가</h2>
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addProcedureModal">
+                <i class="fas fa-plus"></i> 절차서 추가
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Procedures Table -->
+<div class="card">
+    <div class="card-header">
+        <div class="row">
+            <div class="col-md-6">
+                <h5 class="mb-0">작업절차서 목록</h5>
+            </div>
+            <div class="col-md-6">
+                <div class="input-group">
+                    <select class="form-select" id="categoryFilter">
+                        <option value="">전체 카테고리</option>
+                        <option value="실험절차">실험절차</option>
+                        <option value="장비운영">장비운영</option>
+                        <option value="안전관리">안전관리</option>
+                        <option value="위험성평가">위험성평가</option>
+                        <option value="응급처치">응급처치</option>
+                    </select>
+                    <button class="btn btn-outline-secondary" type="button">
+                        <i class="fas fa-filter"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-striped" id="proceduresTable">
+                <thead>
+                    <tr>
+                        <th>제목</th>
+                        <th>카테고리</th>
+                        <th>설명</th>
+                        <th>버전</th>
+                        <th>작성자</th>
+                        <th>검토일</th>
+                        <th>상태</th>
+                        <th>링크</th>
+                        <th>액션</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for procedure in procedures %}
+                    <tr>
+                        <td>{{ procedure.title }}</td>
+                        <td>
+                            <span class="badge {% if procedure.category == '위험성평가' %}bg-danger{% elif procedure.category == '안전관리' %}bg-warning{% else %}bg-info{% endif %}">
+                                {{ procedure.category }}
+                            </span>
+                        </td>
+                        <td>{{ procedure.description[:50] }}{% if procedure.description|length > 50 %}...{% endif %}</td>
+                        <td>{{ procedure.version }}</td>
+                        <td>{{ procedure.created_by }}</td>
+                        <td>{{ procedure.review_date }}</td>
+                        <td>
+                            <span class="badge {% if procedure.status == '유효' %}bg-success{% elif procedure.status == '검토중' %}bg-warning{% else %}bg-secondary{% endif %}">
+                                {{ procedure.status }}
+                            </span>
+                        </td>
+                        <td>
+                            {% if procedure.file_link %}
+                            <a href="{{ procedure.file_link }}" target="_blank" class="btn btn-sm btn-outline-primary">
+                                <i class="fas fa-external-link-alt"></i>
+                            </a>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-primary">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-info" onclick="viewProcedure({{ procedure|tojson }})">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Access Cards -->
+<div class="row mt-4">
+    <div class="col-lg-3 col-md-6 mb-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <i class="fas fa-flask fa-3x text-primary mb-3"></i>
+                <h6>실험 절차서</h6>
+                <p class="text-muted">각종 실험의 표준 작업절차</p>
+                <button class="btn btn-primary btn-sm">보기</button>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-6 mb-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <i class="fas fa-exclamation-triangle fa-3x text-danger mb-3"></i>
+                <h6>위험성 평가</h6>
+                <p class="text-muted">작업별 위험요소 분석</p>
+                <button class="btn btn-danger btn-sm">보기</button>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-6 mb-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <i class="fas fa-tools fa-3x text-info mb-3"></i>
+                <h6>장비 운영</h6>
+                <p class="text-muted">장비별 운영 매뉴얼</p>
+                <button class="btn btn-info btn-sm">보기</button>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-6 mb-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <i class="fas fa-first-aid fa-3x text-success mb-3"></i>
+                <h6>응급 처치</h6>
+                <p class="text-muted">응급상황 대응 절차</p>
+                <button class="btn btn-success btn-sm">보기</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Procedure Modal -->
+<div class="modal fade" id="addProcedureModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <form method="POST" action="{{ url_for('safety.add_procedure') }}">
+                <div class="modal-header">
+                    <h5 class="modal-title">작업절차서 추가</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-8 mb-3">
+                            <label class="form-label">제목 *</label>
+                            <input type="text" class="form-control" name="title" required>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">카테고리 *</label>
+                            <select class="form-select" name="category" required>
+                                <option value="">선택하세요</option>
+                                <option value="실험절차">실험절차</option>
+                                <option value="장비운영">장비운영</option>
+                                <option value="안전관리">안전관리</option>
+                                <option value="위험성평가">위험성평가</option>
+                                <option value="응급처치">응급처치</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">설명 *</label>
+                        <textarea class="form-control" name="description" rows="3" required></textarea>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">버전</label>
+                            <input type="text" class="form-control" name="version" value="1.0">
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">작성자 *</label>
+                            <input type="text" class="form-control" name="created_by" required>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">검토일</label>
+                            <input type="date" class="form-control" name="review_date">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">파일 링크</label>
+                            <input type="url" class="form-control" name="file_link" placeholder="https://">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">상태</label>
+                            <select class="form-select" name="status">
+                                <option value="유효">유효</option>
+                                <option value="검토중">검토중</option>
+                                <option value="폐기">폐기</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+                    <button type="submit" class="btn btn-primary">추가</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- View Procedure Modal -->
+<div class="modal fade" id="viewProcedureModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">작업절차서 상세</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div id="procedureDetails"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+                <button type="button" class="btn btn-primary">파일 열기</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function viewProcedure(procedure) {
+    const categoryClass = procedure.category === '위험성평가' ? 'danger' : procedure.category === '안전관리' ? 'warning' : 'info';
+    const statusClass = procedure.status === '유효' ? 'success' : procedure.status === '검토중' ? 'warning' : 'secondary';
+    
+    const details = `
+        <div class="row mb-3">
+            <div class="col-6"><strong>제목:</strong></div>
+            <div class="col-6">${procedure.title}</div>
+        </div>
+        <div class="row mb-3">
+            <div class="col-6"><strong>카테고리:</strong></div>
+            <div class="col-6"><span class="badge bg-${categoryClass}">${procedure.category}</span></div>
+        </div>
+        <div class="row mb-3">
+            <div class="col-6"><strong>버전:</strong></div>
+            <div class="col-6">${procedure.version}</div>
+        </div>
+        <div class="row mb-3">
+            <div class="col-6"><strong>작성자:</strong></div>
+            <div class="col-6">${procedure.created_by}</div>
+        </div>
+        <div class="row mb-3">
+            <div class="col-6"><strong>검토일:</strong></div>
+            <div class="col-6">${procedure.review_date || '미정'}</div>
+        </div>
+        <div class="row mb-3">
+            <div class="col-6"><strong>상태:</strong></div>
+            <div class="col-6"><span class="badge bg-${statusClass}">${procedure.status}</span></div>
+        </div>
+        <hr>
+        <div class="mb-3">
+            <strong>설명:</strong>
+            <p class="mt-2">${procedure.description}</p>
+        </div>
+        ${procedure.file_link ? `
+        <div class="mb-3">
+            <strong>파일 링크:</strong>
+            <p class="mt-2"><a href="${procedure.file_link}" target="_blank">${procedure.file_link}</a></p>
+        </div>
+        ` : ''}
+    `;
+    
+    document.getElementById('procedureDetails').innerHTML = details;
+    new bootstrap.Modal(document.getElementById('viewProcedureModal')).show();
+}
+
+// Category filter
+document.getElementById('categoryFilter').addEventListener('change', function() {
+    const selectedCategory = this.value.toLowerCase();
+    const tableRows = document.querySelectorAll('#proceduresTable tbody tr');
+    
+    tableRows.forEach(row => {
+        const category = row.cells[1].textContent.toLowerCase();
+        if (selectedCategory === '' || category.includes(selectedCategory)) {
+            row.style.display = '';
+        } else {
+            row.style.display = 'none';
+        }
+    });
+});
+</script>
+{% endblock %}

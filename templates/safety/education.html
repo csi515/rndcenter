@@ -1,0 +1,192 @@
+{% extends "base.html" %}
+
+{% block title %}교육 이력 - R&D 센터 관리시스템{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2><i class="fas fa-graduation-cap"></i> 교육 이력</h2>
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addEducationModal">
+                <i class="fas fa-plus"></i> 교육 이력 추가
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Education Table -->
+<div class="card">
+    <div class="card-header">
+        <h5 class="mb-0">교육 수강 이력</h5>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>수강자</th>
+                        <th>교육과정</th>
+                        <th>교육일자</th>
+                        <th>교육시간</th>
+                        <th>강사</th>
+                        <th>이수상태</th>
+                        <th>점수</th>
+                        <th>수료증</th>
+                        <th>액션</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for education in education %}
+                    <tr>
+                        <td>{{ education.trainee_name }}</td>
+                        <td>{{ education.course_name }}</td>
+                        <td>{{ education.course_date }}</td>
+                        <td>{{ education.duration }}시간</td>
+                        <td>{{ education.instructor }}</td>
+                        <td>
+                            <span class="badge {% if education.completion_status == '완료' %}bg-success{% elif education.completion_status == '진행중' %}bg-warning{% else %}bg-secondary{% endif %}">
+                                {{ education.completion_status }}
+                            </span>
+                        </td>
+                        <td>{{ education.score or '-' }}</td>
+                        <td>
+                            {% if education.certificate_issued == 'Y' %}
+                            <span class="badge bg-success">발급</span>
+                            {% else %}
+                            <span class="badge bg-secondary">미발급</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-primary">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-secondary">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Education Summary -->
+<div class="row mt-4">
+    <div class="col-lg-4 col-md-6 mb-3">
+        <div class="card bg-primary text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h6 class="card-title">총 교육 이수</h6>
+                        <h3 class="mb-0">{{ education|length }}</h3>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-book fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-4 col-md-6 mb-3">
+        <div class="card bg-success text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h6 class="card-title">수료증 발급</h6>
+                        <h3 class="mb-0">{{ education|selectattr('certificate_issued', 'equalto', 'Y')|list|length }}</h3>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-certificate fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-4 col-md-6 mb-3">
+        <div class="card bg-info text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h6 class="card-title">완료 교육</h6>
+                        <h3 class="mb-0">{{ education|selectattr('completion_status', 'equalto', '완료')|list|length }}</h3>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-check-circle fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Education Modal -->
+<div class="modal fade" id="addEducationModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <form method="POST" action="{{ url_for('safety.add_education') }}">
+                <div class="modal-header">
+                    <h5 class="modal-title">교육 이력 추가</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">수강자명 *</label>
+                            <input type="text" class="form-control" name="trainee_name" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">교육과정명 *</label>
+                            <input type="text" class="form-control" name="course_name" required>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">교육일자 *</label>
+                            <input type="date" class="form-control" name="course_date" required>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">교육시간 (시간)</label>
+                            <input type="number" class="form-control" name="duration" min="1" max="40">
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">강사명</label>
+                            <input type="text" class="form-control" name="instructor">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">이수상태</label>
+                            <select class="form-select" name="completion_status">
+                                <option value="완료">완료</option>
+                                <option value="진행중">진행중</option>
+                                <option value="미완료">미완료</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">점수</label>
+                            <input type="number" class="form-control" name="score" min="0" max="100">
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">수료증 발급</label>
+                            <select class="form-select" name="certificate_issued">
+                                <option value="N">미발급</option>
+                                <option value="Y">발급</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">비고</label>
+                        <textarea class="form-control" name="notes" rows="3"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+                    <button type="submit" class="btn btn-primary">추가</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,404 @@
+{% extends "base.html" %}
+
+{% block title %}구매 요청 - R&D 센터 관리시스템{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2><i class="fas fa-shopping-cart"></i> 구매 요청</h2>
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addRequestModal">
+                <i class="fas fa-plus"></i> 구매 요청
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Requests Table -->
+<div class="card">
+    <div class="card-header">
+        <div class="row">
+            <div class="col-md-6">
+                <h5 class="mb-0">구매 요청 목록</h5>
+            </div>
+            <div class="col-md-6">
+                <div class="btn-group" role="group">
+                    <input type="radio" class="btn-check" name="statusFilter" id="all" autocomplete="off" checked>
+                    <label class="btn btn-outline-primary" for="all">전체</label>
+                    
+                    <input type="radio" class="btn-check" name="statusFilter" id="pending" autocomplete="off">
+                    <label class="btn btn-outline-warning" for="pending">요청</label>
+                    
+                    <input type="radio" class="btn-check" name="statusFilter" id="approved" autocomplete="off">
+                    <label class="btn btn-outline-success" for="approved">승인</label>
+                    
+                    <input type="radio" class="btn-check" name="statusFilter" id="rejected" autocomplete="off">
+                    <label class="btn btn-outline-danger" for="rejected">거절</label>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-striped" id="requestsTable">
+                <thead>
+                    <tr>
+                        <th>요청자</th>
+                        <th>품목명</th>
+                        <th>수량</th>
+                        <th>단가</th>
+                        <th>총액</th>
+                        <th>카테고리</th>
+                        <th>긴급도</th>
+                        <th>상태</th>
+                        <th>요청일</th>
+                        <th>액션</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for request in requests %}
+                    <tr data-status="{{ request.status }}">
+                        <td>{{ request.requester }}</td>
+                        <td>{{ request.item_name }}</td>
+                        <td>{{ request.quantity }}</td>
+                        <td>{{ "{:,}".format(request.unit_price|int) }}원</td>
+                        <td>{{ "{:,}".format(request.total_price|int) }}원</td>
+                        <td>{{ request.category }}</td>
+                        <td>
+                            <span class="badge {% if request.urgency == '긴급' %}bg-danger{% elif request.urgency == '보통' %}bg-primary{% else %}bg-secondary{% endif %}">
+                                {{ request.urgency }}
+                            </span>
+                        </td>
+                        <td>
+                            <span class="badge {% if request.status == '승인' %}bg-success{% elif request.status == '거절' %}bg-danger{% else %}bg-warning{% endif %}">
+                                {{ request.status }}
+                            </span>
+                        </td>
+                        <td>{{ request.request_date }}</td>
+                        <td>
+                            {% if request.status == '요청' %}
+                            <button class="btn btn-sm btn-outline-success" onclick="updateStatus({{ loop.index0 }}, '승인')">
+                                <i class="fas fa-check"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-danger" onclick="updateStatus({{ loop.index0 }}, '거절')">
+                                <i class="fas fa-times"></i>
+                            </button>
+                            {% endif %}
+                            <button class="btn btn-sm btn-outline-primary" onclick="viewRequest({{ request|tojson }})">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Summary Cards -->
+<div class="row mt-4">
+    <div class="col-lg-3 col-md-6 mb-3">
+        <div class="card bg-primary text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h6 class="card-title">총 요청</h6>
+                        <h3 class="mb-0">{{ requests|length }}</h3>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-list fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-6 mb-3">
+        <div class="card bg-warning text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h6 class="card-title">대기 중</h6>
+                        <h3 class="mb-0">{{ requests|selectattr('status', 'equalto', '요청')|list|length }}</h3>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-clock fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-6 mb-3">
+        <div class="card bg-success text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h6 class="card-title">승인</h6>
+                        <h3 class="mb-0">{{ requests|selectattr('status', 'equalto', '승인')|list|length }}</h3>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-check fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-6 mb-3">
+        <div class="card bg-danger text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h6 class="card-title">거절</h6>
+                        <h3 class="mb-0">{{ requests|selectattr('status', 'equalto', '거절')|list|length }}</h3>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-times fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Request Modal -->
+<div class="modal fade" id="addRequestModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <form method="POST" action="{{ url_for('purchasing.add_purchase_request') }}">
+                <div class="modal-header">
+                    <h5 class="modal-title">구매 요청 등록</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">요청자 *</label>
+                            <input type="text" class="form-control" name="requester" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">카테고리 *</label>
+                            <select class="form-select" name="category" required>
+                                <option value="">선택하세요</option>
+                                <option value="시약">시약</option>
+                                <option value="소모품">소모품</option>
+                                <option value="장비">장비</option>
+                                <option value="기타">기타</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">품목명 *</label>
+                        <input type="text" class="form-control" name="item_name" required>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">수량 *</label>
+                            <input type="number" class="form-control" name="quantity" required min="1" id="quantity" onchange="calculateTotal()">
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">단가 *</label>
+                            <input type="number" class="form-control" name="unit_price" required min="0" id="unitPrice" onchange="calculateTotal()">
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">총액</label>
+                            <input type="text" class="form-control" id="totalPrice" readonly>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">공급업체</label>
+                            <input type="text" class="form-control" name="supplier">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">긴급도</label>
+                            <select class="form-select" name="urgency">
+                                <option value="보통">보통</option>
+                                <option value="긴급">긴급</option>
+                                <option value="낮음">낮음</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">예산코드</label>
+                        <input type="text" class="form-control" name="budget_code" placeholder="예산 관리를 위한 코드">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">요청 사유 *</label>
+                        <textarea class="form-control" name="reason" rows="3" required placeholder="구매가 필요한 사유를 상세히 기록하세요"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">비고</label>
+                        <textarea class="form-control" name="notes" rows="2"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+                    <button type="submit" class="btn btn-primary">요청 등록</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Update Status Modal -->
+<div class="modal fade" id="updateStatusModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="POST" id="updateStatusForm">
+                <div class="modal-header">
+                    <h5 class="modal-title">상태 변경</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">새 상태</label>
+                        <select class="form-select" name="status" id="newStatus" required>
+                            <option value="승인">승인</option>
+                            <option value="거절">거절</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">승인자</label>
+                        <input type="text" class="form-control" name="approved_by" placeholder="승인자 이름">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">비고</label>
+                        <textarea class="form-control" name="notes" rows="3" placeholder="승인/거절 사유"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+                    <button type="submit" class="btn btn-primary">변경</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- View Request Modal -->
+<div class="modal fade" id="viewRequestModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">구매 요청 상세</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div id="requestDetails"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+                <button type="button" class="btn btn-primary">인쇄</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function calculateTotal() {
+    const quantity = parseInt(document.getElementById('quantity').value) || 0;
+    const unitPrice = parseInt(document.getElementById('unitPrice').value) || 0;
+    const total = quantity * unitPrice;
+    document.getElementById('totalPrice').value = total.toLocaleString() + '원';
+}
+
+function updateStatus(index, status) {
+    document.getElementById('updateStatusForm').action = `/purchasing/requests/update_status/${index}`;
+    document.getElementById('newStatus').value = status;
+    new bootstrap.Modal(document.getElementById('updateStatusModal')).show();
+}
+
+function viewRequest(request) {
+    const urgencyClass = request.urgency === '긴급' ? 'danger' : request.urgency === '보통' ? 'primary' : 'secondary';
+    const statusClass = request.status === '승인' ? 'success' : request.status === '거절' ? 'danger' : 'warning';
+    
+    const details = `
+        <div class="row mb-3">
+            <div class="col-6"><strong>요청자:</strong></div>
+            <div class="col-6">${request.requester}</div>
+        </div>
+        <div class="row mb-3">
+            <div class="col-6"><strong>품목명:</strong></div>
+            <div class="col-6">${request.item_name}</div>
+        </div>
+        <div class="row mb-3">
+            <div class="col-6"><strong>카테고리:</strong></div>
+            <div class="col-6">${request.category}</div>
+        </div>
+        <div class="row mb-3">
+            <div class="col-6"><strong>수량:</strong></div>
+            <div class="col-6">${request.quantity}</div>
+        </div>
+        <div class="row mb-3">
+            <div class="col-6"><strong>단가:</strong></div>
+            <div class="col-6">${parseInt(request.unit_price).toLocaleString()}원</div>
+        </div>
+        <div class="row mb-3">
+            <div class="col-6"><strong>총액:</strong></div>
+            <div class="col-6">${parseInt(request.total_price).toLocaleString()}원</div>
+        </div>
+        <div class="row mb-3">
+            <div class="col-6"><strong>공급업체:</strong></div>
+            <div class="col-6">${request.supplier || '미정'}</div>
+        </div>
+        <div class="row mb-3">
+            <div class="col-6"><strong>긴급도:</strong></div>
+            <div class="col-6"><span class="badge bg-${urgencyClass}">${request.urgency}</span></div>
+        </div>
+        <div class="row mb-3">
+            <div class="col-6"><strong>상태:</strong></div>
+            <div class="col-6"><span class="badge bg-${statusClass}">${request.status}</span></div>
+        </div>
+        <div class="row mb-3">
+            <div class="col-6"><strong>요청일:</strong></div>
+            <div class="col-6">${request.request_date}</div>
+        </div>
+        ${request.budget_code ? `
+        <div class="row mb-3">
+            <div class="col-6"><strong>예산코드:</strong></div>
+            <div class="col-6">${request.budget_code}</div>
+        </div>
+        ` : ''}
+        <hr>
+        <div class="mb-3">
+            <strong>요청 사유:</strong>
+            <p class="mt-2">${request.reason}</p>
+        </div>
+        ${request.notes ? `
+        <div class="mb-3">
+            <strong>비고:</strong>
+            <p class="mt-2">${request.notes}</p>
+        </div>
+        ` : ''}
+    `;
+    
+    document.getElementById('requestDetails').innerHTML = details;
+    new bootstrap.Modal(document.getElementById('viewRequestModal')).show();
+}
+
+// Status filter
+document.querySelectorAll('input[name="statusFilter"]').forEach(radio => {
+    radio.addEventListener('change', function() {
+        const selectedStatus = this.id;
+        const tableRows = document.querySelectorAll('#requestsTable tbody tr');
+        
+        tableRows.forEach(row => {
+            if (selectedStatus === 'all') {
+                row.style.display = '';
+            } else {
+                const status = row.dataset.status;
+                if ((selectedStatus === 'pending' && status === '요청') ||
+                    (selectedStatus === 'approved' && status === '승인') ||
+                    (selectedStatus === 'rejected' && status === '거절')) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            }
+        });
+    });
+});
+</script>
+{% endblock %}

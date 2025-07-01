@@ -1,0 +1,268 @@
+{% extends "base.html" %}
+
+{% block title %}우수 연구실 관리 - R&D 센터 관리시스템{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2><i class="fas fa-star"></i> 우수 연구실 관리</h2>
+            <button class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#addExcellenceModal">
+                <i class="fas fa-plus"></i> 우수 연구실 등록
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Excellence Criteria -->
+<div class="card mb-4">
+    <div class="card-header">
+        <h5 class="mb-0"><i class="fas fa-clipboard-check"></i> 우수 연구실 평가 기준</h5>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-lg-3 col-md-6 mb-3">
+                <div class="text-center">
+                    <i class="fas fa-shield-alt fa-3x text-primary mb-2"></i>
+                    <h6>안전관리</h6>
+                    <p class="text-muted">안전수칙 준수, 사고 발생률, 안전교육 참여도</p>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-3">
+                <div class="text-center">
+                    <i class="fas fa-broom fa-3x text-success mb-2"></i>
+                    <h6>청결도</h6>
+                    <p class="text-muted">실험실 정리정돈, 청소 상태, 폐기물 관리</p>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-3">
+                <div class="text-center">
+                    <i class="fas fa-tools fa-3x text-info mb-2"></i>
+                    <h6>장비관리</h6>
+                    <p class="text-muted">장비 점검, 유지보수, 사용일지 작성</p>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-3">
+                <div class="text-center">
+                    <i class="fas fa-recycle fa-3x text-warning mb-2"></i>
+                    <h6>환경관리</h6>
+                    <p class="text-muted">에너지 절약, 폐기물 분리수거, 환경보호</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Current Excellence Labs -->
+<div class="row">
+    <div class="col-lg-4 col-md-6 mb-4">
+        <div class="card border-warning">
+            <div class="card-header bg-warning text-dark text-center">
+                <i class="fas fa-trophy fa-2x mb-2"></i>
+                <h5 class="mb-0">이번 달 우수 연구실</h5>
+            </div>
+            <div class="card-body text-center">
+                <h4 class="text-warning">나노소재 연구실</h4>
+                <p class="mb-2"><strong>책임자:</strong> 김연구 교수</p>
+                <p class="mb-2"><strong>평가점수:</strong> 95점</p>
+                <p class="mb-3"><strong>평가일:</strong> 2024년 7월</p>
+                <span class="badge bg-warning text-dark">최우수</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4 col-md-6 mb-4">
+        <div class="card border-success">
+            <div class="card-header bg-success text-white text-center">
+                <i class="fas fa-medal fa-2x mb-2"></i>
+                <h5 class="mb-0">우수 연구실</h5>
+            </div>
+            <div class="card-body text-center">
+                <h4 class="text-success">에너지 변환 연구실</h4>
+                <p class="mb-2"><strong>책임자:</strong> 이실험 교수</p>
+                <p class="mb-2"><strong>평가점수:</strong> 88점</p>
+                <p class="mb-3"><strong>평가일:</strong> 2024년 7월</p>
+                <span class="badge bg-success">우수</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4 col-md-6 mb-4">
+        <div class="card border-info">
+            <div class="card-header bg-info text-white text-center">
+                <i class="fas fa-award fa-2x mb-2"></i>
+                <h5 class="mb-0">장려 연구실</h5>
+            </div>
+            <div class="card-body text-center">
+                <h4 class="text-info">바이오 센서 연구실</h4>
+                <p class="mb-2"><strong>책임자:</strong> 박안전 교수</p>
+                <p class="mb-2"><strong>평가점수:</strong> 82점</p>
+                <p class="mb-3"><strong>평가일:</strong> 2024년 7월</p>
+                <span class="badge bg-info">장려</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Evaluation History -->
+<div class="card">
+    <div class="card-header">
+        <h5 class="mb-0">평가 이력</h5>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>연구실명</th>
+                        <th>책임자</th>
+                        <th>평가일</th>
+                        <th>안전관리</th>
+                        <th>청결도</th>
+                        <th>장비관리</th>
+                        <th>환경관리</th>
+                        <th>총점</th>
+                        <th>등급</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>나노소재 연구실</td>
+                        <td>김연구 교수</td>
+                        <td>2024-07-01</td>
+                        <td>24/25</td>
+                        <td>23/25</td>
+                        <td>24/25</td>
+                        <td>24/25</td>
+                        <td>95/100</td>
+                        <td><span class="badge bg-warning text-dark">최우수</span></td>
+                    </tr>
+                    <tr>
+                        <td>에너지 변환 연구실</td>
+                        <td>이실험 교수</td>
+                        <td>2024-07-01</td>
+                        <td>22/25</td>
+                        <td>22/25</td>
+                        <td>22/25</td>
+                        <td>22/25</td>
+                        <td>88/100</td>
+                        <td><span class="badge bg-success">우수</span></td>
+                    </tr>
+                    <tr>
+                        <td>바이오 센서 연구실</td>
+                        <td>박안전 교수</td>
+                        <td>2024-07-01</td>
+                        <td>20/25</td>
+                        <td>21/25</td>
+                        <td>20/25</td>
+                        <td>21/25</td>
+                        <td>82/100</td>
+                        <td><span class="badge bg-info">장려</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Benefits Panel -->
+<div class="card mt-4">
+    <div class="card-header">
+        <h5 class="mb-0"><i class="fas fa-gift"></i> 우수 연구실 혜택</h5>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-3">
+                <div class="text-center">
+                    <i class="fas fa-trophy fa-2x text-warning mb-2"></i>
+                    <h6>인증서 수여</h6>
+                    <p class="text-muted">우수연구실 인증서 및 현판 제공</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="text-center">
+                    <i class="fas fa-coins fa-2x text-success mb-2"></i>
+                    <h6>인센티브 지급</h6>
+                    <p class="text-muted">연구실 운영비 추가 지원</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="text-center">
+                    <i class="fas fa-tools fa-2x text-info mb-2"></i>
+                    <h6>장비 우선권</h6>
+                    <p class="text-muted">공용장비 사용 우선권 부여</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="text-center">
+                    <i class="fas fa-star fa-2x text-primary mb-2"></i>
+                    <h6>홍보 지원</h6>
+                    <p class="text-muted">연구실 홍보 및 견학 프로그램 지원</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Excellence Modal -->
+<div class="modal fade" id="addExcellenceModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <form>
+                <div class="modal-header">
+                    <h5 class="modal-title">우수 연구실 평가</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">연구실명 *</label>
+                            <input type="text" class="form-control" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">책임자 *</label>
+                            <input type="text" class="form-control" required>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">평가일 *</label>
+                            <input type="date" class="form-control" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">평가자</label>
+                            <input type="text" class="form-control">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-3 mb-3">
+                            <label class="form-label">안전관리 (25점)</label>
+                            <input type="number" class="form-control" min="0" max="25">
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label class="form-label">청결도 (25점)</label>
+                            <input type="number" class="form-control" min="0" max="25">
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label class="form-label">장비관리 (25점)</label>
+                            <input type="number" class="form-control" min="0" max="25">
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label class="form-label">환경관리 (25점)</label>
+                            <input type="number" class="form-control" min="0" max="25">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">특이사항</label>
+                        <textarea class="form-control" rows="3"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+                    <button type="submit" class="btn btn-warning">평가 등록</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
