@@ -14,6 +14,10 @@ function initializeEquipmentCalendar() {
         height: 'auto',
         locale: 'ko',
         firstDay: 1, // Monday
+        dayHeaderFormat: { weekday: 'short' },
+        dayCellContent: function(arg) {
+            return arg.dayNumberText.replace('일', '');
+        },
         businessHours: {
             daysOfWeek: [1, 2, 3, 4, 5], // Monday - Friday
             startTime: '09:00',
