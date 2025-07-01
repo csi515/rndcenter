@@ -72,10 +72,7 @@ def add_researcher():
         'id': datetime.now().strftime('%Y%m%d%H%M%S'),
         'name': request.form.get('name'),
         'email': request.form.get('email'),
-        'role': request.form.get('role'),
-        'department': request.form.get('department'),
-        'join_date': request.form.get('join_date'),
-        'projects': request.form.get('projects', ''),
+        'position': request.form.get('position', ''),
         'created_date': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     }
     

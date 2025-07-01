@@ -26,10 +26,7 @@
                     <tr>
                         <th>이름</th>
                         <th>이메일</th>
-                        <th>역할</th>
-                        <th>부서</th>
-                        <th>입사일</th>
-                        <th>참여 프로젝트</th>
+                        <th>직급</th>
                         <th>액션</th>
                     </tr>
                 </thead>
@@ -38,10 +35,7 @@
                     <tr>
                         <td>{{ researcher.name }}</td>
                         <td>{{ researcher.email }}</td>
-                        <td>{{ researcher.role }}</td>
-                        <td>{{ researcher.department }}</td>
-                        <td>{{ researcher.join_date }}</td>
-                        <td>{{ researcher.projects }}</td>
+                        <td>{{ researcher.position }}</td>
                         <td>
                             <button class="btn btn-sm btn-outline-primary">
                                 <i class="fas fa-edit"></i>
@@ -78,28 +72,9 @@
                             <input type="email" class="form-control" name="email" required>
                         </div>
                     </div>
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">역할</label>
-                            <select class="form-select" name="role">
-                                <option value="연구원">연구원</option>
-                                <option value="선임연구원">선임연구원</option>
-                                <option value="책임연구원">책임연구원</option>
-                                <option value="연구소장">연구소장</option>
-                            </select>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">부서</label>
-                            <input type="text" class="form-control" name="department">
-                        </div>
-                    </div>
                     <div class="mb-3">
-                        <label class="form-label">입사일</label>
-                        <input type="date" class="form-control" name="join_date">
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">참여 프로젝트</label>
-                        <input type="text" class="form-control" name="projects" placeholder="프로젝트명을 쉼표로 구분">
+                        <label class="form-label">직급</label>
+                        <input type="text" class="form-control" name="position" placeholder="예: 연구원, 선임연구원, 책임연구원 등">
                     </div>
                 </div>
                 <div class="modal-footer">
