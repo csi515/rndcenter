@@ -14,6 +14,29 @@ def projects():
     projects_list = projects_data.to_dict('records') if not projects_data.empty else []
     return render_template('research/projects.html', projects=projects_list)
 
+@research_bp.route('/projects/api')
+def projects_api():
+    """API endpoint for projects data"""
+    try:
+        projects = Project.query.all()
+        projects_list = []
+        for project in projects:
+            projects_list.append({
+                'id': project.id,
+                'project_id': project.project_id,
+                'name': project.name,
+                'description': project.description,
+                'leader': project.leader,
+                'department': project.department,
+                'start_date': project.start_date.isoformat() if project.start_date else None,
+                'end_date': project.end_date.isoformat() if project.end_date else None,
+                'status': project.status,
+                'progress': project.progress
+            })
+        return jsonify(projects_list)
+    except Exception as e:
+        return jsonify([])
+
 @research_bp.route('/projects/add', methods=['POST'])
 def add_project():
     data = {
@@ -114,6 +137,28 @@ def delete_researcher(index):
         flash(f'연구원 삭제 중 오류가 발생했습니다: {str(e)}', 'error')
     
     return redirect(url_for('research.researchers'))
+
+@research_bp.route('/researchers/api')
+def researchers_api():
+    """API endpoint for researchers data"""
+    try:
+        researchers = Researcher.query.all()
+        researchers_list = []
+        for researcher in researchers:
+            researchers_list.append({
+                'id': researcher.id,
+                'employee_id': researcher.employee_id,
+                'name': researcher.name,
+                'position': researcher.position,
+                'department': researcher.department,
+                'specialization': researcher.specialization,
+                'email': researcher.email,
+                'phone': researcher.phone,
+                'status': researcher.status
+            })
+        return jsonify(researchers_list)
+    except Exception as e:
+        return jsonify([])
 
 @research_bp.route('/schedule')
 def schedule():
