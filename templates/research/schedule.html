@@ -7,23 +7,122 @@
     <div class="col-12">
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h2><i class="fas fa-calendar-week"></i> 주간 일정</h2>
-            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addScheduleModal">
-                <i class="fas fa-plus"></i> 일정 추가
-            </button>
         </div>
     </div>
 </div>
 
-<!-- Calendar -->
+<!-- Monthly Week Schedule -->
 <div class="card">
     <div class="card-body">
-        <div id="calendar"></div>
+        <!-- Month Navigation -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <button class="btn btn-outline-secondary" id="prevMonth">
+                <i class="fas fa-chevron-left"></i> 이전 달
+            </button>
+            <h3 class="mb-0" id="currentMonth">2025년 1월</h3>
+            <button class="btn btn-outline-secondary" id="nextMonth">
+                다음 달 <i class="fas fa-chevron-right"></i>
+            </button>
+        </div>
+
+        <!-- Weekly Schedule Grid -->
+        <div class="row g-3" id="weeklyGrid">
+            <!-- Week 1 -->
+            <div class="col-lg-2 col-md-4 col-sm-6">
+                <div class="week-card card h-100">
+                    <div class="card-header text-center bg-primary text-white">
+                        <h6 class="mb-0">1주차</h6>
+                        <small class="week-dates"></small>
+                    </div>
+                    <div class="card-body week-content" data-week="1">
+                        <div class="schedule-items sortable-list" id="week-1">
+                            <!-- Schedule items will be dynamically added here -->
+                        </div>
+                        <button class="btn btn-sm btn-outline-primary w-100 mt-2 add-schedule-btn" data-week="1">
+                            <i class="fas fa-plus"></i> 일정 추가
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Week 2 -->
+            <div class="col-lg-2 col-md-4 col-sm-6">
+                <div class="week-card card h-100">
+                    <div class="card-header text-center bg-primary text-white">
+                        <h6 class="mb-0">2주차</h6>
+                        <small class="week-dates"></small>
+                    </div>
+                    <div class="card-body week-content" data-week="2">
+                        <div class="schedule-items sortable-list" id="week-2">
+                            <!-- Schedule items will be dynamically added here -->
+                        </div>
+                        <button class="btn btn-sm btn-outline-primary w-100 mt-2 add-schedule-btn" data-week="2">
+                            <i class="fas fa-plus"></i> 일정 추가
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Week 3 -->
+            <div class="col-lg-2 col-md-4 col-sm-6">
+                <div class="week-card card h-100">
+                    <div class="card-header text-center bg-primary text-white">
+                        <h6 class="mb-0">3주차</h6>
+                        <small class="week-dates"></small>
+                    </div>
+                    <div class="card-body week-content" data-week="3">
+                        <div class="schedule-items sortable-list" id="week-3">
+                            <!-- Schedule items will be dynamically added here -->
+                        </div>
+                        <button class="btn btn-sm btn-outline-primary w-100 mt-2 add-schedule-btn" data-week="3">
+                            <i class="fas fa-plus"></i> 일정 추가
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Week 4 -->
+            <div class="col-lg-2 col-md-4 col-sm-6">
+                <div class="week-card card h-100">
+                    <div class="card-header text-center bg-primary text-white">
+                        <h6 class="mb-0">4주차</h6>
+                        <small class="week-dates"></small>
+                    </div>
+                    <div class="card-body week-content" data-week="4">
+                        <div class="schedule-items sortable-list" id="week-4">
+                            <!-- Schedule items will be dynamically added here -->
+                        </div>
+                        <button class="btn btn-sm btn-outline-primary w-100 mt-2 add-schedule-btn" data-week="4">
+                            <i class="fas fa-plus"></i> 일정 추가
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Week 5 -->
+            <div class="col-lg-2 col-md-4 col-sm-6">
+                <div class="week-card card h-100">
+                    <div class="card-header text-center bg-primary text-white">
+                        <h6 class="mb-0">5주차</h6>
+                        <small class="week-dates"></small>
+                    </div>
+                    <div class="card-body week-content" data-week="5">
+                        <div class="schedule-items sortable-list" id="week-5">
+                            <!-- Schedule items will be dynamically added here -->
+                        </div>
+                        <button class="btn btn-sm btn-outline-primary w-100 mt-2 add-schedule-btn" data-week="5">
+                            <i class="fas fa-plus"></i> 일정 추가
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
 <!-- Add Schedule Modal -->
 <div class="modal fade" id="addScheduleModal" tabindex="-1">
-    <div class="modal-dialog modal-lg">
+    <div class="modal-dialog">
         <div class="modal-content">
             <form id="addScheduleForm">
                 <div class="modal-header">
@@ -31,64 +130,31 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">연구원 *</label>
-                            <select class="form-select" name="researcher_name" required>
-                                <option value="">연구원 선택</option>
-                                {% for researcher in researchers %}
-                                <option value="{{ researcher.name }}">{{ researcher.name }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">프로젝트</label>
-                            <select class="form-select" name="project_name">
-                                <option value="">프로젝트 선택</option>
-                                {% for project in projects %}
-                                <option value="{{ project.name }}">{{ project.name }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                    </div>
+                    <input type="hidden" id="scheduleWeek" name="week">
                     <div class="mb-3">
                         <label class="form-label">작업 내용 *</label>
-                        <input type="text" class="form-control" name="task" required>
+                        <input type="text" class="form-control" id="scheduleTask" name="task" required>
                     </div>
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">시작일 *</label>
-                            <input type="date" class="form-control" name="start_date" required>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">종료일 *</label>
-                            <input type="date" class="form-control" name="end_date" required>
-                        </div>
+                    <div class="mb-3">
+                        <label class="form-label">연구원</label>
+                        <input type="text" class="form-control" id="scheduleResearcher" name="researcher">
                     </div>
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">시작 시간</label>
-                            <input type="time" class="form-control" name="start_time" value="09:00">
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">종료 시간</label>
-                            <input type="time" class="form-control" name="end_time" value="18:00">
-                        </div>
+                    <div class="mb-3">
+                        <label class="form-label">프로젝트</label>
+                        <input type="text" class="form-control" id="scheduleProject" name="project">
                     </div>
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">상태</label>
-                            <select class="form-select" name="status">
-                                <option value="예정">예정</option>
-                                <option value="진행중">진행중</option>
-                                <option value="완료">완료</option>
-                                <option value="연기">연기</option>
-                            </select>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">비고</label>
-                            <input type="text" class="form-control" name="notes">
-                        </div>
+                    <div class="mb-3">
+                        <label class="form-label">우선순위</label>
+                        <select class="form-select" id="schedulePriority" name="priority">
+                            <option value="낮음">낮음</option>
+                            <option value="보통" selected>보통</option>
+                            <option value="높음">높음</option>
+                            <option value="긴급">긴급</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">메모</label>
+                        <textarea class="form-control" id="scheduleNotes" name="notes" rows="3"></textarea>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -99,8 +165,56 @@
         </div>
     </div>
 </div>
+
+<!-- Edit Schedule Modal -->
+<div class="modal fade" id="editScheduleModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form id="editScheduleForm">
+                <div class="modal-header">
+                    <h5 class="modal-title">일정 수정</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="editScheduleId" name="id">
+                    <input type="hidden" id="editScheduleWeek" name="week">
+                    <div class="mb-3">
+                        <label class="form-label">작업 내용 *</label>
+                        <input type="text" class="form-control" id="editScheduleTask" name="task" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">연구원</label>
+                        <input type="text" class="form-control" id="editScheduleResearcher" name="researcher">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">프로젝트</label>
+                        <input type="text" class="form-control" id="editScheduleProject" name="project">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">우선순위</label>
+                        <select class="form-select" id="editSchedulePriority" name="priority">
+                            <option value="낮음">낮음</option>
+                            <option value="보통">보통</option>
+                            <option value="높음">높음</option>
+                            <option value="긴급">긴급</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">메모</label>
+                        <textarea class="form-control" id="editScheduleNotes" name="notes" rows="3"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" id="deleteScheduleBtn">삭제</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+                    <button type="submit" class="btn btn-primary">수정</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 {% endblock %}
 
 {% block extra_js %}
-<script src="{{ url_for('static', filename='js/schedule.js') }}"></script>
+<script src="{{ url_for('static', filename='js/weekly-schedule.js') }}"></script>
 {% endblock %}

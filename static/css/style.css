@@ -349,3 +349,137 @@ canvas {
     background-color: rgba(25, 135, 84, 0.1);
     border-left: 4px solid var(--bs-success);
 }
+
+/* Weekly Schedule Styles */
+.week-card {
+    min-height: 400px;
+    transition: all 0.3s ease;
+}
+
+.week-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.week-content {
+    position: relative;
+}
+
+.schedule-items {
+    min-height: 300px;
+    padding: 5px;
+}
+
+.sortable-list {
+    border: 2px dashed transparent;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.sortable-list.drag-over {
+    border-color: var(--bs-primary);
+    background-color: rgba(var(--bs-primary-rgb), 0.1);
+}
+
+.schedule-item {
+    position: relative;
+    cursor: move;
+    transition: all 0.3s ease;
+    background: var(--bs-body-bg);
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+}
+
+.schedule-item:hover {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transform: translateY(-1px);
+}
+
+.schedule-item.dragging {
+    opacity: 0.5;
+    transform: rotate(5deg);
+}
+
+.schedule-content {
+    flex: 1;
+}
+
+.schedule-actions {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.schedule-item:hover .schedule-actions {
+    opacity: 1;
+}
+
+.week-dates {
+    font-size: 0.75rem;
+    opacity: 0.8;
+}
+
+/* Priority Colors */
+.schedule-item.border-danger {
+    border-left: 4px solid var(--bs-danger) !important;
+}
+
+.schedule-item.border-warning {
+    border-left: 4px solid var(--bs-warning) !important;
+}
+
+.schedule-item.border-primary {
+    border-left: 4px solid var(--bs-primary) !important;
+}
+
+.schedule-item.border-secondary {
+    border-left: 4px solid var(--bs-secondary) !important;
+}
+
+/* Add Schedule Button */
+.add-schedule-btn {
+    border-style: dashed;
+    transition: all 0.3s ease;
+}
+
+.add-schedule-btn:hover {
+    background-color: var(--bs-primary);
+    color: white;
+    border-style: solid;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .week-card {
+        min-height: 300px;
+    }
+    
+    .schedule-items {
+        min-height: 200px;
+    }
+}
+
+/* Month navigation */
+#currentMonth {
+    font-weight: 600;
+    color: var(--bs-primary);
+}
+
+/* Animation for new items */
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.schedule-item.new-item {
+    animation: slideIn 0.3s ease;
+}
