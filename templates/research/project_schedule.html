@@ -1,0 +1,914 @@
+{% extends "base.html" %}
+
+{% block title %}연구 일정 관리 - R&D 센터 관리시스템{% endblock %}
+
+{% block extra_css %}
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+<style>
+.schedule-calendar {
+    overflow-x: auto;
+    min-height: 600px;
+}
+
+.calendar-header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: white;
+    border-bottom: 2px solid #dee2e6;
+}
+
+.month-column {
+    min-width: 300px;
+    border-right: 1px solid #dee2e6;
+}
+
+.month-column:last-child {
+    border-right: none;
+}
+
+.week-header {
+    background: #f8f9fa;
+    border-bottom: 1px solid #dee2e6;
+    padding: 10px;
+    text-align: center;
+    font-weight: 600;
+    color: #495057;
+}
+
+.week-cell {
+    min-height: 120px;
+    border-bottom: 1px solid #e9ecef;
+    padding: 8px;
+    position: relative;
+    background: white;
+    transition: background-color 0.2s ease;
+}
+
+.week-cell:hover {
+    background: #f8f9fa;
+}
+
+.week-cell.current-week {
+    background: #e3f2fd;
+    border-left: 4px solid #2196f3;
+}
+
+.schedule-item {
+    background: linear-gradient(135deg, #007bff, #0056b3);
+    color: white;
+    border-radius: 6px;
+    padding: 8px;
+    margin-bottom: 4px;
+    cursor: move;
+    font-size: 12px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.schedule-item:hover {
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    transform: translateY(-2px);
+}
+
+.schedule-item.multi-week {
+    background: linear-gradient(135deg, #28a745, #1e7e34);
+}
+
+.schedule-item.urgent {
+    background: linear-gradient(135deg, #dc3545, #c82333);
+}
+
+.schedule-item.sortable-chosen {
+    transform: rotate(5deg);
+    box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+}
+
+.schedule-title {
+    font-weight: 600;
+    margin-bottom: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.schedule-researchers {
+    font-size: 10px;
+    opacity: 0.9;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.add-schedule-btn {
+    position: absolute;
+    bottom: 5px;
+    right: 5px;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: none;
+    background: #007bff;
+    color: white;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.week-cell:hover .add-schedule-btn {
+    opacity: 1;
+}
+
+.schedule-more {
+    background: #6c757d;
+    color: white;
+    text-align: center;
+    padding: 4px;
+    border-radius: 4px;
+    font-size: 10px;
+    margin-top: 2px;
+    cursor: pointer;
+}
+
+.filters-section {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.project-filter {
+    min-width: 200px;
+}
+
+.researcher-filter {
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.navigation-controls {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.current-period {
+    font-weight: 600;
+    color: #495057;
+    margin: 0 15px;
+}
+
+.legend {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 15px;
+    flex-wrap: wrap;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 12px;
+}
+
+.legend-color {
+    width: 16px;
+    height: 16px;
+    border-radius: 4px;
+}
+
+.sortable-ghost {
+    opacity: 0.4;
+    background: #f8f9fa !important;
+    border: 2px dashed #007bff;
+}
+
+.drag-placeholder {
+    background: rgba(0, 123, 255, 0.1);
+    border: 2px dashed #007bff;
+    border-radius: 6px;
+    height: 30px;
+    margin-bottom: 4px;
+}
+
+@media (max-width: 768px) {
+    .month-column {
+        min-width: 250px;
+    }
+    
+    .schedule-item {
+        font-size: 11px;
+        padding: 6px;
+    }
+    
+    .filters-section {
+        padding: 15px;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2><i class="fas fa-calendar-alt"></i> 연구 일정 관리</h2>
+            <button class="btn btn-primary" onclick="showAddScheduleModal()">
+                <i class="fas fa-plus"></i> 일정 추가
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- 필터 및 검색 -->
+<div class="filters-section">
+    <div class="row g-3">
+        <div class="col-md-3">
+            <label class="form-label">프로젝트 선택</label>
+            <select class="form-select project-filter" id="projectFilter">
+                <option value="">전체 프로젝트</option>
+                {% for project in projects %}
+                <option value="{{ project.project_id }}">{{ project.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-3">
+            <label class="form-label">연구원 필터</label>
+            <div class="dropdown">
+                <button class="btn btn-outline-secondary dropdown-toggle w-100" type="button" data-bs-toggle="dropdown">
+                    연구원 선택
+                </button>
+                <div class="dropdown-menu researcher-filter p-3">
+                    {% for researcher in researchers %}
+                    <div class="form-check">
+                        <input class="form-check-input researcher-checkbox" type="checkbox" 
+                               value="{{ researcher.employee_id }}" id="researcher{{ researcher.id }}">
+                        <label class="form-check-label" for="researcher{{ researcher.id }}">
+                            {{ researcher.name }}
+                        </label>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <label class="form-label">일정 검색</label>
+            <input type="text" class="form-control" id="scheduleSearch" placeholder="제목 또는 메모로 검색...">
+        </div>
+        <div class="col-md-2">
+            <label class="form-label">&nbsp;</label>
+            <button class="btn btn-secondary w-100" onclick="resetFilters()">
+                <i class="fas fa-undo"></i> 초기화
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- 네비게이션 및 범례 -->
+<div class="navigation-controls">
+    <button class="btn btn-outline-secondary" onclick="navigateMonth(-1)">
+        <i class="fas fa-chevron-left"></i> 이전
+    </button>
+    <span class="current-period" id="currentPeriod">2025년 7월</span>
+    <button class="btn btn-outline-secondary" onclick="navigateMonth(1)">
+        다음 <i class="fas fa-chevron-right"></i>
+    </button>
+    <button class="btn btn-outline-info ms-auto" onclick="goToCurrentWeek()">
+        <i class="fas fa-calendar-day"></i> 현재 주차
+    </button>
+</div>
+
+<div class="legend">
+    <div class="legend-item">
+        <div class="legend-color" style="background: linear-gradient(135deg, #007bff, #0056b3);"></div>
+        <span>일반 일정</span>
+    </div>
+    <div class="legend-item">
+        <div class="legend-color" style="background: linear-gradient(135deg, #28a745, #1e7e34);"></div>
+        <span>장기 일정 (2주 이상)</span>
+    </div>
+    <div class="legend-item">
+        <div class="legend-color" style="background: linear-gradient(135deg, #dc3545, #c82333);"></div>
+        <span>긴급 일정</span>
+    </div>
+    <div class="legend-item">
+        <div class="legend-color" style="background: #e3f2fd; border: 2px solid #2196f3;"></div>
+        <span>현재 주차</span>
+    </div>
+</div>
+
+<!-- 캘린더 그리드 -->
+<div class="card">
+    <div class="card-body p-0">
+        <div class="schedule-calendar">
+            <div class="calendar-header d-flex">
+                <!-- 월별 헤더 -->
+                <div class="month-column">
+                    <div class="week-header" id="month1Header">6월 2025</div>
+                </div>
+                <div class="month-column">
+                    <div class="week-header" id="month2Header">7월 2025</div>
+                </div>
+                <div class="month-column">
+                    <div class="week-header" id="month3Header">8월 2025</div>
+                </div>
+            </div>
+            
+            <div class="d-flex">
+                <!-- 월별 주차 그리드 -->
+                <div class="month-column" id="month1Grid">
+                    <!-- 6월 주차들 -->
+                </div>
+                <div class="month-column" id="month2Grid">
+                    <!-- 7월 주차들 -->
+                </div>
+                <div class="month-column" id="month3Grid">
+                    <!-- 8월 주차들 -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 일정 추가 모달 -->
+<div class="modal fade" id="addScheduleModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <form id="addScheduleForm">
+                <div class="modal-header">
+                    <h5 class="modal-title">일정 추가</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">프로젝트 *</label>
+                            <select class="form-select" id="scheduleProject" name="project_id" required>
+                                <option value="">프로젝트 선택</option>
+                                {% for project in projects %}
+                                <option value="{{ project.project_id }}">{{ project.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">일정 제목 *</label>
+                            <input type="text" class="form-control" id="scheduleTitle" name="title" required>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">시작 년도</label>
+                            <input type="number" class="form-control" id="scheduleStartYear" name="start_year" value="2025">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">시작 월</label>
+                            <select class="form-select" id="scheduleStartMonth" name="start_month">
+                                <option value="1">1월</option>
+                                <option value="2">2월</option>
+                                <option value="3">3월</option>
+                                <option value="4">4월</option>
+                                <option value="5">5월</option>
+                                <option value="6">6월</option>
+                                <option value="7" selected>7월</option>
+                                <option value="8">8월</option>
+                                <option value="9">9월</option>
+                                <option value="10">10월</option>
+                                <option value="11">11월</option>
+                                <option value="12">12월</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">시작 주차</label>
+                            <select class="form-select" id="scheduleStartWeek" name="start_week">
+                                <option value="1">1주차</option>
+                                <option value="2">2주차</option>
+                                <option value="3">3주차</option>
+                                <option value="4">4주차</option>
+                                <option value="5">5주차</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">종료 주차</label>
+                            <select class="form-select" id="scheduleEndWeek" name="end_week">
+                                <option value="1">1주차</option>
+                                <option value="2">2주차</option>
+                                <option value="3">3주차</option>
+                                <option value="4">4주차</option>
+                                <option value="5">5주차</option>
+                            </select>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">담당 연구원</label>
+                            <div class="researcher-selection">
+                                {% for researcher in researchers %}
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="checkbox" name="researcher_ids" 
+                                           value="{{ researcher.employee_id }}" id="modal_researcher{{ researcher.id }}">
+                                    <label class="form-check-label" for="modal_researcher{{ researcher.id }}">
+                                        {{ researcher.name }}
+                                    </label>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">메모</label>
+                            <textarea class="form-control" id="scheduleMemo" name="memo" rows="3"></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+                    <button type="submit" class="btn btn-primary">일정 추가</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- 일정 상세/수정 모달 -->
+<div class="modal fade" id="scheduleDetailModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">일정 상세</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="scheduleDetailContent">
+                <!-- 동적으로 채워짐 -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" onclick="deleteCurrentSchedule()">삭제</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+                <button type="button" class="btn btn-primary" onclick="editCurrentSchedule()">수정</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+let currentYear = 2025;
+let currentMonth = 7;
+let calendarData = {};
+let scheduleData = [];
+let filteredSchedules = [];
+let currentScheduleId = null;
+
+// 페이지 로드 시 초기화
+document.addEventListener('DOMContentLoaded', function() {
+    initializeCalendar();
+    setupEventListeners();
+    loadScheduleData();
+});
+
+// 캘린더 초기화
+function initializeCalendar() {
+    updatePeriodDisplay();
+}
+
+// 이벤트 리스너 설정
+function setupEventListeners() {
+    // 프로젝트 필터 변경
+    document.getElementById('projectFilter').addEventListener('change', function() {
+        filterSchedules();
+    });
+    
+    // 연구원 필터 변경
+    document.querySelectorAll('.researcher-checkbox').forEach(checkbox => {
+        checkbox.addEventListener('change', filterSchedules);
+    });
+    
+    // 검색 입력
+    document.getElementById('scheduleSearch').addEventListener('input', debounce(filterSchedules, 300));
+    
+    // 일정 추가 폼 제출
+    document.getElementById('addScheduleForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        addSchedule();
+    });
+}
+
+// 스케줄 데이터 로딩
+async function loadScheduleData() {
+    try {
+        const projectFilter = document.getElementById('projectFilter').value;
+        const url = `/research/schedule/projects/api/data?year=${currentYear}&month=${currentMonth}${projectFilter ? '&project_id=' + projectFilter : ''}`;
+        
+        const response = await fetch(url);
+        const data = await response.json();
+        
+        calendarData = data.calendar;
+        scheduleData = data.schedules;
+        
+        renderCalendar();
+        filterSchedules();
+    } catch (error) {
+        console.error('Error loading schedule data:', error);
+        showNotification('데이터 로딩 중 오류가 발생했습니다.', 'error');
+    }
+}
+
+// 캘린더 렌더링
+function renderCalendar() {
+    const monthNames = ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월'];
+    
+    // 월별 헤더 업데이트
+    calendarData.forEach((monthData, index) => {
+        const headerElement = document.getElementById(`month${index + 1}Header`);
+        headerElement.textContent = `${monthNames[monthData.month - 1]} ${monthData.year}`;
+    });
+    
+    // 주차 그리드 생성
+    calendarData.forEach((monthData, index) => {
+        const gridElement = document.getElementById(`month${index + 1}Grid`);
+        gridElement.innerHTML = '';
+        
+        monthData.weeks.forEach(week => {
+            const weekCell = document.createElement('div');
+            weekCell.className = 'week-cell';
+            weekCell.dataset.year = week.year;
+            weekCell.dataset.month = week.month;
+            weekCell.dataset.week = week.week_num;
+            
+            // 현재 주차 표시
+            if (isCurrentWeek(week.year, week.month, week.week_num)) {
+                weekCell.classList.add('current-week');
+            }
+            
+            weekCell.innerHTML = `
+                <div class="week-info mb-2">
+                    <small class="text-muted">${week.week_num}주차 (${week.week_start}~${week.week_end}일)</small>
+                </div>
+                <div class="schedule-items sortable-list" data-week="${week.week_num}" data-month="${week.month}" data-year="${week.year}">
+                    <!-- 일정 아이템들이 여기에 추가됨 -->
+                </div>
+                <button class="add-schedule-btn" onclick="showAddScheduleModal(${week.year}, ${week.month}, ${week.week_num})">
+                    <i class="fas fa-plus"></i>
+                </button>
+            `;
+            
+            gridElement.appendChild(weekCell);
+        });
+    });
+    
+    // 드래그 앤 드롭 초기화
+    initializeSortable();
+}
+
+// 드래그 앤 드롭 초기화
+function initializeSortable() {
+    document.querySelectorAll('.sortable-list').forEach(list => {
+        Sortable.create(list, {
+            group: 'schedules',
+            animation: 150,
+            ghostClass: 'sortable-ghost',
+            chosenClass: 'sortable-chosen',
+            onEnd: function(evt) {
+                const scheduleId = evt.item.dataset.scheduleId;
+                const newWeek = evt.to.dataset.week;
+                const newMonth = evt.to.dataset.month;
+                const newYear = evt.to.dataset.year;
+                
+                moveSchedule(scheduleId, newYear, newMonth, newWeek);
+            }
+        });
+    });
+}
+
+// 일정 필터링
+function filterSchedules() {
+    const projectFilter = document.getElementById('projectFilter').value;
+    const researcherFilters = Array.from(document.querySelectorAll('.researcher-checkbox:checked')).map(cb => cb.value);
+    const searchTerm = document.getElementById('scheduleSearch').value.toLowerCase();
+    
+    filteredSchedules = scheduleData.filter(schedule => {
+        // 프로젝트 필터
+        if (projectFilter && schedule.project_id !== projectFilter) return false;
+        
+        // 연구원 필터
+        if (researcherFilters.length > 0) {
+            const hasMatchingResearcher = schedule.researchers.some(researcher => 
+                researcherFilters.some(filter => 
+                    researcher.includes(filter) || filter.includes(researcher)
+                )
+            );
+            if (!hasMatchingResearcher) return false;
+        }
+        
+        // 검색어 필터
+        if (searchTerm) {
+            const titleMatch = schedule.title.toLowerCase().includes(searchTerm);
+            const memoMatch = schedule.memo && schedule.memo.toLowerCase().includes(searchTerm);
+            if (!titleMatch && !memoMatch) return false;
+        }
+        
+        return true;
+    });
+    
+    renderScheduleItems();
+}
+
+// 일정 아이템 렌더링
+function renderScheduleItems() {
+    // 기존 일정 아이템 제거
+    document.querySelectorAll('.schedule-item').forEach(item => item.remove());
+    document.querySelectorAll('.schedule-more').forEach(item => item.remove());
+    
+    // 주차별 일정 그룹화
+    const schedulesByWeek = {};
+    
+    filteredSchedules.forEach(schedule => {
+        for (let week = schedule.start_week; week <= schedule.end_week; week++) {
+            const key = `${schedule.start_year}-${schedule.start_month}-${week}`;
+            if (!schedulesByWeek[key]) {
+                schedulesByWeek[key] = [];
+            }
+            schedulesByWeek[key].push(schedule);
+        }
+    });
+    
+    // 각 주차에 일정 아이템 추가
+    Object.keys(schedulesByWeek).forEach(weekKey => {
+        const [year, month, week] = weekKey.split('-');
+        const container = document.querySelector(`[data-year="${year}"][data-month="${month}"][data-week="${week}"]`);
+        
+        if (container) {
+            const schedules = schedulesByWeek[weekKey];
+            const maxVisible = 2;
+            
+            schedules.slice(0, maxVisible).forEach(schedule => {
+                const scheduleElement = createScheduleElement(schedule);
+                container.appendChild(scheduleElement);
+            });
+            
+            // 더 많은 일정이 있는 경우 "더보기" 표시
+            if (schedules.length > maxVisible) {
+                const moreElement = document.createElement('div');
+                moreElement.className = 'schedule-more';
+                moreElement.textContent = `+${schedules.length - maxVisible} 더보기`;
+                moreElement.onclick = () => showMoreSchedules(weekKey, schedules);
+                container.appendChild(moreElement);
+            }
+        }
+    });
+}
+
+// 일정 요소 생성
+function createScheduleElement(schedule) {
+    const element = document.createElement('div');
+    element.className = 'schedule-item';
+    element.dataset.scheduleId = schedule.id;
+    
+    // 일정 유형에 따른 클래스 추가
+    if (schedule.end_week - schedule.start_week >= 1) {
+        element.classList.add('multi-week');
+    }
+    
+    element.innerHTML = `
+        <div class="schedule-title">${schedule.title}</div>
+        <div class="schedule-researchers">${schedule.researchers.join(', ')}</div>
+    `;
+    
+    element.addEventListener('click', () => showScheduleDetail(schedule));
+    
+    return element;
+}
+
+// 일정 상세 보기
+function showScheduleDetail(schedule) {
+    currentScheduleId = schedule.id;
+    
+    const content = `
+        <div class="row g-3">
+            <div class="col-md-6">
+                <label class="form-label">프로젝트</label>
+                <p class="form-control-plaintext">${schedule.project_name}</p>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">일정 제목</label>
+                <p class="form-control-plaintext">${schedule.title}</p>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">기간</label>
+                <p class="form-control-plaintext">${schedule.start_year}년 ${schedule.start_month}월 ${schedule.start_week}주차 ~ ${schedule.end_week}주차</p>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">담당 연구원</label>
+                <p class="form-control-plaintext">${schedule.researchers.join(', ') || '없음'}</p>
+            </div>
+            <div class="col-12">
+                <label class="form-label">메모</label>
+                <p class="form-control-plaintext">${schedule.memo || '없음'}</p>
+            </div>
+        </div>
+    `;
+    
+    document.getElementById('scheduleDetailContent').innerHTML = content;
+    new bootstrap.Modal(document.getElementById('scheduleDetailModal')).show();
+}
+
+// 일정 추가 모달 표시
+function showAddScheduleModal(year = null, month = null, week = null) {
+    if (year && month && week) {
+        document.getElementById('scheduleStartYear').value = year;
+        document.getElementById('scheduleStartMonth').value = month;
+        document.getElementById('scheduleStartWeek').value = week;
+        document.getElementById('scheduleEndWeek').value = week;
+    }
+    
+    new bootstrap.Modal(document.getElementById('addScheduleModal')).show();
+}
+
+// 일정 추가
+async function addSchedule() {
+    try {
+        const formData = new FormData(document.getElementById('addScheduleForm'));
+        const researcherIds = Array.from(document.querySelectorAll('input[name="researcher_ids"]:checked')).map(cb => cb.value);
+        
+        const data = {
+            project_id: formData.get('project_id'),
+            title: formData.get('title'),
+            start_year: parseInt(formData.get('start_year')),
+            start_month: parseInt(formData.get('start_month')),
+            start_week: parseInt(formData.get('start_week')),
+            end_week: parseInt(formData.get('end_week')),
+            researcher_ids: researcherIds,
+            memo: formData.get('memo')
+        };
+        
+        const response = await fetch('/research/schedule/projects/add', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            bootstrap.Modal.getInstance(document.getElementById('addScheduleModal')).hide();
+            document.getElementById('addScheduleForm').reset();
+            loadScheduleData();
+            showNotification('일정이 추가되었습니다.', 'success');
+        } else {
+            showNotification('일정 추가 중 오류가 발생했습니다.', 'error');
+        }
+    } catch (error) {
+        console.error('Error adding schedule:', error);
+        showNotification('일정 추가 중 오류가 발생했습니다.', 'error');
+    }
+}
+
+// 일정 이동
+async function moveSchedule(scheduleId, newYear, newMonth, newWeek) {
+    try {
+        const data = {
+            start_year: parseInt(newYear),
+            start_month: parseInt(newMonth),
+            start_week: parseInt(newWeek),
+            end_week: parseInt(newWeek) // 단순 이동의 경우 같은 주차로 설정
+        };
+        
+        const response = await fetch(`/research/schedule/projects/move/${scheduleId}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            loadScheduleData();
+            showNotification('일정이 이동되었습니다.', 'success');
+        } else {
+            loadScheduleData(); // 실패 시 원상복구
+            showNotification('일정 이동 중 오류가 발생했습니다.', 'error');
+        }
+    } catch (error) {
+        console.error('Error moving schedule:', error);
+        loadScheduleData();
+        showNotification('일정 이동 중 오류가 발생했습니다.', 'error');
+    }
+}
+
+// 일정 삭제
+async function deleteCurrentSchedule() {
+    if (!currentScheduleId) return;
+    
+    if (confirm('정말로 이 일정을 삭제하시겠습니까?')) {
+        try {
+            const response = await fetch(`/research/schedule/projects/delete/${currentScheduleId}`, {
+                method: 'DELETE'
+            });
+            
+            const result = await response.json();
+            
+            if (result.success) {
+                bootstrap.Modal.getInstance(document.getElementById('scheduleDetailModal')).hide();
+                loadScheduleData();
+                showNotification('일정이 삭제되었습니다.', 'success');
+            } else {
+                showNotification('일정 삭제 중 오류가 발생했습니다.', 'error');
+            }
+        } catch (error) {
+            console.error('Error deleting schedule:', error);
+            showNotification('일정 삭제 중 오류가 발생했습니다.', 'error');
+        }
+    }
+}
+
+// 월 네비게이션
+function navigateMonth(direction) {
+    currentMonth += direction;
+    if (currentMonth < 1) {
+        currentMonth = 12;
+        currentYear--;
+    } else if (currentMonth > 12) {
+        currentMonth = 1;
+        currentYear++;
+    }
+    
+    updatePeriodDisplay();
+    loadScheduleData();
+}
+
+// 현재 주차로 이동
+function goToCurrentWeek() {
+    const now = new Date();
+    currentYear = now.getFullYear();
+    currentMonth = now.getMonth() + 1;
+    
+    updatePeriodDisplay();
+    loadScheduleData();
+}
+
+// 기간 표시 업데이트
+function updatePeriodDisplay() {
+    const monthNames = ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월'];
+    document.getElementById('currentPeriod').textContent = `${currentYear}년 ${monthNames[currentMonth - 1]}`;
+}
+
+// 현재 주차 확인
+function isCurrentWeek(year, month, week) {
+    const now = new Date();
+    const currentWeek = Math.ceil(now.getDate() / 7);
+    
+    return year === now.getFullYear() && 
+           month === (now.getMonth() + 1) && 
+           week === currentWeek;
+}
+
+// 필터 초기화
+function resetFilters() {
+    document.getElementById('projectFilter').value = '';
+    document.getElementById('scheduleSearch').value = '';
+    document.querySelectorAll('.researcher-checkbox').forEach(cb => cb.checked = false);
+    filterSchedules();
+}
+
+// 알림 표시
+function showNotification(message, type = 'info') {
+    // 간단한 토스트 메시지 구현
+    const toast = document.createElement('div');
+    toast.className = `alert alert-${type === 'error' ? 'danger' : type} position-fixed`;
+    toast.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+    toast.textContent = message;
+    
+    document.body.appendChild(toast);
+    
+    setTimeout(() => {
+        toast.remove();
+    }, 3000);
+}
+
+// 디바운스 함수
+function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
+}
+
+// 더 많은 일정 보기
+function showMoreSchedules(weekKey, schedules) {
+    // 추가 구현 필요 (모달 또는 드롭다운으로 전체 일정 표시)
+    console.log('More schedules for week:', weekKey, schedules);
+}
+
+// 일정 수정
+function editCurrentSchedule() {
+    // 추가 구현 필요 (수정 모달 표시)
+    console.log('Edit schedule:', currentScheduleId);
+}
+</script>
+{% endblock %}

@@ -1,8 +1,10 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify
 from csv_manager import csv_manager
-from database import db, WeeklySchedule
+from database import db, WeeklySchedule, Project, Researcher, ProjectSchedule
 import pandas as pd
-from datetime import datetime
+from datetime import datetime, date
+import json
+import calendar
 
 research_bp = Blueprint('research', __name__)
 
@@ -304,3 +306,183 @@ def delete_weekly_schedule(schedule_id):
     except Exception as e:
         db.session.rollback()
         return jsonify({'success': False, 'error': str(e)}), 400
+
+# 프로젝트 일정 관리 (새로운 페이지)
+@research_bp.route('/schedule/projects')
+def project_schedule():
+    """프로젝트별 주간 일정 관리 페이지"""
+    # 프로젝트 목록 가져오기
+    projects = Project.query.all()
+    researchers = Researcher.query.all()
+    
+    return render_template('research/project_schedule.html', 
+                         projects=projects, 
+                         researchers=researchers)
+
+@research_bp.route('/schedule/projects/api/data')
+def get_project_schedule_data():
+    """프로젝트 일정 데이터 API"""
+    year = request.args.get('year', type=int, default=datetime.now().year)
+    month = request.args.get('month', type=int, default=datetime.now().month)
+    project_id = request.args.get('project_id')
+    
+    # 3개월 범위 계산
+    months = []
+    for i in range(-1, 2):  # 이전달, 현재달, 다음달
+        target_month = month + i
+        target_year = year
+        
+        if target_month < 1:
+            target_month += 12
+            target_year -= 1
+        elif target_month > 12:
+            target_month -= 12
+            target_year += 1
+            
+        months.append({'year': target_year, 'month': target_month})
+    
+    # 주차 정보 생성
+    calendar_data = []
+    for month_info in months:
+        cal = calendar.monthcalendar(month_info['year'], month_info['month'])
+        weeks = []
+        
+        for week_num, week in enumerate(cal, 1):
+            if any(day > 0 for day in week):  # 유효한 주차만
+                week_start = next(day for day in week if day > 0)
+                week_end = max(day for day in week if day > 0)
+                weeks.append({
+                    'week_num': week_num,
+                    'week_start': week_start,
+                    'week_end': week_end,
+                    'month': month_info['month'],
+                    'year': month_info['year']
+                })
+        
+        calendar_data.append({
+            'month': month_info['month'],
+            'year': month_info['year'],
+            'weeks': weeks
+        })
+    
+    # 일정 데이터 가져오기
+    query = ProjectSchedule.query.join(Project)
+    if project_id:
+        query = query.filter(ProjectSchedule.project_id == project_id)
+    
+    schedules = query.all()
+    
+    # 일정 데이터를 주차별로 그룹화
+    schedule_data = []
+    for schedule in schedules:
+        researchers = []
+        if schedule.researcher_ids:
+            try:
+                researcher_ids = json.loads(schedule.researcher_ids)
+                researchers = [r.name for r in Researcher.query.filter(Researcher.employee_id.in_(researcher_ids)).all()]
+            except:
+                pass
+        
+        schedule_data.append({
+            'id': schedule.id,
+            'project_id': schedule.project_id,
+            'project_name': schedule.project.name if schedule.project else '',
+            'title': schedule.title,
+            'start_week': schedule.start_week,
+            'end_week': schedule.end_week,
+            'start_month': schedule.start_month,
+            'start_year': schedule.start_year,
+            'researchers': researchers,
+            'memo': schedule.memo
+        })
+    
+    return jsonify({
+        'calendar': calendar_data,
+        'schedules': schedule_data
+    })
+
+@research_bp.route('/schedule/projects/add', methods=['POST'])
+def add_project_schedule():
+    """프로젝트 일정 추가"""
+    try:
+        data = request.get_json()
+        
+        new_schedule = ProjectSchedule(
+            project_id=data['project_id'],
+            title=data['title'],
+            start_week=data['start_week'],
+            end_week=data['end_week'],
+            start_month=data['start_month'],
+            start_year=data['start_year'],
+            researcher_ids=json.dumps(data.get('researcher_ids', [])),
+            memo=data.get('memo', '')
+        )
+        
+        db.session.add(new_schedule)
+        db.session.commit()
+        
+        return jsonify({'success': True, 'id': new_schedule.id})
+    
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'error': str(e)})
+
+@research_bp.route('/schedule/projects/update/<int:schedule_id>', methods=['PUT'])
+def update_project_schedule(schedule_id):
+    """프로젝트 일정 수정"""
+    try:
+        schedule = ProjectSchedule.query.get_or_404(schedule_id)
+        data = request.get_json()
+        
+        schedule.title = data.get('title', schedule.title)
+        schedule.start_week = data.get('start_week', schedule.start_week)
+        schedule.end_week = data.get('end_week', schedule.end_week)
+        schedule.start_month = data.get('start_month', schedule.start_month)
+        schedule.start_year = data.get('start_year', schedule.start_year)
+        schedule.researcher_ids = json.dumps(data.get('researcher_ids', []))
+        schedule.memo = data.get('memo', schedule.memo)
+        schedule.updated_at = datetime.utcnow()
+        
+        db.session.commit()
+        
+        return jsonify({'success': True})
+    
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'error': str(e)})
+
+@research_bp.route('/schedule/projects/delete/<int:schedule_id>', methods=['DELETE'])
+def delete_project_schedule(schedule_id):
+    """프로젝트 일정 삭제"""
+    try:
+        schedule = ProjectSchedule.query.get_or_404(schedule_id)
+        db.session.delete(schedule)
+        db.session.commit()
+        
+        return jsonify({'success': True})
+    
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'error': str(e)})
+
+@research_bp.route('/schedule/projects/move/<int:schedule_id>', methods=['POST'])
+def move_project_schedule(schedule_id):
+    """프로젝트 일정 이동"""
+    try:
+        schedule = ProjectSchedule.query.get_or_404(schedule_id)
+        data = request.get_json()
+        
+        # 새로운 주차/월 정보로 업데이트
+        schedule.start_week = data['start_week']
+        schedule.end_week = data['end_week']
+        schedule.start_month = data['start_month']
+        schedule.start_year = data['start_year']
+        schedule.updated_at = datetime.utcnow()
+        
+        db.session.commit()
+        
+        return jsonify({'success': True})
+    
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'error': str(e)})

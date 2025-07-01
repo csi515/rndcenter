@@ -284,3 +284,21 @@ class SafetyProcedure(db.Model):
     version = db.Column(db.String(20), default='1.0')
     status = db.Column(db.String(50), default='유효')
     created_date = db.Column(db.DateTime, default=datetime.utcnow)
+
+class ProjectSchedule(db.Model):
+    __tablename__ = 'project_schedules'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    project_id = db.Column(db.String(50), db.ForeignKey('projects.project_id'), nullable=False)
+    title = db.Column(db.String(500), nullable=False)
+    start_week = db.Column(db.Integer, nullable=False)
+    end_week = db.Column(db.Integer, nullable=False)
+    start_month = db.Column(db.Integer, nullable=False)
+    start_year = db.Column(db.Integer, nullable=False)
+    researcher_ids = db.Column(db.Text)  # JSON string of researcher IDs
+    memo = db.Column(db.Text)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    
+    # Relationship with Project
+    project = db.relationship('Project', backref='schedules')
