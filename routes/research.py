@@ -205,17 +205,17 @@ def add_weekly_schedule():
     data = request.get_json()
     
     try:
-        schedule = WeeklySchedule(
-            schedule_id=f"schedule_{datetime.now().strftime('%Y%m%d_%H%M%S')}_{hash(data.get('task', ''))%10000}",
-            week=int(data.get('week')),
-            month=int(data.get('month')),
-            year=int(data.get('year')),
-            task=data.get('task'),
-            researcher=data.get('researcher', ''),
-            project=data.get('project', ''),
-            priority=data.get('priority', '보통'),
-            notes=data.get('notes', '')
-        )
+        schedule = WeeklySchedule(**{
+            'schedule_id': f"schedule_{datetime.now().strftime('%Y%m%d_%H%M%S')}_{hash(data.get('task', ''))%10000}",
+            'week': int(data.get('week')),
+            'month': int(data.get('month')),
+            'year': int(data.get('year')),
+            'task': data.get('task'),
+            'researcher': data.get('researcher', ''),
+            'project': data.get('project', ''),
+            'priority': data.get('priority', '보통'),
+            'notes': data.get('notes', '')
+        })
         
         db.session.add(schedule)
         db.session.commit()
@@ -407,16 +407,16 @@ def add_project_schedule():
     try:
         data = request.get_json()
         
-        new_schedule = ProjectSchedule(
-            project_id=data['project_id'],
-            title=data['title'],
-            start_week=data['start_week'],
-            end_week=data['end_week'],
-            start_month=data['start_month'],
-            start_year=data['start_year'],
-            researcher_ids=json.dumps(data.get('researcher_ids', [])),
-            memo=data.get('memo', '')
-        )
+        new_schedule = ProjectSchedule(**{
+            'project_id': data['project_id'],
+            'title': data['title'],
+            'start_week': data['start_week'],
+            'end_week': data['end_week'],
+            'start_month': data['start_month'],
+            'start_year': data['start_year'],
+            'researcher_ids': json.dumps(data.get('researcher_ids', [])),
+            'memo': data.get('memo', '')
+        })
         
         db.session.add(new_schedule)
         db.session.commit()
