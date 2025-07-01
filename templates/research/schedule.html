@@ -2,31 +2,175 @@
 
 {% block title %}주간 일정 - R&D 센터 관리시스템{% endblock %}
 
+{% block extra_css %}
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+<style>
+.project-tabs {
+    border-bottom: 2px solid #dee2e6;
+    margin-bottom: 2rem;
+}
+
+.project-tab {
+    padding: 10px 20px;
+    margin-right: 10px;
+    background: transparent;
+    border: none;
+    border-bottom: 3px solid transparent;
+    color: #666;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.project-tab.active {
+    color: #007bff;
+    border-bottom-color: #007bff;
+    font-weight: 600;
+}
+
+.project-tab:hover {
+    color: #007bff;
+    background-color: rgba(13, 110, 253, 0.1);
+}
+
+.experiment-section {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 20px;
+}
+
+.week-experiment-input {
+    border: 2px dashed #dee2e6;
+    border-radius: 8px;
+    padding: 15px;
+    min-height: 100px;
+    background: #fff;
+    cursor: text;
+    transition: all 0.3s ease;
+}
+
+.week-experiment-input:hover {
+    border-color: #007bff;
+    background: #f8f9fa;
+}
+
+.week-experiment-input.active {
+    border-color: #007bff;
+    border-style: solid;
+}
+
+.sortable-list {
+    min-height: 50px;
+    border: 2px dashed transparent;
+    border-radius: 8px;
+    padding: 10px;
+    transition: all 0.3s ease;
+}
+
+.sortable-list.sortable-ghost {
+    background: rgba(13, 110, 253, 0.1);
+    border-color: #007bff;
+}
+
+.schedule-item {
+    background: #fff;
+    border: 1px solid #dee2e6;
+    border-radius: 6px;
+    padding: 10px;
+    margin-bottom: 8px;
+    cursor: move;
+    transition: all 0.3s ease;
+}
+
+.schedule-item:hover {
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    transform: translateY(-2px);
+}
+
+.schedule-item.sortable-chosen {
+    transform: rotate(5deg);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+.week-header {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: #fff;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.project-content {
+    display: none;
+}
+
+.project-content.active {
+    display: block;
+}
+</style>
+{% endblock %}
+
 {% block content %}
 <div class="row">
     <div class="col-12">
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h2><i class="fas fa-calendar-week"></i> 주간 일정</h2>
+            <button class="btn btn-primary" onclick="addNewProject()">
+                <i class="fas fa-plus"></i> 프로젝트 추가
+            </button>
         </div>
     </div>
 </div>
 
-<!-- Monthly Week Schedule -->
-<div class="card">
-    <div class="card-body">
-        <!-- Month Navigation -->
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <button class="btn btn-outline-secondary" id="prevMonth">
-                <i class="fas fa-chevron-left"></i> 이전 달
-            </button>
-            <h3 class="mb-0" id="currentMonth">2025년 1월</h3>
-            <button class="btn btn-outline-secondary" id="nextMonth">
-                다음 달 <i class="fas fa-chevron-right"></i>
-            </button>
+<!-- Project Tabs -->
+<div class="project-tabs">
+    <button class="project-tab active" data-project="전체" onclick="switchProject('전체')">전체</button>
+    <button class="project-tab" data-project="프로젝트A" onclick="switchProject('프로젝트A')">프로젝트A</button>
+    <button class="project-tab" data-project="프로젝트B" onclick="switchProject('프로젝트B')">프로젝트B</button>
+</div>
+
+<!-- Project Contents -->
+<div id="projectContents">
+    <!-- 전체 프로젝트 뷰 -->
+    <div class="project-content active" data-project="전체">
+        <!-- 실험 계획 섹션 -->
+        <div class="experiment-section">
+            <h5><i class="fas fa-flask"></i> 실험 계획</h5>
+            <div class="row">
+                <div class="col-md-4">
+                    <h6>1주차 실험</h6>
+                    <div class="week-experiment-input" data-week="1" contenteditable="true" placeholder="1주차 실험 내용을 입력하세요...">
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <h6>2주차 실험</h6>
+                    <div class="week-experiment-input" data-week="2" contenteditable="true" placeholder="2주차 실험 내용을 입력하세요...">
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <h6>3주차 실험</h6>
+                    <div class="week-experiment-input" data-week="3" contenteditable="true" placeholder="3주차 실험 내용을 입력하세요...">
+                    </div>
+                </div>
+            </div>
         </div>
 
-        <!-- Weekly Schedule Grid -->
-        <div class="row g-3" id="weeklyGrid">
+        <!-- Monthly Week Schedule -->
+        <div class="card">
+            <div class="card-body">
+                <!-- Month Navigation -->
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <button class="btn btn-outline-secondary" id="prevMonth">
+                        <i class="fas fa-chevron-left"></i> 이전 달
+                    </button>
+                    <h3 class="mb-0" id="currentMonth">2025년 1월</h3>
+                    <button class="btn btn-outline-secondary" id="nextMonth">
+                        다음 달 <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
+
+                <!-- Weekly Schedule Grid -->
+                <div class="row g-3" id="weeklyGrid">
             <!-- Week 1 -->
             <div class="col-lg-2 col-md-4 col-sm-6">
                 <div class="week-card card h-100">
@@ -38,7 +182,7 @@
                         <div class="schedule-items sortable-list" id="week-1">
                             <!-- Schedule items will be dynamically added here -->
                         </div>
-                        <button class="btn btn-sm btn-outline-primary w-100 mt-2 add-schedule-btn" data-week="1">
+                        <button class="btn btn-sm btn-outline-primary w-100 mt-2 add-schedule-btn" data-week="1" data-project="전체">
                             <i class="fas fa-plus"></i> 일정 추가
                         </button>
                     </div>
@@ -114,6 +258,65 @@
                             <i class="fas fa-plus"></i> 일정 추가
                         </button>
                     </div>
+                </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 프로젝트A 뷰 -->
+    <div class="project-content" data-project="프로젝트A">
+        <div class="experiment-section">
+            <h5><i class="fas fa-flask"></i> 프로젝트A 실험 계획</h5>
+            <div class="row">
+                <div class="col-md-4">
+                    <h6>1주차 실험</h6>
+                    <div class="week-experiment-input" data-week="1" data-project="프로젝트A" contenteditable="true" placeholder="1주차 실험 내용을 입력하세요..."></div>
+                </div>
+                <div class="col-md-4">
+                    <h6>2주차 실험</h6>
+                    <div class="week-experiment-input" data-week="2" data-project="프로젝트A" contenteditable="true" placeholder="2주차 실험 내용을 입력하세요..."></div>
+                </div>
+                <div class="col-md-4">
+                    <h6>3주차 실험</h6>
+                    <div class="week-experiment-input" data-week="3" data-project="프로젝트A" contenteditable="true" placeholder="3주차 실험 내용을 입력하세요..."></div>
+                </div>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-body">
+                <h5>프로젝트A 주간 일정</h5>
+                <div class="row g-3" id="weeklyGridA">
+                    <!-- 프로젝트A 전용 주간 그리드 -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 프로젝트B 뷰 -->
+    <div class="project-content" data-project="프로젝트B">
+        <div class="experiment-section">
+            <h5><i class="fas fa-flask"></i> 프로젝트B 실험 계획</h5>
+            <div class="row">
+                <div class="col-md-4">
+                    <h6>1주차 실험</h6>
+                    <div class="week-experiment-input" data-week="1" data-project="프로젝트B" contenteditable="true" placeholder="1주차 실험 내용을 입력하세요..."></div>
+                </div>
+                <div class="col-md-4">
+                    <h6>2주차 실험</h6>
+                    <div class="week-experiment-input" data-week="2" data-project="프로젝트B" contenteditable="true" placeholder="2주차 실험 내용을 입력하세요..."></div>
+                </div>
+                <div class="col-md-4">
+                    <h6>3주차 실험</h6>
+                    <div class="week-experiment-input" data-week="3" data-project="프로젝트B" contenteditable="true" placeholder="3주차 실험 내용을 입력하세요..."></div>
+                </div>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-body">
+                <h5>프로젝트B 주간 일정</h5>
+                <div class="row g-3" id="weeklyGridB">
+                    <!-- 프로젝트B 전용 주간 그리드 -->
                 </div>
             </div>
         </div>
@@ -216,5 +419,381 @@
 {% endblock %}
 
 {% block extra_js %}
-<script src="{{ url_for('static', filename='js/weekly-schedule.js') }}"></script>
+<script>
+let currentProject = '전체';
+let currentYear = 2025;
+let currentMonth = 1;
+let sortableInstances = [];
+
+document.addEventListener('DOMContentLoaded', function() {
+    initializeProjectTabs();
+    initializeSortable();
+    initializeExperimentInputs();
+    loadScheduleData();
+    setupMonthNavigation();
+});
+
+// 프로젝트 탭 전환
+function switchProject(projectName) {
+    currentProject = projectName;
+    
+    // 탭 활성화 상태 변경
+    document.querySelectorAll('.project-tab').forEach(tab => {
+        tab.classList.remove('active');
+    });
+    document.querySelector(`[data-project="${projectName}"]`).classList.add('active');
+    
+    // 프로젝트 콘텐츠 표시/숨김
+    document.querySelectorAll('.project-content').forEach(content => {
+        content.classList.remove('active');
+    });
+    document.querySelector(`[data-project="${projectName}"]`).classList.add('active');
+    
+    loadProjectSchedule(projectName);
+}
+
+// 드래그 앤 드롭 초기화
+function initializeSortable() {
+    const sortableLists = document.querySelectorAll('.sortable-list');
+    
+    sortableLists.forEach(list => {
+        const sortable = Sortable.create(list, {
+            group: 'schedule',
+            animation: 150,
+            ghostClass: 'sortable-ghost',
+            chosenClass: 'sortable-chosen',
+            onEnd: function(evt) {
+                const item = evt.item;
+                const fromWeek = evt.from.id.split('-')[1];
+                const toWeek = evt.to.id.split('-')[1];
+                const scheduleId = item.dataset.scheduleId;
+                
+                if (fromWeek !== toWeek) {
+                    moveScheduleItem(scheduleId, toWeek);
+                }
+            }
+        });
+        sortableInstances.push(sortable);
+    });
+}
+
+// 실험 내용 입력 초기화
+function initializeExperimentInputs() {
+    const experimentInputs = document.querySelectorAll('.week-experiment-input');
+    
+    experimentInputs.forEach(input => {
+        input.addEventListener('focus', function() {
+            this.classList.add('active');
+        });
+        
+        input.addEventListener('blur', function() {
+            this.classList.remove('active');
+            saveExperimentContent(this);
+        });
+        
+        input.addEventListener('input', function() {
+            // 자동 저장 (디바운싱)
+            clearTimeout(this.saveTimeout);
+            this.saveTimeout = setTimeout(() => {
+                saveExperimentContent(this);
+            }, 1000);
+        });
+    });
+}
+
+// 실험 내용 저장
+function saveExperimentContent(inputElement) {
+    const week = inputElement.dataset.week;
+    const project = inputElement.dataset.project || currentProject;
+    const content = inputElement.innerHTML;
+    
+    const data = {
+        week: week,
+        project: project,
+        content: content
+    };
+    
+    fetch('/research/schedule/experiment/save', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data)
+    })
+    .then(response => response.json())
+    .then(result => {
+        if (result.success) {
+            inputElement.style.borderColor = '#28a745';
+            setTimeout(() => {
+                inputElement.style.borderColor = '';
+            }, 1000);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        inputElement.style.borderColor = '#dc3545';
+    });
+}
+
+// 일정 항목 이동
+function moveScheduleItem(scheduleId, newWeek) {
+    fetch(`/research/schedule/move/${scheduleId}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({week: newWeek})
+    })
+    .then(response => response.json())
+    .then(result => {
+        if (!result.success) {
+            location.reload(); // 실패 시 새로고침
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        location.reload();
+    });
+}
+
+// 일정 추가 버튼 클릭
+document.addEventListener('click', function(e) {
+    if (e.target.closest('.add-schedule-btn')) {
+        const btn = e.target.closest('.add-schedule-btn');
+        const week = btn.dataset.week;
+        const project = btn.dataset.project || currentProject;
+        
+        document.getElementById('scheduleWeek').value = week;
+        document.getElementById('scheduleProject').value = project;
+        
+        new bootstrap.Modal(document.getElementById('addScheduleModal')).show();
+    }
+});
+
+// 일정 추가 폼 제출
+document.getElementById('addScheduleForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const formData = new FormData(this);
+    const data = Object.fromEntries(formData);
+    data.project = currentProject;
+    
+    fetch('/research/schedule/weekly/add', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data)
+    })
+    .then(response => response.json())
+    .then(result => {
+        if (result.success) {
+            bootstrap.Modal.getInstance(document.getElementById('addScheduleModal')).hide();
+            this.reset();
+            loadProjectSchedule(currentProject);
+        } else {
+            alert('일정 추가 중 오류가 발생했습니다.');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('일정 추가 중 오류가 발생했습니다.');
+    });
+});
+
+// 스케줄 데이터 로드
+function loadScheduleData() {
+    loadProjectSchedule(currentProject);
+    loadExperimentData();
+}
+
+// 프로젝트별 스케줄 로드
+function loadProjectSchedule(project) {
+    const url = `/research/schedule/weekly/${currentYear}/${currentMonth}?project=${encodeURIComponent(project)}`;
+    
+    fetch(url)
+    .then(response => response.json())
+    .then(data => {
+        renderScheduleItems(data.schedules || []);
+    })
+    .catch(error => {
+        console.error('Error loading schedule:', error);
+    });
+}
+
+// 실험 데이터 로드
+function loadExperimentData() {
+    fetch(`/research/schedule/experiments/${currentProject}`)
+    .then(response => response.json())
+    .then(data => {
+        data.experiments.forEach(exp => {
+            const input = document.querySelector(`[data-week="${exp.week}"][data-project="${exp.project}"]`);
+            if (input) {
+                input.innerHTML = exp.content;
+            }
+        });
+    })
+    .catch(error => {
+        console.error('Error loading experiments:', error);
+    });
+}
+
+// 스케줄 아이템 렌더링
+function renderScheduleItems(schedules) {
+    // 기존 아이템 제거
+    document.querySelectorAll('.schedule-item').forEach(item => item.remove());
+    
+    schedules.forEach(schedule => {
+        const weekContainer = document.getElementById(`week-${schedule.week}`);
+        if (weekContainer) {
+            const scheduleItem = createScheduleItem(schedule);
+            weekContainer.appendChild(scheduleItem);
+        }
+    });
+}
+
+// 스케줄 아이템 생성
+function createScheduleItem(schedule) {
+    const div = document.createElement('div');
+    div.className = 'schedule-item';
+    div.dataset.scheduleId = schedule.schedule_id;
+    
+    const priorityClass = {
+        '긴급': 'danger',
+        '높음': 'warning',
+        '보통': 'info',
+        '낮음': 'secondary'
+    }[schedule.priority] || 'info';
+    
+    div.innerHTML = `
+        <div class="d-flex justify-content-between align-items-start">
+            <div class="flex-grow-1">
+                <div class="fw-bold small">${schedule.task}</div>
+                <div class="text-muted small">${schedule.researcher || ''}</div>
+            </div>
+            <div class="ms-2">
+                <span class="badge bg-${priorityClass}">${schedule.priority}</span>
+                <button class="btn btn-sm btn-outline-danger ms-1" onclick="deleteScheduleItem('${schedule.schedule_id}')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        </div>
+        ${schedule.notes ? `<div class="text-muted small mt-1">${schedule.notes}</div>` : ''}
+    `;
+    
+    return div;
+}
+
+// 스케줄 아이템 삭제
+function deleteScheduleItem(scheduleId) {
+    if (confirm('정말로 이 일정을 삭제하시겠습니까?')) {
+        fetch(`/research/schedule/weekly/delete/${scheduleId}`, {
+            method: 'DELETE'
+        })
+        .then(response => response.json())
+        .then(result => {
+            if (result.success) {
+                loadProjectSchedule(currentProject);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+    }
+}
+
+// 월 네비게이션 설정
+function setupMonthNavigation() {
+    document.getElementById('prevMonth').addEventListener('click', function() {
+        currentMonth--;
+        if (currentMonth < 1) {
+            currentMonth = 12;
+            currentYear--;
+        }
+        updateMonthDisplay();
+        loadProjectSchedule(currentProject);
+    });
+    
+    document.getElementById('nextMonth').addEventListener('click', function() {
+        currentMonth++;
+        if (currentMonth > 12) {
+            currentMonth = 1;
+            currentYear++;
+        }
+        updateMonthDisplay();
+        loadProjectSchedule(currentProject);
+    });
+    
+    updateMonthDisplay();
+}
+
+// 월 표시 업데이트
+function updateMonthDisplay() {
+    const monthNames = ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월'];
+    document.getElementById('currentMonth').textContent = `${currentYear}년 ${monthNames[currentMonth - 1]}`;
+}
+
+// 새 프로젝트 추가
+function addNewProject() {
+    const projectName = prompt('새 프로젝트 이름을 입력하세요:');
+    if (projectName && projectName.trim()) {
+        // 새 탭 추가
+        const tabsContainer = document.querySelector('.project-tabs');
+        const newTab = document.createElement('button');
+        newTab.className = 'project-tab';
+        newTab.dataset.project = projectName;
+        newTab.textContent = projectName;
+        newTab.onclick = () => switchProject(projectName);
+        tabsContainer.appendChild(newTab);
+        
+        // 새 프로젝트 콘텐츠 추가
+        const projectContent = createProjectContent(projectName);
+        document.getElementById('projectContents').appendChild(projectContent);
+        
+        // 새 프로젝트로 전환
+        switchProject(projectName);
+    }
+}
+
+// 프로젝트 콘텐츠 생성
+function createProjectContent(projectName) {
+    const div = document.createElement('div');
+    div.className = 'project-content';
+    div.dataset.project = projectName;
+    
+    div.innerHTML = `
+        <div class="experiment-section">
+            <h5><i class="fas fa-flask"></i> ${projectName} 실험 계획</h5>
+            <div class="row">
+                <div class="col-md-4">
+                    <h6>1주차 실험</h6>
+                    <div class="week-experiment-input" data-week="1" data-project="${projectName}" contenteditable="true" placeholder="1주차 실험 내용을 입력하세요..."></div>
+                </div>
+                <div class="col-md-4">
+                    <h6>2주차 실험</h6>
+                    <div class="week-experiment-input" data-week="2" data-project="${projectName}" contenteditable="true" placeholder="2주차 실험 내용을 입력하세요..."></div>
+                </div>
+                <div class="col-md-4">
+                    <h6>3주차 실험</h6>
+                    <div class="week-experiment-input" data-week="3" data-project="${projectName}" contenteditable="true" placeholder="3주차 실험 내용을 입력하세요..."></div>
+                </div>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-body">
+                <h5>${projectName} 주간 일정</h5>
+                <div class="row g-3">
+                    <!-- 주간 그리드는 동적으로 생성 -->
+                </div>
+            </div>
+        </div>
+    `;
+    
+    return div;
+}
+
+function initializeProjectTabs() {
+    // 탭 초기화는 이미 HTML에서 처리됨
+}
+</script>
 {% endblock %}
