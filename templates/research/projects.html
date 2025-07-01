@@ -59,7 +59,8 @@
                         </td>
                         <td>{{ project.participants }}</td>
                         <td>
-                            <button class="btn btn-sm btn-outline-primary" onclick="editProject({{ loop.index0 }}, {{ project|tojson }})">
+                            <button class="btn btn-sm btn-outline-primary" 
+                                    onclick="editProject({{ loop.index0 }}, '{{ project.name|e }}', '{{ project.description|e }}', '{{ project.start_date|e }}', '{{ project.end_date|e }}', '{{ project.status|e }}', '{{ project.participants|e }}')">
                                 <i class="fas fa-edit"></i>
                             </button>
                             <a href="{{ url_for('research.delete_project', index=loop.index0) }}" 
@@ -183,14 +184,14 @@
 
 {% block extra_js %}
 <script>
-function editProject(index, project) {
+function editProject(index, name, description, startDate, endDate, status, participants) {
     document.getElementById('editProjectForm').action = `/research/projects/update/${index}`;
-    document.getElementById('editName').value = project.name || '';
-    document.getElementById('editDescription').value = project.description || '';
-    document.getElementById('editStartDate').value = project.start_date || '';
-    document.getElementById('editEndDate').value = project.end_date || '';
-    document.getElementById('editStatus').value = project.status || '';
-    document.getElementById('editParticipants').value = project.participants || '';
+    document.getElementById('editName').value = name || '';
+    document.getElementById('editDescription').value = description || '';
+    document.getElementById('editStartDate').value = startDate || '';
+    document.getElementById('editEndDate').value = endDate || '';
+    document.getElementById('editStatus').value = status || '';
+    document.getElementById('editParticipants').value = participants || '';
     
     new bootstrap.Modal(document.getElementById('editProjectModal')).show();
 }
