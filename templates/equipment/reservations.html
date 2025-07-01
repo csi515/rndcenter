@@ -2,118 +2,406 @@
 
 {% block title %}장비 예약 - R&D 센터 관리시스템{% endblock %}
 
+{% block extra_css %}
+<script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js'></script>
+<style>
+    .fc {
+        max-width: 100%;
+        font-family: inherit;
+    }
+    
+    .fc-event {
+        cursor: pointer;
+        border-radius: 4px;
+        font-size: 0.8rem;
+    }
+    
+    .fc-event:hover {
+        opacity: 0.8;
+    }
+    
+    .fc-toolbar {
+        flex-wrap: wrap;
+        margin-bottom: 1rem;
+    }
+    
+    .fc-toolbar-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+    }
+    
+    .fc-button-group .fc-button {
+        border-radius: 0.375rem;
+        margin: 0 2px;
+    }
+    
+    .fc-button-primary {
+        background-color: var(--bs-primary);
+        border-color: var(--bs-primary);
+    }
+    
+    .fc-button-primary:not(:disabled):active,
+    .fc-button-primary:not(:disabled).fc-button-active {
+        background-color: var(--bs-primary);
+        border-color: var(--bs-primary);
+    }
+    
+    .calendar-controls {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+    
+    .equipment-legend {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin-top: 1rem;
+    }
+    
+    .equipment-legend-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.875rem;
+    }
+    
+    .equipment-color {
+        width: 16px;
+        height: 16px;
+        border-radius: 2px;
+    }
+    
+    .all-day-toggle {
+        margin-top: 0.5rem;
+    }
+    
+    .time-inputs {
+        transition: opacity 0.2s ease;
+    }
+    
+    .time-inputs.disabled {
+        opacity: 0.5;
+        pointer-events: none;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
 <div class="row">
     <div class="col-12">
-        <div class="d-flex justify-content-between align-items-center mb-4">
+        <div class="calendar-controls">
             <h2><i class="fas fa-calendar-check"></i> 장비 예약</h2>
-            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addReservationModal">
+            <button class="btn btn-primary" onclick="showAddReservationModal()">
                 <i class="fas fa-plus"></i> 예약 추가
             </button>
         </div>
     </div>
 </div>
 
-<!-- Reservations Table -->
+<!-- Calendar Container -->
 <div class="card">
-    <div class="card-header">
-        <h5 class="mb-0">예약 현황</h5>
-    </div>
     <div class="card-body">
-        <div class="table-responsive">
-            <table class="table table-striped">
-                <thead>
-                    <tr>
-                        <th>장비명</th>
-                        <th>예약자</th>
-                        <th>예약일</th>
-                        <th>시작 시간</th>
-                        <th>종료 시간</th>
-                        <th>목적</th>
-                        <th>상태</th>
-                        <th>액션</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for reservation in reservations %}
-                    <tr>
-                        <td>{{ reservation.equipment_name }}</td>
-                        <td>{{ reservation.user_name }}</td>
-                        <td>{{ reservation.reservation_date }}</td>
-                        <td>{{ reservation.start_time }}</td>
-                        <td>{{ reservation.end_time }}</td>
-                        <td>{{ reservation.purpose }}</td>
-                        <td>
-                            <span class="badge {% if reservation.status == '예약됨' %}bg-primary{% elif reservation.status == '사용중' %}bg-success{% else %}bg-secondary{% endif %}">
-                                {{ reservation.status }}
-                            </span>
-                        </td>
-                        <td>
-                            <button class="btn btn-sm btn-outline-success" title="사용 완료">
-                                <i class="fas fa-check"></i>
-                            </button>
-                            <button class="btn btn-sm btn-outline-danger" title="취소">
-                                <i class="fas fa-times"></i>
-                            </button>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+        <div id="calendar"></div>
+    </div>
+</div>
+
+<!-- Equipment Legend -->
+<div class="card mt-3">
+    <div class="card-body">
+        <h6 class="card-title">장비별 색상 구분</h6>
+        <div class="equipment-legend" id="equipmentLegend"></div>
+    </div>
+</div>
+
+<!-- Add/Edit Reservation Modal -->
+<div class="modal fade" id="reservationModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="reservationModalTitle">장비 예약</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="reservationForm">
+                    <input type="hidden" id="reservationId" name="reservation_id">
+                    
+                    <div class="mb-3">
+                        <label class="form-label">장비 선택 *</label>
+                        <select class="form-select" id="equipmentName" name="equipment_name" required>
+                            <option value="">장비를 선택하세요</option>
+                            {% for equip in equipment %}
+                            <option value="{{ equip.name }}">{{ equip.name }} ({{ equip.location }})</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">예약자명 *</label>
+                        <input type="text" class="form-control" id="reserver" name="reserver" required>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">시작일 *</label>
+                            <input type="date" class="form-control" id="startDate" name="start_date" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">종료일 *</label>
+                            <input type="date" class="form-control" id="endDate" name="end_date" required>
+                        </div>
+                    </div>
+                    
+                    <div class="all-day-toggle">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="allDay" name="all_day">
+                            <label class="form-check-label" for="allDay">
+                                하루 종일
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="row time-inputs" id="timeInputs">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">시작 시간</label>
+                            <input type="time" class="form-control" id="startTime" name="start_time">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">종료 시간</label>
+                            <input type="time" class="form-control" id="endTime" name="end_time">
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">사용 목적</label>
+                        <textarea class="form-control" id="purpose" name="purpose" rows="3"></textarea>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">메모</label>
+                        <textarea class="form-control" id="notes" name="notes" rows="2"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" id="deleteBtn" onclick="deleteReservation()" style="display: none;">삭제</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+                <button type="button" class="btn btn-primary" onclick="saveReservation()">저장</button>
+            </div>
         </div>
     </div>
 </div>
 
-<!-- Add Reservation Modal -->
-<div class="modal fade" id="addReservationModal" tabindex="-1">
+<!-- Event Details Modal -->
+<div class="modal fade" id="eventDetailsModal" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
-            <form method="POST" action="{{ url_for('equipment.add_reservation') }}">
-                <div class="modal-header">
-                    <h5 class="modal-title">장비 예약</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <label class="form-label">장비 선택 *</label>
-                        <select class="form-select" name="equipment_name" required>
-                            <option value="">장비를 선택하세요</option>
-                            {% for equip in equipment %}
-                            {% if equip.status == '사용 가능' %}
-                            <option value="{{ equip.name }}">{{ equip.name }} ({{ equip.location }})</option>
-                            {% endif %}
-                            {% endfor %}
-                        </select>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">예약자명 *</label>
-                        <input type="text" class="form-control" name="user_name" required>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">예약일 *</label>
-                        <input type="date" class="form-control" name="reservation_date" required>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">시작 시간 *</label>
-                            <input type="time" class="form-control" name="start_time" required>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">종료 시간 *</label>
-                            <input type="time" class="form-control" name="end_time" required>
-                        </div>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">사용 목적</label>
-                        <textarea class="form-control" name="purpose" rows="3"></textarea>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
-                    <button type="submit" class="btn btn-primary">예약</button>
-                </div>
-            </form>
+            <div class="modal-header">
+                <h5 class="modal-title">예약 상세 정보</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="eventDetailsContent">
+                <!-- Event details will be populated here -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" onclick="editEventFromDetails()">수정</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+            </div>
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/equipment-calendar.js') }}"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize the equipment reservation calendar
+    initializeEquipmentCalendar();
+    
+    // Setup all-day toggle
+    document.getElementById('allDay').addEventListener('change', function() {
+        const timeInputs = document.getElementById('timeInputs');
+        if (this.checked) {
+            timeInputs.classList.add('disabled');
+            document.getElementById('startTime').value = '';
+            document.getElementById('endTime').value = '';
+        } else {
+            timeInputs.classList.remove('disabled');
+        }
+    });
+    
+    // Auto-set end date when start date changes
+    document.getElementById('startDate').addEventListener('change', function() {
+        const endDate = document.getElementById('endDate');
+        if (!endDate.value || endDate.value < this.value) {
+            endDate.value = this.value;
+        }
+    });
+});
+
+let currentReservationId = null;
+
+function showAddReservationModal(startDate = null, endDate = null) {
+    currentReservationId = null;
+    document.getElementById('reservationModalTitle').textContent = '새 예약 등록';
+    document.getElementById('deleteBtn').style.display = 'none';
+    document.getElementById('reservationForm').reset();
+    
+    if (startDate) {
+        document.getElementById('startDate').value = startDate;
+        document.getElementById('endDate').value = endDate || startDate;
+    }
+    
+    new bootstrap.Modal(document.getElementById('reservationModal')).show();
+}
+
+function editReservation(reservation) {
+    currentReservationId = reservation.id;
+    document.getElementById('reservationModalTitle').textContent = '예약 수정';
+    document.getElementById('deleteBtn').style.display = 'inline-block';
+    
+    // Populate form with reservation data
+    document.getElementById('equipmentName').value = reservation.extendedProps.equipment_name;
+    document.getElementById('reserver').value = reservation.extendedProps.reserver;
+    document.getElementById('purpose').value = reservation.extendedProps.purpose || '';
+    document.getElementById('notes').value = reservation.extendedProps.notes || '';
+    
+    // Parse dates
+    const startDate = new Date(reservation.start);
+    const endDate = new Date(reservation.end);
+    
+    document.getElementById('startDate').value = startDate.toISOString().split('T')[0];
+    document.getElementById('endDate').value = endDate.toISOString().split('T')[0];
+    
+    // Check if it's an all-day event
+    const isAllDay = startDate.getHours() === 0 && startDate.getMinutes() === 0 && 
+                     endDate.getHours() === 23 && endDate.getMinutes() === 59;
+    
+    document.getElementById('allDay').checked = isAllDay;
+    
+    if (!isAllDay) {
+        document.getElementById('startTime').value = startDate.toTimeString().substr(0, 5);
+        document.getElementById('endTime').value = endDate.toTimeString().substr(0, 5);
+        document.getElementById('timeInputs').classList.remove('disabled');
+    } else {
+        document.getElementById('timeInputs').classList.add('disabled');
+    }
+    
+    new bootstrap.Modal(document.getElementById('reservationModal')).show();
+}
+
+function saveReservation() {
+    const form = document.getElementById('reservationForm');
+    if (!form.checkValidity()) {
+        form.reportValidity();
+        return;
+    }
+    
+    const formData = new FormData(form);
+    const data = Object.fromEntries(formData);
+    
+    // Construct datetime strings
+    let startDateTime, endDateTime;
+    
+    if (document.getElementById('allDay').checked) {
+        startDateTime = data.start_date + 'T00:00:00';
+        endDateTime = data.end_date + 'T23:59:59';
+    } else {
+        startDateTime = data.start_date + 'T' + (data.start_time || '09:00:00');
+        endDateTime = data.end_date + 'T' + (data.end_time || '18:00:00');
+    }
+    
+    const payload = {
+        equipment_name: data.equipment_name,
+        reserver: data.reserver,
+        purpose: data.purpose,
+        notes: data.notes,
+        start: startDateTime,
+        end: endDateTime
+    };
+    
+    const url = currentReservationId ? 
+        `/equipment/reservations/update/${currentReservationId}` : 
+        '/equipment/reservations/add';
+    
+    fetch(url, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload)
+    })
+    .then(response => response.json())
+    .then(result => {
+        if (result.success) {
+            bootstrap.Modal.getInstance(document.getElementById('reservationModal')).hide();
+            calendar.refetchEvents();
+            showNotification(result.message, 'success');
+        } else {
+            showNotification(result.message, 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showNotification('예약 처리 중 오류가 발생했습니다.', 'error');
+    });
+}
+
+function deleteReservation() {
+    if (!currentReservationId || !confirm('정말로 이 예약을 삭제하시겠습니까?')) {
+        return;
+    }
+    
+    fetch(`/equipment/reservations/delete/${currentReservationId}`, {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json',
+        }
+    })
+    .then(response => response.json())
+    .then(result => {
+        if (result.success) {
+            bootstrap.Modal.getInstance(document.getElementById('reservationModal')).hide();
+            calendar.refetchEvents();
+            showNotification(result.message, 'success');
+        } else {
+            showNotification(result.message, 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showNotification('예약 삭제 중 오류가 발생했습니다.', 'error');
+    });
+}
+
+function editEventFromDetails() {
+    bootstrap.Modal.getInstance(document.getElementById('eventDetailsModal')).hide();
+    // The editReservation function will be called from the calendar click handler
+}
+
+function showNotification(message, type) {
+    // Create and show notification
+    const alertClass = type === 'success' ? 'alert-success' : 'alert-danger';
+    const alertHtml = `
+        <div class="alert ${alertClass} alert-dismissible fade show position-fixed" 
+             style="top: 20px; right: 20px; z-index: 9999; min-width: 300px;">
+            ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    `;
+    document.body.insertAdjacentHTML('beforeend', alertHtml);
+    
+    // Auto-remove after 5 seconds
+    setTimeout(() => {
+        const alert = document.querySelector('.alert:last-of-type');
+        if (alert) {
+            alert.remove();
+        }
+    }, 5000);
+}
+</script>
 {% endblock %}
