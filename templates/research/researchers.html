@@ -37,10 +37,11 @@
                         <td>{{ researcher.email }}</td>
                         <td>{{ researcher.position }}</td>
                         <td>
-                            <button class="btn btn-sm btn-outline-primary" onclick="editResearcher({{ loop.index0 }}, {{ researcher|tojson }})">
+                            <button class="btn btn-sm btn-outline-primary" 
+                                    onclick="editResearcher({{ loop.index0 }}, '{{ researcher.name|e }}', '{{ researcher.email|e }}', '{{ researcher.position|e }}')">
                                 <i class="fas fa-edit"></i>
                             </button>
-                            <button class="btn btn-sm btn-outline-danger" onclick="deleteResearcher({{ loop.index0 }}, '{{ researcher.name }}')">
+                            <button class="btn btn-sm btn-outline-danger" onclick="deleteResearcher({{ loop.index0 }}, '{{ researcher.name|e }}')">
                                 <i class="fas fa-trash"></i>
                             </button>
                         </td>
@@ -123,11 +124,11 @@
 
 {% block extra_js %}
 <script>
-function editResearcher(index, researcher) {
+function editResearcher(index, name, email, position) {
     document.getElementById('editResearcherForm').action = `/research/researchers/update/${index}`;
-    document.getElementById('editName').value = researcher.name || '';
-    document.getElementById('editEmail').value = researcher.email || '';
-    document.getElementById('editPosition').value = researcher.position || '';
+    document.getElementById('editName').value = name || '';
+    document.getElementById('editEmail').value = email || '';
+    document.getElementById('editPosition').value = position || '';
     
     new bootstrap.Modal(document.getElementById('editResearcherModal')).show();
 }
