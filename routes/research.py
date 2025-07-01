@@ -83,6 +83,36 @@ def add_researcher():
     
     return redirect(url_for('research.researchers'))
 
+@research_bp.route('/researchers/update/<int:index>', methods=['POST'])
+def update_researcher(index):
+    try:
+        data = {
+            'name': request.form.get('name'),
+            'email': request.form.get('email'),
+            'position': request.form.get('position', '')
+        }
+        
+        if csv_manager.update_row('researchers.csv', index, data):
+            flash('연구원 정보가 성공적으로 수정되었습니다.', 'success')
+        else:
+            flash('연구원 정보 수정 중 오류가 발생했습니다.', 'error')
+    except Exception as e:
+        flash(f'연구원 정보 수정 중 오류가 발생했습니다: {str(e)}', 'error')
+    
+    return redirect(url_for('research.researchers'))
+
+@research_bp.route('/researchers/delete/<int:index>', methods=['POST'])
+def delete_researcher(index):
+    try:
+        if csv_manager.delete_row('researchers.csv', index):
+            flash('연구원이 성공적으로 삭제되었습니다.', 'success')
+        else:
+            flash('연구원 삭제 중 오류가 발생했습니다.', 'error')
+    except Exception as e:
+        flash(f'연구원 삭제 중 오류가 발생했습니다: {str(e)}', 'error')
+    
+    return redirect(url_for('research.researchers'))
+
 @research_bp.route('/schedule')
 def schedule():
     schedule_data = csv_manager.read_csv('schedule.csv')
