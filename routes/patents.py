@@ -94,3 +94,10 @@ def enhanced_patents_api():
         return jsonify(patents_list)
     except Exception as e:
         return jsonify([])
+
+
+# 간결한 특허 관리 페이지
+@patents_bp.route("/simplified")
+def simplified_patent_list():
+    """간결한 테이블 구조의 특허 관리 페이지"""
+    return render_template("patents/simplified_list.html")

@@ -1,0 +1,1193 @@
+{% extends "base.html" %}
+
+{% block title %}특허 관리{% endblock %}
+
+{% block extra_head %}
+<style>
+.patent-container {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.header-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    padding: 1rem;
+    background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+    border-radius: 12px;
+    color: white;
+}
+
+/* 특허 목록 테이블 */
+.patents-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+}
+
+.patents-table th {
+    background: #495057;
+    color: white;
+    padding: 1rem 0.75rem;
+    text-align: left;
+    font-weight: 600;
+    border: 1px solid #6c757d;
+}
+
+.patents-table td {
+    padding: 0.75rem;
+    border: 1px solid #dee2e6;
+    vertical-align: middle;
+}
+
+.patents-table tbody tr {
+    transition: background-color 0.2s;
+}
+
+.patents-table tbody tr:hover {
+    background: #f8f9fa;
+}
+
+.patents-table tbody tr.expanded {
+    background: #e3f2fd;
+}
+
+/* 상태 배지 */
+.status-badge {
+    padding: 0.3rem 0.6rem;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.status-준비중 { background: #e3f2fd; color: #1976d2; }
+.status-출원중 { background: #fff3e0; color: #f57c00; }
+.status-등록 { background: #e8f5e8; color: #388e3c; }
+.status-거절 { background: #ffebee; color: #d32f2f; }
+.status-공개 { background: #f3e5f5; color: #7b1fa2; }
+
+/* 액션 버튼 */
+.action-buttons {
+    display: flex;
+    gap: 0.25rem;
+    white-space: nowrap;
+}
+
+.btn-action {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.8rem;
+    border-radius: 4px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-detail {
+    background: #007bff;
+    color: white;
+}
+
+.btn-detail:hover {
+    background: #0056b3;
+}
+
+.btn-edit {
+    background: #28a745;
+    color: white;
+}
+
+.btn-edit:hover {
+    background: #1e7e34;
+}
+
+.btn-delete {
+    background: #dc3545;
+    color: white;
+}
+
+.btn-delete:hover {
+    background: #c82333;
+}
+
+/* 상세 정보 카드 */
+.detail-card {
+    display: none;
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin: 1rem 0;
+}
+
+.detail-card.show {
+    display: block;
+    animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.detail-section {
+    margin-bottom: 1.5rem;
+}
+
+.detail-section h6 {
+    color: #495057;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    border-bottom: 2px solid #007bff;
+    padding-bottom: 0.5rem;
+}
+
+.detail-info {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.info-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.5rem;
+    background: white;
+    border-radius: 4px;
+    border: 1px solid #dee2e6;
+}
+
+.info-label {
+    font-weight: 600;
+    color: #6c757d;
+}
+
+.info-value {
+    color: #495057;
+    text-align: right;
+}
+
+/* 출원인 정보 테이블 */
+.applicants-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.applicants-table th {
+    background: #6c757d;
+    color: white;
+    padding: 0.75rem 0.5rem;
+    text-align: center;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.applicants-table td {
+    padding: 0.75rem 0.5rem;
+    border: 1px solid #dee2e6;
+    text-align: center;
+    vertical-align: middle;
+}
+
+.applicants-table tr:nth-child(even) {
+    background: #f8f9fa;
+}
+
+.applicants-table input {
+    border: 1px solid #ced4da;
+    background: white;
+    width: 100%;
+    padding: 0.375rem;
+    font-size: 0.9rem;
+    border-radius: 4px;
+    text-align: center;
+}
+
+.applicants-table input:focus {
+    border-color: #007bff;
+    outline: none;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+.applicants-table input:read-only {
+    background: #e9ecef;
+    border-color: #dee2e6;
+}
+
+/* 지분율 총합 표시 */
+.share-summary {
+    background: white;
+    border: 2px solid #dee2e6;
+    border-radius: 8px;
+    padding: 1rem;
+    margin-top: 1rem;
+    text-align: center;
+}
+
+.share-summary.valid {
+    border-color: #28a745;
+    background: #d4edda;
+}
+
+.share-summary.invalid {
+    border-color: #dc3545;
+    background: #f8d7da;
+}
+
+.share-total {
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.share-warning {
+    font-size: 0.9rem;
+    margin-top: 0.5rem;
+    display: none;
+}
+
+.share-warning.show {
+    display: block;
+    color: #dc3545;
+}
+
+/* 출원인 관리 버튼 */
+.applicant-actions {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: center;
+    margin-top: 1rem;
+}
+
+.btn-add-applicant {
+    background: #007bff;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-add-applicant:hover {
+    background: #0056b3;
+}
+
+.btn-remove-applicant {
+    background: #dc3545;
+    color: white;
+    border: none;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    cursor: pointer;
+}
+
+.btn-remove-applicant:hover {
+    background: #c82333;
+}
+
+/* 관리자 전용 요소 */
+.admin-only {
+    display: block;
+}
+
+.readonly-mode .admin-only {
+    display: none;
+}
+
+.readonly-mode input,
+.readonly-mode select,
+.readonly-mode textarea {
+    background: #e9ecef !important;
+    border-color: #dee2e6 !important;
+    pointer-events: none;
+}
+
+/* 저장/취소 버튼 */
+.detail-actions {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: flex-end;
+    margin-top: 1.5rem;
+    padding-top: 1rem;
+    border-top: 1px solid #dee2e6;
+}
+
+.btn-save {
+    background: #28a745;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.btn-save:hover {
+    background: #1e7e34;
+}
+
+.btn-save:disabled {
+    background: #6c757d;
+    cursor: not-allowed;
+}
+
+.btn-cancel {
+    background: #6c757d;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.btn-cancel:hover {
+    background: #545b62;
+}
+
+/* 반응형 */
+@media (max-width: 768px) {
+    .patents-table th,
+    .patents-table td {
+        padding: 0.5rem 0.25rem;
+        font-size: 0.9rem;
+    }
+    
+    .action-buttons {
+        flex-direction: column;
+        gap: 0.1rem;
+    }
+    
+    .detail-info {
+        grid-template-columns: 1fr;
+    }
+    
+    .applicants-table {
+        font-size: 0.8rem;
+    }
+    
+    .applicants-table th,
+    .applicants-table td {
+        padding: 0.5rem 0.25rem;
+    }
+}
+
+/* 숫자 포맷팅 */
+.currency {
+    color: #28a745;
+    font-weight: 600;
+}
+
+.percentage {
+    color: #007bff;
+    font-weight: 600;
+}
+
+/* 로딩 상태 */
+.loading {
+    text-align: center;
+    padding: 2rem;
+    color: #6c757d;
+}
+
+.spinner {
+    border: 2px solid #f3f3f3;
+    border-top: 2px solid #007bff;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    animation: spin 1s linear infinite;
+    display: inline-block;
+    margin-right: 0.5rem;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- 헤더 섹션 -->
+    <div class="header-section">
+        <h2 class="mb-0">
+            <i class="fas fa-certificate me-2"></i>특허 관리
+        </h2>
+        <div class="d-flex gap-2">
+            <button class="btn btn-light btn-sm admin-only" onclick="exportToExcel()">
+                <i class="fas fa-file-excel me-1"></i>엑셀 내보내기
+            </button>
+            <button class="btn btn-success btn-sm admin-only" onclick="addNewPatent()">
+                <i class="fas fa-plus me-1"></i>특허 등록
+            </button>
+        </div>
+    </div>
+
+    <!-- 특허 목록 -->
+    <div class="patent-container">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="mb-0">등록된 특허 목록</h5>
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="adminMode" onchange="toggleAdminMode()">
+                <label class="form-check-label" for="adminMode">
+                    관리자 모드
+                </label>
+            </div>
+        </div>
+
+        <div class="table-responsive">
+            <table class="patents-table">
+                <thead>
+                    <tr>
+                        <th style="width: 50%;">특허 제목</th>
+                        <th style="width: 15%;">상태</th>
+                        <th style="width: 20%;">대표 출원자</th>
+                        <th style="width: 15%;">관리</th>
+                    </tr>
+                </thead>
+                <tbody id="patentTableBody">
+                    <!-- JavaScript로 동적 생성 -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- 특허 등록/수정 모달 -->
+<div class="modal fade" id="patentModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="patentModalTitle">특허 등록</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="patentForm">
+                    <input type="hidden" id="patentId">
+                    
+                    <!-- 기본 정보 -->
+                    <div class="row g-3 mb-4">
+                        <div class="col-12">
+                            <label class="form-label">특허명 *</label>
+                            <input type="text" class="form-control" id="patentTitle" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">상태 *</label>
+                            <select class="form-select" id="patentStatus" required onchange="toggleRegistrationFields()">
+                                <option value="">상태 선택</option>
+                                <option value="출원 준비 중">출원 준비 중</option>
+                                <option value="출원 중">출원 중</option>
+                                <option value="공개">공개</option>
+                                <option value="등록">등록</option>
+                                <option value="거절">거절</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">기술 분야</label>
+                            <input type="text" class="form-control" id="patentField">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">출원일</label>
+                            <input type="date" class="form-control" id="applicationDate">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">출원번호</label>
+                            <input type="text" class="form-control" id="applicationNumber">
+                        </div>
+                        <div class="col-md-6" id="registrationDateField" style="display: none;">
+                            <label class="form-label">등록일</label>
+                            <input type="date" class="form-control" id="registrationDate">
+                        </div>
+                        <div class="col-md-6" id="registrationNumberField" style="display: none;">
+                            <label class="form-label">등록번호 *</label>
+                            <input type="text" class="form-control" id="registrationNumber">
+                        </div>
+                    </div>
+
+                    <!-- 출원인 정보 -->
+                    <h6>출원인 정보</h6>
+                    <table class="applicants-table" id="applicantsTable">
+                        <thead>
+                            <tr>
+                                <th>이름 *</th>
+                                <th>소속</th>
+                                <th>지분율 (%)</th>
+                                <th>출원 보상금 (원)</th>
+                                <th>등록 보상금 (원)</th>
+                                <th class="admin-only">삭제</th>
+                            </tr>
+                        </thead>
+                        <tbody id="applicantsTableBody">
+                            <!-- JavaScript로 동적 생성 -->
+                        </tbody>
+                    </table>
+                    
+                    <div class="applicant-actions admin-only">
+                        <button type="button" class="btn-add-applicant" onclick="addApplicantRow()">
+                            <i class="fas fa-plus me-1"></i>출원인 추가
+                        </button>
+                    </div>
+                    
+                    <div class="share-summary" id="shareSummary">
+                        <div class="share-total" id="shareTotal">총 지분율: 0%</div>
+                        <div class="share-warning" id="shareWarning">지분율 총합이 100%가 되어야 합니다.</div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+                <button type="button" class="btn btn-danger admin-only" id="deletePatentBtn" onclick="deletePatent()" style="display: none;">삭제</button>
+                <button type="button" class="btn btn-primary admin-only" onclick="savePatent()">저장</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+let patents = [];
+let isAdminMode = false;
+let expandedRows = new Set();
+
+// 페이지 로드 시 초기화
+document.addEventListener('DOMContentLoaded', function() {
+    loadPatents();
+    checkAdminMode();
+    
+    // 입력 이벤트 리스너
+    document.addEventListener('input', function(e) {
+        if (e.target.name === 'share_percentage') {
+            updateShareTotal();
+        }
+        if (e.target.classList.contains('currency-input')) {
+            formatCurrencyInput(e.target);
+        }
+    });
+});
+
+// 관리자 모드 확인
+function checkAdminMode() {
+    // 실제 구현시 사용자 권한 확인
+    isAdminMode = true; // 임시로 true 설정
+    document.getElementById('adminMode').checked = isAdminMode;
+    toggleAdminMode();
+}
+
+// 관리자 모드 토글
+function toggleAdminMode() {
+    isAdminMode = document.getElementById('adminMode').checked;
+    const body = document.body;
+    
+    if (isAdminMode) {
+        body.classList.remove('readonly-mode');
+    } else {
+        body.classList.add('readonly-mode');
+    }
+    
+    renderPatents();
+}
+
+// 특허 목록 로드
+function loadPatents() {
+    // 임시 데이터
+    patents = [
+        {
+            id: 1,
+            title: '나노 입자를 이용한 암 치료 시스템',
+            status: '등록',
+            field: '바이오메디컬',
+            application_number: '10-2024-0001234',
+            registration_number: '10-2566789',
+            application_date: '2024-03-15',
+            registration_date: '2024-12-10',
+            applicants: [
+                { name: '김연구', affiliation: '연구소', share_percentage: 60, filing_reward: 300000, registration_reward: 500000 },
+                { name: '이박사', affiliation: '대학교', share_percentage: 40, filing_reward: 200000, registration_reward: 300000 }
+            ]
+        },
+        {
+            id: 2,
+            title: 'AI 기반 신약 발견 플랫폼',
+            status: '출원 중',
+            field: 'AI/바이오',
+            application_number: '10-2024-0005678',
+            registration_number: '',
+            application_date: '2024-06-20',
+            registration_date: '',
+            applicants: [
+                { name: '박교수', affiliation: '연구소', share_percentage: 50, filing_reward: 400000, registration_reward: 0 },
+                { name: '최연구원', affiliation: '연구소', share_percentage: 30, filing_reward: 240000, registration_reward: 0 },
+                { name: '정박사', affiliation: '외부', share_percentage: 20, filing_reward: 160000, registration_reward: 0 }
+            ]
+        },
+        {
+            id: 3,
+            title: '차세대 배터리 소재',
+            status: '출원 준비 중',
+            field: '에너지/소재',
+            application_number: '',
+            registration_number: '',
+            application_date: '',
+            registration_date: '',
+            applicants: [
+                { name: '한연구', affiliation: '연구소', share_percentage: 100, filing_reward: 0, registration_reward: 0 }
+            ]
+        }
+    ];
+    
+    renderPatents();
+}
+
+// 특허 목록 렌더링
+function renderPatents() {
+    const tbody = document.getElementById('patentTableBody');
+    let html = '';
+    
+    patents.forEach(patent => {
+        const statusClass = patent.status.replace(/\s+/g, '');
+        const primaryApplicant = patent.applicants && patent.applicants.length > 0 ? 
+            patent.applicants[0].name : '출원인 없음';
+        const applicantAffiliation = patent.applicants && patent.applicants.length > 0 ? 
+            patent.applicants[0].affiliation : '';
+        
+        const isExpanded = expandedRows.has(patent.id);
+        
+        html += `
+        <tr class="${isExpanded ? 'expanded' : ''}" id="row-${patent.id}">
+            <td>
+                <div style="font-weight: 600; margin-bottom: 0.25rem;">${patent.title}</div>
+                <small class="text-muted">${patent.field || '분야 미지정'}</small>
+            </td>
+            <td>
+                <span class="status-badge status-${statusClass}">${patent.status}</span>
+            </td>
+            <td>
+                <div style="font-weight: 600;">${primaryApplicant}</div>
+                ${applicantAffiliation ? `<small class="text-muted">${applicantAffiliation}</small>` : ''}
+            </td>
+            <td>
+                <div class="action-buttons">
+                    <button class="btn-action btn-detail" onclick="togglePatentDetails(${patent.id})" title="상세보기">
+                        <i class="fas fa-${isExpanded ? 'eye-slash' : 'eye'}"></i>
+                    </button>
+                    <button class="btn-action btn-edit admin-only" onclick="editPatent(${patent.id})" title="수정">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="btn-action btn-delete admin-only" onclick="deletePatent(${patent.id})" title="삭제">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            </td>
+        </tr>`;
+        
+        if (isExpanded) {
+            html += `
+            <tr id="detail-${patent.id}">
+                <td colspan="4">
+                    <div class="detail-card show">
+                        ${generatePatentDetails(patent)}
+                    </div>
+                </td>
+            </tr>`;
+        }
+    });
+    
+    tbody.innerHTML = html;
+}
+
+// 특허 상세 정보 생성
+function generatePatentDetails(patent) {
+    const totalFilingReward = patent.applicants.reduce((sum, app) => sum + (app.filing_reward || 0), 0);
+    const totalRegistrationReward = patent.applicants.reduce((sum, app) => sum + (app.registration_reward || 0), 0);
+    
+    let applicantsTableHtml = `
+    <table class="applicants-table">
+        <thead>
+            <tr>
+                <th>이름</th>
+                <th>소속</th>
+                <th>지분율 (%)</th>
+                <th>출원 보상금 (원)</th>
+                <th>등록 보상금 (원)</th>
+                ${isAdminMode ? '<th>삭제</th>' : ''}
+            </tr>
+        </thead>
+        <tbody>`;
+    
+    patent.applicants.forEach((applicant, index) => {
+        applicantsTableHtml += `
+        <tr>
+            <td>
+                <input type="text" name="applicant_name" value="${applicant.name}" ${!isAdminMode ? 'readonly' : ''}>
+            </td>
+            <td>
+                <input type="text" name="applicant_affiliation" value="${applicant.affiliation || ''}" ${!isAdminMode ? 'readonly' : ''}>
+            </td>
+            <td>
+                <input type="number" name="share_percentage" value="${applicant.share_percentage}" 
+                       min="0" max="100" step="0.01" ${!isAdminMode ? 'readonly' : ''}>
+            </td>
+            <td>
+                <input type="number" name="filing_reward" value="${applicant.filing_reward || 0}" 
+                       min="0" step="1000" class="currency-input" ${!isAdminMode ? 'readonly' : ''}>
+            </td>
+            <td>
+                <input type="number" name="registration_reward" value="${applicant.registration_reward || 0}" 
+                       min="0" step="1000" class="currency-input" ${!isAdminMode ? 'readonly' : ''}>
+            </td>
+            ${isAdminMode ? `<td><button type="button" class="btn-remove-applicant" onclick="removeApplicantDetailRow(this)" ${index === 0 && patent.applicants.length === 1 ? 'style="display:none;"' : ''}><i class="fas fa-times"></i></button></td>` : ''}
+        </tr>`;
+    });
+    
+    applicantsTableHtml += '</tbody></table>';
+    
+    if (isAdminMode) {
+        applicantsTableHtml += `
+        <div class="applicant-actions">
+            <button type="button" class="btn-add-applicant" onclick="addApplicantDetailRow(${patent.id})">
+                <i class="fas fa-plus me-1"></i>출원인 추가
+            </button>
+        </div>`;
+    }
+    
+    const shareTotal = patent.applicants.reduce((sum, app) => sum + app.share_percentage, 0);
+    const isValidShare = Math.abs(shareTotal - 100) < 0.01;
+    
+    applicantsTableHtml += `
+    <div class="share-summary ${isValidShare ? 'valid' : 'invalid'}" id="shareSummary-${patent.id}">
+        <div class="share-total">총 지분율: <span class="percentage">${shareTotal.toFixed(2)}%</span></div>
+        ${!isValidShare ? '<div class="share-warning show">지분율 총합이 100%가 되어야 합니다.</div>' : ''}
+    </div>`;
+    
+    return `
+    <div class="detail-section">
+        <h6><i class="fas fa-info-circle me-2"></i>기본 정보</h6>
+        <div class="detail-info">
+            <div class="info-item">
+                <span class="info-label">출원번호:</span>
+                <span class="info-value">${patent.application_number || '미등록'}</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">등록번호:</span>
+                <span class="info-value">${patent.registration_number || '미등록'}</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">출원일:</span>
+                <span class="info-value">${patent.application_date || '미정'}</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">등록일:</span>
+                <span class="info-value">${patent.registration_date || '미정'}</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">총 출원 보상금:</span>
+                <span class="info-value currency">${formatCurrency(totalFilingReward)}원</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">총 등록 보상금:</span>
+                <span class="info-value currency">${formatCurrency(totalRegistrationReward)}원</span>
+            </div>
+        </div>
+    </div>
+    
+    <div class="detail-section">
+        <h6><i class="fas fa-users me-2"></i>출원인 정보</h6>
+        ${applicantsTableHtml}
+    </div>
+    
+    ${isAdminMode ? `
+    <div class="detail-actions">
+        <button type="button" class="btn-save" onclick="savePatentDetails(${patent.id})" ${!isValidShare ? 'disabled' : ''}>
+            저장
+        </button>
+        <button type="button" class="btn-cancel" onclick="togglePatentDetails(${patent.id})">
+            취소
+        </button>
+    </div>` : ''}`;
+}
+
+// 상세 정보 토글
+function togglePatentDetails(patentId) {
+    const isExpanded = expandedRows.has(patentId);
+    
+    if (isExpanded) {
+        expandedRows.delete(patentId);
+    } else {
+        expandedRows.add(patentId);
+    }
+    
+    renderPatents();
+}
+
+// 상세 보기에서 출원인 행 추가
+function addApplicantDetailRow(patentId) {
+    const patent = patents.find(p => p.id === patentId);
+    if (!patent) return;
+    
+    patent.applicants.push({
+        name: '',
+        affiliation: '',
+        share_percentage: 0,
+        filing_reward: 0,
+        registration_reward: 0
+    });
+    
+    renderPatents();
+}
+
+// 상세 보기에서 출원인 행 제거
+function removeApplicantDetailRow(button) {
+    const row = button.closest('tr');
+    const patentId = parseInt(row.closest('[id^="detail-"]').id.split('-')[1]);
+    const patent = patents.find(p => p.id === patentId);
+    
+    if (!patent || patent.applicants.length <= 1) return;
+    
+    const index = Array.from(row.parentNode.children).indexOf(row);
+    patent.applicants.splice(index, 1);
+    
+    renderPatents();
+}
+
+// 지분율 총합 업데이트 (상세보기용)
+function updateShareTotal() {
+    // 모든 확장된 행에 대해 지분율 계산
+    expandedRows.forEach(patentId => {
+        const detailRow = document.getElementById(`detail-${patentId}`);
+        if (!detailRow) return;
+        
+        const shareInputs = detailRow.querySelectorAll('input[name="share_percentage"]');
+        let total = 0;
+        
+        shareInputs.forEach(input => {
+            total += parseFloat(input.value) || 0;
+        });
+        
+        const shareSummary = document.getElementById(`shareSummary-${patentId}`);
+        const shareTotal = shareSummary.querySelector('.share-total');
+        const shareWarning = shareSummary.querySelector('.share-warning');
+        const saveBtn = detailRow.querySelector('.btn-save');
+        
+        shareTotal.innerHTML = `총 지분율: <span class="percentage">${total.toFixed(2)}%</span>`;
+        
+        const isValid = Math.abs(total - 100) < 0.01;
+        if (isValid) {
+            shareSummary.className = 'share-summary valid';
+            if (shareWarning) shareWarning.classList.remove('show');
+            if (saveBtn) saveBtn.disabled = false;
+        } else {
+            shareSummary.className = 'share-summary invalid';
+            if (shareWarning) shareWarning.classList.add('show');
+            if (saveBtn) saveBtn.disabled = true;
+        }
+    });
+}
+
+// 상세 정보 저장
+function savePatentDetails(patentId) {
+    const patent = patents.find(p => p.id === patentId);
+    if (!patent) return;
+    
+    const detailRow = document.getElementById(`detail-${patentId}`);
+    const applicantRows = detailRow.querySelectorAll('tbody tr');
+    
+    const newApplicants = [];
+    applicantRows.forEach(row => {
+        const name = row.querySelector('input[name="applicant_name"]').value.trim();
+        if (name) {
+            newApplicants.push({
+                name: name,
+                affiliation: row.querySelector('input[name="applicant_affiliation"]').value.trim(),
+                share_percentage: parseFloat(row.querySelector('input[name="share_percentage"]').value) || 0,
+                filing_reward: parseInt(row.querySelector('input[name="filing_reward"]').value) || 0,
+                registration_reward: parseInt(row.querySelector('input[name="registration_reward"]').value) || 0
+            });
+        }
+    });
+    
+    // 지분율 검증
+    const totalShare = newApplicants.reduce((sum, app) => sum + app.share_percentage, 0);
+    if (Math.abs(totalShare - 100) > 0.01) {
+        alert(`지분율 총합이 100%가 되어야 합니다. (현재: ${totalShare.toFixed(2)}%)`);
+        return;
+    }
+    
+    patent.applicants = newApplicants;
+    
+    // 실제 구현시 서버에 저장
+    alert('저장되었습니다.');
+    renderPatents();
+}
+
+// 새 특허 추가
+function addNewPatent() {
+    document.getElementById('patentModalTitle').textContent = '특허 등록';
+    document.getElementById('patentForm').reset();
+    document.getElementById('patentId').value = '';
+    document.getElementById('deletePatentBtn').style.display = 'none';
+    
+    clearApplicantsTable();
+    addApplicantRow();
+    
+    new bootstrap.Modal(document.getElementById('patentModal')).show();
+}
+
+// 특허 편집 (모달)
+function editPatent(id) {
+    const patent = patents.find(p => p.id === id);
+    if (!patent) return;
+    
+    document.getElementById('patentModalTitle').textContent = '특허 수정';
+    document.getElementById('patentId').value = patent.id;
+    document.getElementById('patentTitle').value = patent.title;
+    document.getElementById('patentStatus').value = patent.status;
+    document.getElementById('patentField').value = patent.field || '';
+    document.getElementById('applicationDate').value = patent.application_date || '';
+    document.getElementById('applicationNumber').value = patent.application_number || '';
+    document.getElementById('registrationDate').value = patent.registration_date || '';
+    document.getElementById('registrationNumber').value = patent.registration_number || '';
+    document.getElementById('deletePatentBtn').style.display = 'inline-block';
+    
+    toggleRegistrationFields();
+    loadApplicants(patent.applicants || []);
+    
+    new bootstrap.Modal(document.getElementById('patentModal')).show();
+}
+
+// 모달 관련 함수들은 기존과 동일
+function toggleRegistrationFields() {
+    const status = document.getElementById('patentStatus').value;
+    const registrationDateField = document.getElementById('registrationDateField');
+    const registrationNumberField = document.getElementById('registrationNumberField');
+    const registrationNumberInput = document.getElementById('registrationNumber');
+    
+    if (status === '등록') {
+        registrationDateField.style.display = 'block';
+        registrationNumberField.style.display = 'block';
+        registrationNumberInput.required = true;
+    } else {
+        registrationDateField.style.display = 'none';
+        registrationNumberField.style.display = 'none';
+        registrationNumberInput.required = false;
+    }
+}
+
+function clearApplicantsTable() {
+    document.getElementById('applicantsTableBody').innerHTML = '';
+    updateModalShareTotal();
+}
+
+function loadApplicants(applicants) {
+    clearApplicantsTable();
+    
+    if (applicants.length === 0) {
+        addApplicantRow();
+    } else {
+        applicants.forEach(applicant => {
+            addApplicantRow(applicant);
+        });
+    }
+}
+
+function addApplicantRow(applicant = null) {
+    const tbody = document.getElementById('applicantsTableBody');
+    const rowIndex = tbody.children.length;
+    
+    const row = document.createElement('tr');
+    row.innerHTML = `
+        <td>
+            <input type="text" name="applicant_name" value="${applicant ? applicant.name : ''}" required>
+        </td>
+        <td>
+            <input type="text" name="applicant_affiliation" value="${applicant ? applicant.affiliation || '' : ''}">
+        </td>
+        <td>
+            <input type="number" name="share_percentage" min="0" max="100" step="0.01" 
+                   value="${applicant ? applicant.share_percentage : ''}" required>
+        </td>
+        <td>
+            <input type="number" name="filing_reward" min="0" step="1000" class="currency-input"
+                   value="${applicant ? applicant.filing_reward || 0 : 0}">
+        </td>
+        <td>
+            <input type="number" name="registration_reward" min="0" step="1000" class="currency-input"
+                   value="${applicant ? applicant.registration_reward || 0 : 0}">
+        </td>
+        <td class="admin-only">
+            <button type="button" class="btn-remove-applicant" onclick="removeApplicantRow(this)" 
+                    ${rowIndex === 0 ? 'style="display:none;"' : ''}>
+                <i class="fas fa-times"></i>
+            </button>
+        </td>
+    `;
+    
+    tbody.appendChild(row);
+    updateModalShareTotal();
+}
+
+function removeApplicantRow(button) {
+    const tbody = document.getElementById('applicantsTableBody');
+    if (tbody.children.length > 1) {
+        button.closest('tr').remove();
+        updateModalShareTotal();
+        
+        if (tbody.children.length === 1) {
+            tbody.children[0].querySelector('.btn-remove-applicant').style.display = 'none';
+        }
+    }
+}
+
+function updateModalShareTotal() {
+    const shareInputs = document.querySelectorAll('#applicantsTable input[name="share_percentage"]');
+    let total = 0;
+    
+    shareInputs.forEach(input => {
+        total += parseFloat(input.value) || 0;
+    });
+    
+    const shareSummary = document.getElementById('shareSummary');
+    const shareTotal = document.getElementById('shareTotal');
+    const shareWarning = document.getElementById('shareWarning');
+    
+    shareTotal.textContent = `총 지분율: ${total.toFixed(2)}%`;
+    
+    if (Math.abs(total - 100) < 0.01) {
+        shareSummary.className = 'share-summary valid';
+        shareWarning.classList.remove('show');
+    } else {
+        shareSummary.className = 'share-summary invalid';
+        shareWarning.classList.add('show');
+    }
+}
+
+// 특허 저장
+function savePatent() {
+    const title = document.getElementById('patentTitle').value;
+    const status = document.getElementById('patentStatus').value;
+    
+    if (!title.trim()) {
+        alert('특허명을 입력해주세요.');
+        return;
+    }
+    
+    if (!status) {
+        alert('상태를 선택해주세요.');
+        return;
+    }
+    
+    if (status === '등록' && !document.getElementById('registrationNumber').value.trim()) {
+        alert('등록 상태에서는 등록번호가 필수입니다.');
+        return;
+    }
+    
+    const applicants = collectApplicantsData();
+    const totalShare = applicants.reduce((sum, app) => sum + parseFloat(app.share_percentage), 0);
+    if (Math.abs(totalShare - 100) > 0.01) {
+        alert(`지분율 총합이 100%가 되어야 합니다. (현재: ${totalShare.toFixed(2)}%)`);
+        return;
+    }
+    
+    const patentData = {
+        title: title,
+        status: status,
+        field: document.getElementById('patentField').value,
+        application_date: document.getElementById('applicationDate').value,
+        application_number: document.getElementById('applicationNumber').value,
+        registration_date: document.getElementById('registrationDate').value,
+        registration_number: document.getElementById('registrationNumber').value,
+        applicants: applicants
+    };
+    
+    const patentId = document.getElementById('patentId').value;
+    if (patentId) {
+        const patentIndex = patents.findIndex(p => p.id == patentId);
+        if (patentIndex !== -1) {
+            patents[patentIndex] = { ...patents[patentIndex], ...patentData };
+        }
+    } else {
+        patentData.id = Date.now();
+        patents.push(patentData);
+    }
+    
+    bootstrap.Modal.getInstance(document.getElementById('patentModal')).hide();
+    renderPatents();
+}
+
+function collectApplicantsData() {
+    const tbody = document.getElementById('applicantsTableBody');
+    const applicants = [];
+    
+    Array.from(tbody.children).forEach(row => {
+        const name = row.querySelector('input[name="applicant_name"]').value.trim();
+        if (name) {
+            applicants.push({
+                name: name,
+                affiliation: row.querySelector('input[name="applicant_affiliation"]').value.trim(),
+                share_percentage: parseFloat(row.querySelector('input[name="share_percentage"]').value) || 0,
+                filing_reward: parseInt(row.querySelector('input[name="filing_reward"]').value) || 0,
+                registration_reward: parseInt(row.querySelector('input[name="registration_reward"]').value) || 0
+            });
+        }
+    });
+    
+    return applicants;
+}
+
+// 특허 삭제
+function deletePatent(id) {
+    if (confirm('이 특허 정보를 삭제하시겠습니까?')) {
+        patents = patents.filter(p => p.id !== id);
+        expandedRows.delete(id);
+        
+        if (document.getElementById('patentModal') && document.getElementById('patentModal').classList.contains('show')) {
+            bootstrap.Modal.getInstance(document.getElementById('patentModal')).hide();
+        }
+        
+        renderPatents();
+    }
+}
+
+// 유틸리티 함수
+function formatCurrency(amount) {
+    return new Intl.NumberFormat('ko-KR').format(amount);
+}
+
+function formatCurrencyInput(input) {
+    const value = input.value.replace(/[^\d]/g, '');
+    input.value = value;
+}
+
+function exportToExcel() {
+    alert('엑셀 내보내기 기능은 추후 구현 예정입니다.');
+}
+
+// 입력 이벤트 위임
+document.addEventListener('input', function(e) {
+    if (e.target.name === 'share_percentage') {
+        if (e.target.closest('#applicantsTable')) {
+            updateModalShareTotal();
+        } else {
+            updateShareTotal();
+        }
+    }
+});
+</script>
+{% endblock %}
