@@ -135,6 +135,10 @@ This is a Flask-based web application designed for managing a Research & Develop
   - Fixed equipment dropdown loading issues with proper error handling and empty state messages
   - Improved calendar UI with clean design, removed underlines, proper Sunday highlighting (red), date-only display
   - Added sample equipment data for testing and demonstration
+  - Fixed Equipment model missing 'notes' field causing add operation failures
+  - Synchronized equipment display between list and reservation pages to show all registered equipment
+  - Enhanced reservation and usage log dropdowns to display all equipment with status indicators
+  - Added console logging for debugging equipment data loading issues
 
 ## User Preferences
 Preferred communication style: Simple, everyday language.

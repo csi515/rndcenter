@@ -140,32 +140,29 @@ async function loadEquipmentForUsage() {
         const response = await fetch('/equipment/api/equipment');
         const data = await response.json();
         
+        console.log('사용일지용 장비 목록 로드:', data); // 디버깅용 로그
+        
         if (data.success && data.equipment) {
             const select = document.getElementById('usageEquipment');
             const filterSelect = document.getElementById('filterEquipment');
             let html = '<option value="">장비를 선택하세요</option>';
             let filterHtml = '<option value="">전체 장비</option>';
             
-            // 사용가능한 장비만 필터링 (사용일지용)
-            const availableEquipment = data.equipment.filter(equipment => 
-                equipment.status === '사용가능'
-            );
+            // 모든 장비를 표시하되, 상태를 표시 (사용일지용)
+            data.equipment.forEach(equipment => {
+                const statusText = equipment.status === '사용가능' ? '' : ` (${equipment.status})`;
+                const disabled = equipment.status !== '사용가능' ? ' disabled' : '';
+                html += `<option value="${equipment.name}"${disabled}>${equipment.name} - ${equipment.location}${statusText}</option>`;
+            });
             
-            if (availableEquipment.length === 0) {
-                html += '<option value="" disabled>등록된 사용가능 장비 없음</option>';
-            } else {
-                availableEquipment.forEach(equipment => {
-                    html += `<option value="${equipment.name}">${equipment.name} (${equipment.location})</option>`;
-                });
-            }
+            // 필터용에는 모든 장비 표시 (상태 관계없이)
+            data.equipment.forEach(equipment => {
+                filterHtml += `<option value="${equipment.name}">${equipment.name}</option>`;
+            });
             
-            // 필터용에는 모든 장비 표시
             if (data.equipment.length === 0) {
+                html += '<option value="" disabled>등록된 장비 없음</option>';
                 filterHtml += '<option value="" disabled>등록된 장비 없음</option>';
-            } else {
-                data.equipment.forEach(equipment => {
-                    filterHtml += `<option value="${equipment.name}">${equipment.name}</option>`;
-                });
             }
             
             select.innerHTML = html;
