@@ -267,5 +267,11 @@ function renderNewUsageLogTable(logs) {
     
     tbody.innerHTML = html;
 }
+
+// 페이지 로드시 초기화
+document.addEventListener('DOMContentLoaded', function() {
+    loadUsageLogs();
+    loadEquipmentForUsage(); // 장비 목록 미리 로드
+});
 </script>
 {% endblock %}

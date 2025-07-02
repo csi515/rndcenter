@@ -188,6 +188,9 @@ function openReservationModal() {
     const today = new Date().toISOString().split('T')[0];
     document.getElementById('reservationDate').value = today;
     
+    // 모달이 열릴 때마다 장비 목록을 새로 로드
+    loadEquipmentForReservation();
+    
     new bootstrap.Modal(document.getElementById('reservationModal')).show();
 }
 
@@ -319,5 +322,11 @@ function getEquipmentColor(equipmentName) {
     }
     return colors[Math.abs(hash) % colors.length];
 }
+
+// 페이지 로드시 초기화
+document.addEventListener('DOMContentLoaded', function() {
+    loadReservationCalendar();
+    loadEquipmentForReservation(); // 장비 목록 미리 로드
+});
 </script>
 {% endblock %}
