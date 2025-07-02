@@ -487,7 +487,9 @@ body {
                             <th>장비명</th>
                             <th>모델명</th>
                             <th>제조사</th>
+                            <th>관리번호</th>
                             <th>위치</th>
+                            <th>담당자</th>
                             <th>상태</th>
                             <th>관리</th>
                         </tr>
@@ -539,39 +541,103 @@ body {
             </div>
             <div class="modal-body">
                 <form id="equipmentForm">
-                    <input type="hidden" id="equipmentId">
-                    <div class="form-group">
-                        <label class="form-label">장비명 *</label>
-                        <input type="text" class="form-control" id="equipmentName" required>
+                    <input type="hidden" id="hiddenEquipmentId">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div class="form-group">
+                                <label class="form-label">장비명 *</label>
+                                <input type="text" class="form-control" id="equipmentName" required>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label class="form-label">관리번호</label>
+                                <input type="text" class="form-control" id="equipmentId" readonly style="background: #f8f9fa;">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label">모델명</label>
+                                <input type="text" class="form-control" id="equipmentModel">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label">제조사</label>
+                                <input type="text" class="form-control" id="equipmentManufacturer">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label">시리얼 번호</label>
+                                <input type="text" class="form-control" id="equipmentSerial">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label">위치</label>
+                                <input type="text" class="form-control" id="equipmentLocation">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label">담당자</label>
+                                <input type="text" class="form-control" id="equipmentManager">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label">상태</label>
+                                <select class="form-control" id="equipmentStatus">
+                                    <option value="사용가능">사용가능</option>
+                                    <option value="점검중">점검중</option>
+                                    <option value="고장">고장</option>
+                                    <option value="대기">대기</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label">구매일</label>
+                                <input type="date" class="form-control" id="equipmentPurchaseDate">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label">구매가격</label>
+                                <input type="number" class="form-control" id="equipmentPrice" placeholder="원">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label">정기점검일</label>
+                                <input type="date" class="form-control" id="equipmentMaintenanceDate">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label">보증만료일</label>
+                                <input type="date" class="form-control" id="equipmentWarrantyExpiry">
+                            </div>
+                        </div>
                     </div>
                     <div class="form-group">
-                        <label class="form-label">모델명</label>
-                        <input type="text" class="form-control" id="equipmentModel">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">제조사</label>
-                        <input type="text" class="form-control" id="equipmentManufacturer">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">위치</label>
-                        <input type="text" class="form-control" id="equipmentLocation">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">상태</label>
-                        <select class="form-control" id="equipmentStatus">
-                            <option value="사용가능">사용가능</option>
-                            <option value="점검중">점검중</option>
-                            <option value="고장">고장</option>
-                            <option value="대기">대기</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">구매일</label>
-                        <input type="date" class="form-control" id="equipmentPurchaseDate">
+                        <label class="form-label">사양 및 특징</label>
+                        <textarea class="form-control" id="equipmentSpecifications" rows="3" placeholder="장비의 주요 사양과 특징을 입력하세요"></textarea>
                     </div>
                     <div class="form-group">
                         <label class="form-label">비고</label>
-                        <textarea class="form-control" id="equipmentNotes" rows="3"></textarea>
+                        <textarea class="form-control" id="equipmentNotes" rows="2" placeholder="기타 참고사항"></textarea>
                     </div>
                 </form>
             </div>
@@ -579,6 +645,98 @@ body {
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
                 <button type="button" class="btn btn-danger" id="deleteEquipmentBtn" onclick="deleteEquipment()" style="display: none;">삭제</button>
                 <button type="button" class="btn btn-primary" onclick="saveEquipment()">저장</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 장비 상세보기 모달 -->
+<div class="modal fade" id="equipmentDetailModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">장비 상세 정보</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-8">
+                        <h6 class="mb-3">기본 정보</h6>
+                        <div class="detail-item">
+                            <label class="detail-label">장비명</label>
+                            <div class="detail-value" id="detailName"></div>
+                        </div>
+                        <div class="detail-item">
+                            <label class="detail-label">모델명</label>
+                            <div class="detail-value" id="detailModel"></div>
+                        </div>
+                        <div class="detail-item">
+                            <label class="detail-label">제조사</label>
+                            <div class="detail-value" id="detailManufacturer"></div>
+                        </div>
+                        <div class="detail-item">
+                            <label class="detail-label">시리얼 번호</label>
+                            <div class="detail-value" id="detailSerial"></div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <h6 class="mb-3">관리 정보</h6>
+                        <div class="detail-item">
+                            <label class="detail-label">관리번호</label>
+                            <div class="detail-value" id="detailEquipmentId"></div>
+                        </div>
+                        <div class="detail-item">
+                            <label class="detail-label">위치</label>
+                            <div class="detail-value" id="detailLocation"></div>
+                        </div>
+                        <div class="detail-item">
+                            <label class="detail-label">담당자</label>
+                            <div class="detail-value" id="detailManager"></div>
+                        </div>
+                        <div class="detail-item">
+                            <label class="detail-label">상태</label>
+                            <div class="detail-value" id="detailStatus"></div>
+                        </div>
+                    </div>
+                </div>
+                <hr>
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6 class="mb-3">구매 정보</h6>
+                        <div class="detail-item">
+                            <label class="detail-label">구매일</label>
+                            <div class="detail-value" id="detailPurchaseDate"></div>
+                        </div>
+                        <div class="detail-item">
+                            <label class="detail-label">구매가격</label>
+                            <div class="detail-value" id="detailPrice"></div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <h6 class="mb-3">점검 정보</h6>
+                        <div class="detail-item">
+                            <label class="detail-label">정기점검일</label>
+                            <div class="detail-value" id="detailMaintenanceDate"></div>
+                        </div>
+                        <div class="detail-item">
+                            <label class="detail-label">보증만료일</label>
+                            <div class="detail-value" id="detailWarrantyExpiry"></div>
+                        </div>
+                    </div>
+                </div>
+                <hr>
+                <div class="detail-item">
+                    <label class="detail-label">사양 및 특징</label>
+                    <div class="detail-value" id="detailSpecifications"></div>
+                </div>
+                <div class="detail-item">
+                    <label class="detail-label">비고</label>
+                    <div class="detail-value" id="detailNotes"></div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+                <button type="button" class="btn btn-primary" onclick="editEquipmentFromDetail()">수정</button>
             </div>
         </div>
     </div>
@@ -718,12 +876,17 @@ function renderEquipmentTable() {
             <td style="font-weight: 500;">${equipment.name}</td>
             <td>${equipment.model || '-'}</td>
             <td>${equipment.manufacturer || '-'}</td>
+            <td>${equipment.equipment_id || '-'}</td>
             <td>${equipment.location || '-'}</td>
+            <td>${equipment.manager || '-'}</td>
             <td>
                 <span class="status-badge status-${statusClass}">${equipment.status}</span>
             </td>
             <td>
                 <div class="action-buttons">
+                    <button class="btn-icon btn-detail" onclick="viewEquipmentDetail(${equipment.id})" title="상세보기">
+                        <i class="fas fa-eye"></i>
+                    </button>
                     <button class="btn-icon btn-edit" onclick="editEquipment(${equipment.id})" title="수정">
                         <i class="fas fa-edit"></i>
                     </button>
@@ -755,10 +918,66 @@ function updateEquipmentDropdown() {
 function addEquipment() {
     document.getElementById('equipmentModalTitle').textContent = '장비 추가';
     document.getElementById('equipmentForm').reset();
-    document.getElementById('equipmentId').value = '';
+    
+    // 관리번호 자동 생성
+    const timestamp = new Date().toISOString().replace(/[-:.TZ]/g, '').slice(0, 14);
+    document.getElementById('equipmentId').value = 'EQ' + timestamp;
+    
+    // 기본값 설정
+    document.getElementById('equipmentStatus').value = '사용가능';
     document.getElementById('deleteEquipmentBtn').style.display = 'none';
     
     new bootstrap.Modal(document.getElementById('equipmentModal')).show();
+}
+
+// 장비 상세보기
+function viewEquipmentDetail(id) {
+    const equipment = equipmentList.find(eq => eq.id === id);
+    if (!equipment) return;
+    
+    // 기본 정보
+    document.getElementById('detailName').textContent = equipment.name;
+    document.getElementById('detailModel').textContent = equipment.model || '';
+    document.getElementById('detailManufacturer').textContent = equipment.manufacturer || '';
+    document.getElementById('detailSerial').textContent = equipment.serial_number || '';
+    
+    // 관리 정보
+    document.getElementById('detailEquipmentId').textContent = equipment.equipment_id || '';
+    document.getElementById('detailLocation').textContent = equipment.location || '';
+    document.getElementById('detailManager').textContent = equipment.manager || '';
+    document.getElementById('detailStatus').innerHTML = equipment.status ? 
+        `<span class="status-badge status-${equipment.status.replace(/\s+/g, '')}">${equipment.status}</span>` : '';
+    
+    // 구매 정보
+    document.getElementById('detailPurchaseDate').textContent = equipment.purchase_date || '';
+    document.getElementById('detailPrice').textContent = equipment.purchase_price ? 
+        new Intl.NumberFormat('ko-KR', { style: 'currency', currency: 'KRW' }).format(equipment.purchase_price) : '';
+    
+    // 점검 정보
+    document.getElementById('detailMaintenanceDate').textContent = equipment.maintenance_date || '';
+    document.getElementById('detailWarrantyExpiry').textContent = equipment.warranty_expiry || '';
+    
+    // 상세 정보
+    document.getElementById('detailSpecifications').textContent = equipment.specifications || '';
+    document.getElementById('detailNotes').textContent = equipment.notes || '';
+    
+    // 상세보기에서 수정할 수 있도록 equipment ID 저장
+    document.getElementById('equipmentDetailModal').dataset.equipmentId = id;
+    
+    new bootstrap.Modal(document.getElementById('equipmentDetailModal')).show();
+}
+
+// 상세보기에서 수정 모달로 전환
+function editEquipmentFromDetail() {
+    const id = document.getElementById('equipmentDetailModal').dataset.equipmentId;
+    
+    // 상세보기 모달 닫기
+    bootstrap.Modal.getInstance(document.getElementById('equipmentDetailModal')).hide();
+    
+    // 수정 모달 열기
+    setTimeout(() => {
+        editEquipment(id);
+    }, 300);
 }
 
 // 장비 수정
@@ -767,13 +986,20 @@ function editEquipment(id) {
     if (!equipment) return;
     
     document.getElementById('equipmentModalTitle').textContent = '장비 수정';
-    document.getElementById('equipmentId').value = equipment.id;
+    document.getElementById('hiddenEquipmentId').value = equipment.id;
     document.getElementById('equipmentName').value = equipment.name;
     document.getElementById('equipmentModel').value = equipment.model || '';
     document.getElementById('equipmentManufacturer').value = equipment.manufacturer || '';
+    document.getElementById('equipmentId').value = equipment.equipment_id || '';
+    document.getElementById('equipmentSerial').value = equipment.serial_number || '';
     document.getElementById('equipmentLocation').value = equipment.location || '';
+    document.getElementById('equipmentManager').value = equipment.manager || '';
     document.getElementById('equipmentStatus').value = equipment.status;
     document.getElementById('equipmentPurchaseDate').value = equipment.purchase_date || '';
+    document.getElementById('equipmentPrice').value = equipment.purchase_price || '';
+    document.getElementById('equipmentMaintenanceDate').value = equipment.maintenance_date || '';
+    document.getElementById('equipmentWarrantyExpiry').value = equipment.warranty_expiry || '';
+    document.getElementById('equipmentSpecifications').value = equipment.specifications || '';
     document.getElementById('equipmentNotes').value = equipment.notes || '';
     document.getElementById('deleteEquipmentBtn').style.display = 'inline-block';
     
@@ -782,14 +1008,21 @@ function editEquipment(id) {
 
 // 장비 저장
 async function saveEquipment() {
-    const id = document.getElementById('equipmentId').value;
+    const id = document.getElementById('hiddenEquipmentId').value;
     const equipmentData = {
         name: document.getElementById('equipmentName').value,
         model: document.getElementById('equipmentModel').value,
         manufacturer: document.getElementById('equipmentManufacturer').value,
+        equipment_id: document.getElementById('equipmentId').value,
+        serial_number: document.getElementById('equipmentSerial').value,
         location: document.getElementById('equipmentLocation').value,
+        manager: document.getElementById('equipmentManager').value,
         status: document.getElementById('equipmentStatus').value,
         purchase_date: document.getElementById('equipmentPurchaseDate').value,
+        purchase_price: document.getElementById('equipmentPrice').value,
+        maintenance_date: document.getElementById('equipmentMaintenanceDate').value,
+        warranty_expiry: document.getElementById('equipmentWarrantyExpiry').value,
+        specifications: document.getElementById('equipmentSpecifications').value,
         notes: document.getElementById('equipmentNotes').value
     };
     

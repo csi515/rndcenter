@@ -283,14 +283,20 @@ def api_add_equipment():
         equipment_id = f"EQ{next_id:03d}"
         
         new_equipment = Equipment(
-            equipment_id=equipment_id,
+            equipment_id=data.get('equipment_id', equipment_id),
             name=data['name'],
             model=data.get('model'),
             manufacturer=data.get('manufacturer'),
+            serial_number=data.get('serial_number'),
             location=data.get('location'),
+            manager=data.get('manager'),
             status=data.get('status', '사용가능'),
             purchase_date=datetime.strptime(data['purchase_date'], '%Y-%m-%d').date() if data.get('purchase_date') else None,
-            specifications=data.get('notes')
+            purchase_price=float(data['purchase_price']) if data.get('purchase_price') else None,
+            maintenance_date=datetime.strptime(data['maintenance_date'], '%Y-%m-%d').date() if data.get('maintenance_date') else None,
+            warranty_expiry=datetime.strptime(data['warranty_expiry'], '%Y-%m-%d').date() if data.get('warranty_expiry') else None,
+            specifications=data.get('specifications'),
+            notes=data.get('notes')
         )
         
         db.session.add(new_equipment)
@@ -311,10 +317,16 @@ def api_update_equipment(equipment_id):
         equipment.name = data['name']
         equipment.model = data.get('model')
         equipment.manufacturer = data.get('manufacturer')
+        equipment.serial_number = data.get('serial_number')
         equipment.location = data.get('location')
+        equipment.manager = data.get('manager')
         equipment.status = data.get('status', '사용가능')
         equipment.purchase_date = datetime.strptime(data['purchase_date'], '%Y-%m-%d').date() if data.get('purchase_date') else None
-        equipment.specifications = data.get('notes')
+        equipment.purchase_price = float(data['purchase_price']) if data.get('purchase_price') else None
+        equipment.maintenance_date = datetime.strptime(data['maintenance_date'], '%Y-%m-%d').date() if data.get('maintenance_date') else None
+        equipment.warranty_expiry = datetime.strptime(data['warranty_expiry'], '%Y-%m-%d').date() if data.get('warranty_expiry') else None
+        equipment.specifications = data.get('specifications')
+        equipment.notes = data.get('notes')
         
         db.session.commit()
         

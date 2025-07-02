@@ -483,3 +483,54 @@ canvas {
 .schedule-item.new-item {
     animation: slideIn 0.3s ease;
 }
+
+/* Equipment Detail Modal 스타일 */
+.detail-item {
+    display: flex;
+    padding: 8px 0;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.detail-item:last-child {
+    border-bottom: none;
+}
+
+.detail-label {
+    font-weight: 600;
+    color: #374151;
+    min-width: 100px;
+    margin-right: 16px;
+    margin-bottom: 0;
+}
+
+.detail-value {
+    flex: 1;
+    color: #6b7280;
+    word-break: break-word;
+}
+
+.detail-value:empty::before {
+    content: "-";
+    color: #9ca3af;
+}
+
+/* 장비 관리 탭 개선 */
+.equipment-table th:nth-child(4) {
+    width: 120px; /* 관리번호 열 너비 */
+}
+
+.equipment-table th:nth-child(6) {
+    width: 100px; /* 담당자 열 너비 */
+}
+
+/* 상세보기 버튼 스타일 */
+.btn-detail {
+    color: #3b82f6 !important;
+    background: transparent;
+    border: 1px solid #3b82f6;
+}
+
+.btn-detail:hover {
+    background: #3b82f6;
+    color: white !important;
+}
