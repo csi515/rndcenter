@@ -94,13 +94,24 @@ function loadReservationCalendar() {
     
     calendar = new FullCalendar.Calendar(calendarEl, {
         initialView: 'dayGridMonth',
-        locale: 'ko',
+        locale: 'en',
         headerToolbar: {
             left: 'prev,next today',
             center: 'title',
             right: 'dayGridMonth,timeGridWeek,timeGridDay'
         },
         height: 'auto',
+        dayHeaderFormat: { weekday: 'short' },
+        dayCellContent: function(arg) {
+            return { html: arg.date.getDate() };
+        },
+        buttonText: {
+            today: '오늘',
+            month: '월',
+            week: '주',
+            day: '일'
+        },
+        titleFormat: { year: 'numeric', month: 'long' },
         events: async function(info, successCallback, failureCallback) {
             try {
                 const response = await fetch('/equipment/api/reservations');

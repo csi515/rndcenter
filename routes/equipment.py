@@ -83,7 +83,21 @@ def api_reservations():
                 }
             })
         
-        return jsonify(events)
+        return jsonify({
+            'success': True,
+            'reservations': [{
+                'id': reservation.id,
+                'equipment_name': reservation.equipment_name,
+                'reserver': reservation.reserver,
+                'start_date': reservation.start_date.strftime('%Y-%m-%d'),
+                'end_date': reservation.end_date.strftime('%Y-%m-%d'),
+                'start_time': reservation.start_time.strftime('%H:%M') if reservation.start_time else None,
+                'end_time': reservation.end_time.strftime('%H:%M') if reservation.end_time else None,
+                'purpose': reservation.purpose,
+                'notes': reservation.notes,
+                'status': reservation.status
+            } for reservation in reservations]
+        })
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 

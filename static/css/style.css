@@ -93,6 +93,147 @@
     transition: height 0.35s ease;
 }
 
+/* FullCalendar 스타일 커스터마이징 */
+.fc-theme-standard .fc-scrollgrid {
+    border: 1px solid #dee2e6;
+}
+
+/* 요일 헤더 스타일 */
+.fc-col-header-cell {
+    background-color: #f8f9fa;
+    font-weight: 600;
+    padding: 10px 0;
+    border-bottom: 2px solid #dee2e6;
+}
+
+/* 일요일 요일 헤더 빨간색 */
+.fc-day-sun .fc-col-header-cell-cushion,
+.fc-col-header-cell:first-child .fc-col-header-cell-cushion {
+    color: #dc3545 !important;
+}
+
+/* 나머지 요일 헤더 검정색 */
+.fc-col-header-cell:not(:first-child) .fc-col-header-cell-cushion {
+    color: #212529 !important;
+}
+
+/* 모든 요일 헤더 기본 스타일 */
+.fc-col-header-cell-cushion {
+    color: #212529 !important;
+    text-decoration: none !important;
+}
+
+/* 날짜 셀 스타일 */
+.fc-daygrid-day {
+    position: relative;
+}
+
+/* 날짜 숫자만 표시 (일, 월 등 제거) */
+.fc-daygrid-day-number {
+    color: #495057;
+    font-weight: 500;
+    padding: 8px;
+    text-decoration: none !important;
+    border: none !important;
+    outline: none !important;
+}
+
+/* 일요일 날짜 빨간색 */
+.fc-day-sun .fc-daygrid-day-number {
+    color: #dc3545 !important;
+}
+
+/* 토요일 날짜 파란색 */
+.fc-day-sat .fc-daygrid-day-number {
+    color: #0d6efd !important;
+}
+
+/* 밑줄 제거 */
+.fc-daygrid-day-number:hover,
+.fc-daygrid-day-number:focus,
+.fc-daygrid-day-number:active {
+    text-decoration: none !important;
+    outline: none !important;
+    border: none !important;
+}
+
+/* 오늘 날짜 하이라이트 */
+.fc-day-today {
+    background-color: rgba(13, 110, 253, 0.1) !important;
+}
+
+.fc-day-today .fc-daygrid-day-number {
+    background-color: #0d6efd;
+    color: white !important;
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+}
+
+/* 이벤트 스타일 */
+.fc-event {
+    border: none;
+    border-radius: 4px;
+    font-size: 12px;
+    padding: 2px 6px;
+    margin: 1px 0;
+}
+
+/* 달력 전체 깔끔한 스타일 */
+.fc {
+    font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+}
+
+.fc-button-group .fc-button {
+    background-color: #6c757d;
+    border-color: #6c757d;
+    border-radius: 6px;
+    font-weight: 500;
+    padding: 8px 16px;
+}
+
+.fc-button-group .fc-button:hover {
+    background-color: #5a6268;
+    border-color: #545b62;
+}
+
+.fc-button-group .fc-button:focus {
+    box-shadow: 0 0 0 0.2rem rgba(108, 117, 125, 0.25);
+}
+
+.fc-toolbar-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #212529;
+}
+
+/* 월/주/일 뷰 버튼 스타일 */
+.fc-button-active {
+    background-color: #0d6efd !important;
+    border-color: #0d6efd !important;
+}
+
+/* 그리드 라인 스타일 */
+.fc-theme-standard td, 
+.fc-theme-standard th {
+    border-color: #e9ecef;
+}
+
+/* 날짜 호버 효과 */
+.fc-daygrid-day:hover {
+    background-color: rgba(13, 110, 253, 0.05);
+}
+
+/* 주말 배경색 약간 다르게 */
+.fc-day-sat,
+.fc-day-sun {
+    background-color: rgba(248, 249, 250, 0.5);
+}
+
 #page-content-wrapper {
     min-width: 100vw;
 }
