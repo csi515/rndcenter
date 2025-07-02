@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify
 from csv_manager import csv_manager
 from datetime import datetime
-from database import db, Equipment, Reservation
+from database import db, Equipment, Reservation, UsageLog
 
 equipment_bp = Blueprint('equipment', __name__)
 
@@ -242,3 +242,259 @@ def add_usage_log():
         flash('사용일지 작성 중 오류가 발생했습니다.', 'error')
     
     return redirect(url_for('equipment.usage_log'))
+
+# 통합 장비 관리 페이지
+@equipment_bp.route('/management')
+def equipment_management():
+    return render_template('equipment/management.html')
+
+# 장비 API 엔드포인트
+@equipment_bp.route('/api/equipment')
+def api_equipment():
+    """장비 목록 API"""
+    try:
+        equipment_list = Equipment.query.all()
+        equipment_data = []
+        for eq in equipment_list:
+            equipment_data.append({
+                'id': eq.id,
+                'equipment_id': eq.equipment_id,
+                'name': eq.name,
+                'model': eq.model,
+                'manufacturer': eq.manufacturer,
+                'location': eq.location,
+                'status': eq.status,
+                'purchase_date': eq.purchase_date.strftime('%Y-%m-%d') if eq.purchase_date else None,
+                'specifications': eq.specifications
+            })
+        return jsonify(equipment_data)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@equipment_bp.route('/api/equipment/add', methods=['POST'])
+def api_add_equipment():
+    """장비 추가 API"""
+    try:
+        data = request.get_json()
+        
+        # 장비 ID 생성
+        last_equipment = Equipment.query.order_by(Equipment.id.desc()).first()
+        next_id = (last_equipment.id + 1) if last_equipment else 1
+        equipment_id = f"EQ{next_id:03d}"
+        
+        new_equipment = Equipment(
+            equipment_id=equipment_id,
+            name=data['name'],
+            model=data.get('model'),
+            manufacturer=data.get('manufacturer'),
+            location=data.get('location'),
+            status=data.get('status', '사용가능'),
+            purchase_date=datetime.strptime(data['purchase_date'], '%Y-%m-%d').date() if data.get('purchase_date') else None,
+            specifications=data.get('notes')
+        )
+        
+        db.session.add(new_equipment)
+        db.session.commit()
+        
+        return jsonify({'success': True, 'id': new_equipment.id})
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500
+
+@equipment_bp.route('/api/equipment/<int:equipment_id>/update', methods=['POST'])
+def api_update_equipment(equipment_id):
+    """장비 수정 API"""
+    try:
+        equipment = Equipment.query.get_or_404(equipment_id)
+        data = request.get_json()
+        
+        equipment.name = data['name']
+        equipment.model = data.get('model')
+        equipment.manufacturer = data.get('manufacturer')
+        equipment.location = data.get('location')
+        equipment.status = data.get('status', '사용가능')
+        equipment.purchase_date = datetime.strptime(data['purchase_date'], '%Y-%m-%d').date() if data.get('purchase_date') else None
+        equipment.specifications = data.get('notes')
+        
+        db.session.commit()
+        
+        return jsonify({'success': True})
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500
+
+@equipment_bp.route('/api/equipment/<int:equipment_id>/delete', methods=['POST'])
+def api_delete_equipment(equipment_id):
+    """장비 삭제 API"""
+    try:
+        equipment = Equipment.query.get_or_404(equipment_id)
+        
+        # 관련 예약이 있는지 확인
+        active_reservations = Reservation.query.filter_by(equipment_name=equipment.name, status='예약').count()
+        if active_reservations > 0:
+            return jsonify({'error': '활성 예약이 있는 장비는 삭제할 수 없습니다.'}), 400
+        
+        db.session.delete(equipment)
+        db.session.commit()
+        
+        return jsonify({'success': True})
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500
+
+# 예약 API 엔드포인트  
+@equipment_bp.route('/api/reservations/add', methods=['POST'])
+def api_add_reservation():
+    """예약 추가 API"""
+    try:
+        data = request.get_json()
+        
+        # 장비 정보 조회
+        equipment = Equipment.query.get(data['equipment_id'])
+        if not equipment:
+            return jsonify({'error': '장비를 찾을 수 없습니다.'}), 400
+        
+        new_reservation = Reservation(
+            equipment_name=equipment.name,
+            reserver=data['reserver'],
+            purpose=data['purpose'],
+            start_date=datetime.strptime(data['start_date'], '%Y-%m-%d').date(),
+            end_date=datetime.strptime(data['end_date'], '%Y-%m-%d').date(),
+            start_time=datetime.strptime(data['start_time'], '%H:%M').time() if data.get('start_time') else None,
+            end_time=datetime.strptime(data['end_time'], '%H:%M').time() if data.get('end_time') else None,
+            status='예약'
+        )
+        
+        db.session.add(new_reservation)
+        db.session.flush()  # ID를 얻기 위해 flush
+        
+        # 사용일지에 자동 추가
+        new_usage_log = UsageLog(
+            equipment_name=equipment.name,
+            user=data['reserver'],
+            usage_date=new_reservation.start_date,
+            start_time=new_reservation.start_time,
+            end_time=new_reservation.end_time,
+            purpose=data['purpose']
+        )
+        
+        db.session.add(new_usage_log)
+        db.session.commit()
+        
+        return jsonify({'success': True, 'id': new_reservation.id})
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500
+
+@equipment_bp.route('/api/reservations/<int:reservation_id>/update', methods=['POST'])
+def api_update_reservation_new(reservation_id):
+    """예약 수정 API"""
+    try:
+        reservation = Reservation.query.get_or_404(reservation_id)
+        data = request.get_json()
+        
+        # 장비 정보 조회
+        equipment = Equipment.query.get(data['equipment_id'])
+        if not equipment:
+            return jsonify({'error': '장비를 찾을 수 없습니다.'}), 400
+        
+        old_equipment_name = reservation.equipment_name
+        old_user = reservation.reserver
+        old_date = reservation.start_date
+        
+        reservation.equipment_name = equipment.name
+        reservation.reserver = data['reserver']
+        reservation.purpose = data['purpose']
+        reservation.start_date = datetime.strptime(data['start_date'], '%Y-%m-%d').date()
+        reservation.end_date = datetime.strptime(data['end_date'], '%Y-%m-%d').date()
+        reservation.start_time = datetime.strptime(data['start_time'], '%H:%M').time() if data.get('start_time') else None
+        reservation.end_time = datetime.strptime(data['end_time'], '%H:%M').time() if data.get('end_time') else None
+        
+        db.session.commit()
+        
+        # 연관된 사용일지도 업데이트
+        usage_log = UsageLog.query.filter_by(
+            equipment_name=old_equipment_name,
+            user=old_user,
+            usage_date=old_date
+        ).first()
+        
+        if usage_log:
+            usage_log.equipment_name = equipment.name
+            usage_log.user = data['reserver']
+            usage_log.usage_date = reservation.start_date
+            usage_log.start_time = reservation.start_time
+            usage_log.end_time = reservation.end_time
+            usage_log.purpose = data['purpose']
+            db.session.commit()
+        
+        return jsonify({'success': True})
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500
+
+@equipment_bp.route('/api/reservations/<int:reservation_id>/delete', methods=['POST'])
+def api_delete_reservation_new(reservation_id):
+    """예약 삭제 API"""
+    try:
+        reservation = Reservation.query.get_or_404(reservation_id)
+        
+        # 연관된 사용일지도 삭제
+        usage_logs = UsageLog.query.filter_by(
+            equipment_name=reservation.equipment_name,
+            user=reservation.reserver,
+            usage_date=reservation.start_date
+        ).all()
+        
+        for log in usage_logs:
+            db.session.delete(log)
+        
+        db.session.delete(reservation)
+        db.session.commit()
+        
+        return jsonify({'success': True})
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500
+
+# 사용일지 API 엔드포인트
+@equipment_bp.route('/api/usage-logs')
+def api_usage_logs():
+    """사용일지 목록 API"""
+    try:
+        usage_logs = UsageLog.query.order_by(UsageLog.usage_date.desc()).all()
+        logs_data = []
+        for log in usage_logs:
+            logs_data.append({
+                'id': log.id,
+                'equipment_name': log.equipment_name,
+                'user': log.user,
+                'usage_date': log.usage_date.strftime('%Y-%m-%d'),
+                'start_time': log.start_time.strftime('%H:%M') if log.start_time else None,
+                'end_time': log.end_time.strftime('%H:%M') if log.end_time else None,
+                'purpose': log.purpose,
+                'condition_before': log.condition_before,
+                'condition_after': log.condition_after,
+                'issues': log.issues
+            })
+        return jsonify(logs_data)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@equipment_bp.route('/api/usage-logs/<int:log_id>/update', methods=['POST'])
+def api_update_usage_log(log_id):
+    """사용일지 수정 API"""
+    try:
+        usage_log = UsageLog.query.get_or_404(log_id)
+        data = request.get_json()
+        
+        usage_log.condition_before = data.get('condition_before', '')
+        usage_log.condition_after = data.get('condition_after', '')
+        usage_log.issues = data.get('issues', '')
+        
+        db.session.commit()
+        
+        return jsonify({'success': True})
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500

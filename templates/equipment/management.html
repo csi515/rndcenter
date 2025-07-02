@@ -1,0 +1,1166 @@
+{% extends "base.html" %}
+
+{% block title %}장비 관리{% endblock %}
+
+{% block extra_head %}
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;600;700&display=swap');
+
+/* 전체 배경 및 기본 레이아웃 */
+body {
+    background: #FAFAFA;
+    font-family: 'Pretendard', 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif;
+    color: #1F2937;
+    line-height: 1.6;
+    font-weight: 400;
+}
+
+.equipment-container {
+    background: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    padding: 2.5rem;
+    margin-bottom: 2rem;
+    border: 1px solid #E5E7EB;
+    transition: box-shadow 0.2s ease;
+}
+
+.equipment-container:hover {
+    box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+}
+
+.header-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2.5rem;
+    padding: 2rem 2.5rem;
+    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+    border-radius: 16px;
+    border: 1px solid #E5E7EB;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+
+/* 탭 네비게이션 */
+.tab-navigation {
+    display: flex;
+    background: #F8F9FA;
+    border-radius: 12px;
+    padding: 0.5rem;
+    margin-bottom: 2rem;
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.tab-button {
+    flex: 1;
+    padding: 0.75rem 1.5rem;
+    border: none;
+    background: transparent;
+    color: #6B7280;
+    font-size: 14px;
+    font-weight: 500;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-align: center;
+}
+
+.tab-button.active {
+    background: linear-gradient(135deg, #4F46E5 0%, #3B82F6 100%);
+    color: white;
+    box-shadow: 0 2px 8px rgba(79, 70, 229, 0.25);
+}
+
+.tab-button:hover:not(.active) {
+    background: #E5E7EB;
+    color: #374151;
+}
+
+/* 탭 컨텐츠 */
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* 장비 목록 테이블 */
+.equipment-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    background: #ffffff;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    border: 1px solid #E5E7EB;
+}
+
+.equipment-table th {
+    background: linear-gradient(135deg, #F9FAFB 0%, #F3F4F6 100%);
+    color: #374151;
+    padding: 1.5rem 1rem;
+    text-align: left;
+    font-weight: 600;
+    font-size: 14px;
+    border-bottom: 1px solid #E5E7EB;
+    letter-spacing: -0.01em;
+}
+
+.equipment-table th:first-child {
+    border-top-left-radius: 12px;
+}
+
+.equipment-table th:last-child {
+    border-top-right-radius: 12px;
+    text-align: center;
+    width: 140px;
+}
+
+.equipment-table td {
+    padding: 1.25rem 1rem;
+    border-bottom: 1px solid #F3F4F6;
+    vertical-align: middle;
+    font-size: 14px;
+    color: #1F2937;
+}
+
+.equipment-table tbody tr {
+    transition: all 0.2s ease;
+}
+
+.equipment-table tbody tr:hover {
+    background: #F8FAFC;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+/* 상태 배지 */
+.status-badge {
+    padding: 0.375rem 0.75rem;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.status-사용가능 { 
+    background: linear-gradient(135deg, #D1FAE5 0%, #A7F3D0 100%); 
+    color: #059669; 
+}
+.status-점검중 { 
+    background: linear-gradient(135deg, #FEF3C7 0%, #FDE68A 100%); 
+    color: #D97706; 
+}
+.status-고장 { 
+    background: linear-gradient(135deg, #FEE2E2 0%, #FECACA 100%); 
+    color: #DC2626; 
+}
+.status-대기 { 
+    background: linear-gradient(135deg, #F3F4F6 0%, #E5E7EB 100%); 
+    color: #6B7280; 
+}
+
+/* 액션 버튼 */
+.action-buttons {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: center;
+}
+
+.btn-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.btn-icon:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+
+.btn-edit {
+    background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+    color: white;
+}
+
+.btn-delete {
+    background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%);
+    color: white;
+}
+
+/* 헤더 버튼 */
+.header-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    border-radius: 12px;
+    border: none;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+}
+
+.header-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #4F46E5 0%, #3B82F6 100%);
+    color: white;
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%);
+}
+
+/* 캘린더 스타일 */
+.calendar-container {
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    border: 1px solid #E5E7EB;
+    overflow: hidden;
+}
+
+.calendar-header {
+    background: linear-gradient(135deg, #F9FAFB 0%, #F3F4F6 100%);
+    padding: 1.5rem;
+    border-bottom: 1px solid #E5E7EB;
+    display: flex;
+    justify-content: between;
+    align-items: center;
+}
+
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+}
+
+.calendar-day-header {
+    padding: 1rem;
+    text-align: center;
+    font-weight: 600;
+    color: #6B7280;
+    border-bottom: 1px solid #F3F4F6;
+    background: #F8F9FA;
+}
+
+.calendar-day {
+    min-height: 120px;
+    padding: 0.75rem;
+    border-right: 1px solid #F3F4F6;
+    border-bottom: 1px solid #F3F4F6;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.calendar-day:hover {
+    background: #F0F9FF;
+}
+
+.calendar-day.other-month {
+    color: #9CA3AF;
+    background: #F9FAFB;
+}
+
+.calendar-day.today {
+    background: #EFF6FF;
+    border: 2px solid #3B82F6;
+}
+
+.day-number {
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.reservation-item {
+    background: linear-gradient(135deg, #DBEAFE 0%, #BFDBFE 100%);
+    color: #1E40AF;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 11px;
+    margin-bottom: 0.25rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.reservation-item:hover {
+    background: linear-gradient(135deg, #BFDBFE 0%, #93C5FD 100%);
+}
+
+/* 사용일지 테이블 */
+.usage-log-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    background: #ffffff;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    border: 1px solid #E5E7EB;
+}
+
+.usage-log-table th {
+    background: linear-gradient(135deg, #F9FAFB 0%, #F3F4F6 100%);
+    color: #374151;
+    padding: 1.5rem 1rem;
+    text-align: left;
+    font-weight: 600;
+    font-size: 14px;
+    border-bottom: 1px solid #E5E7EB;
+}
+
+.usage-log-table td {
+    padding: 1.25rem 1rem;
+    border-bottom: 1px solid #F3F4F6;
+    vertical-align: middle;
+    font-size: 14px;
+}
+
+.usage-textarea {
+    width: 100%;
+    border: 1px solid #E5E7EB;
+    border-radius: 6px;
+    padding: 0.5rem;
+    font-size: 13px;
+    resize: vertical;
+    min-height: 60px;
+}
+
+.usage-textarea:focus {
+    border-color: #3B82F6;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* 모달 스타일 */
+.modal-content {
+    border-radius: 16px;
+    border: 1px solid #E5E7EB;
+}
+
+.modal-header {
+    background: linear-gradient(135deg, #F9FAFB 0%, #F3F4F6 100%);
+    border-bottom: 1px solid #E5E7EB;
+    border-radius: 16px 16px 0 0;
+    padding: 1.5rem 2rem;
+}
+
+.modal-body {
+    padding: 2rem;
+}
+
+.modal-footer {
+    background: #F9FAFB;
+    border-top: 1px solid #E5E7EB;
+    border-radius: 0 0 16px 16px;
+    padding: 1.5rem 2rem;
+}
+
+/* 폼 스타일 */
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    color: #374151;
+}
+
+.form-control {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 1px solid #E5E7EB;
+    border-radius: 8px;
+    font-size: 14px;
+    transition: border-color 0.2s ease;
+}
+
+.form-control:focus {
+    border-color: #3B82F6;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* 반응형 디자인 */
+@media (max-width: 768px) {
+    .container-fluid {
+        padding: 1rem;
+    }
+    
+    .header-section {
+        padding: 1.5rem;
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .equipment-container {
+        padding: 1.5rem;
+    }
+    
+    .tab-button {
+        padding: 0.5rem 0.75rem;
+        font-size: 13px;
+    }
+    
+    .equipment-table,
+    .usage-log-table {
+        font-size: 13px;
+    }
+    
+    .equipment-table th,
+    .equipment-table td,
+    .usage-log-table th,
+    .usage-log-table td {
+        padding: 0.75rem 0.5rem;
+    }
+    
+    .calendar-day {
+        min-height: 80px;
+        padding: 0.5rem;
+    }
+}
+</style>
+
+<!-- FullCalendar CSS -->
+<link href='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css' rel='stylesheet' />
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- 헤더 섹션 -->
+    <div class="header-section">
+        <h2 class="mb-0" style="color: #1F2937; font-weight: 700; font-size: 28px; letter-spacing: -0.02em;">
+            장비 관리
+        </h2>
+        <div class="d-flex gap-3">
+            <button class="header-btn btn-primary" id="addButton" style="display: none;">
+                <i class="fas fa-plus"></i>
+                <span>추가</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- 장비 관리 -->
+    <div class="equipment-container">
+        <!-- 탭 네비게이션 -->
+        <div class="tab-navigation">
+            <button class="tab-button active" onclick="switchTab('equipment-list')">
+                <i class="fas fa-list me-2"></i>장비 목록
+            </button>
+            <button class="tab-button" onclick="switchTab('reservations')">
+                <i class="fas fa-calendar-alt me-2"></i>장비 예약
+            </button>
+            <button class="tab-button" onclick="switchTab('usage-log')">
+                <i class="fas fa-clipboard-list me-2"></i>사용일지
+            </button>
+        </div>
+
+        <!-- 장비 목록 탭 -->
+        <div id="equipment-list" class="tab-content active">
+            <div class="table-responsive">
+                <table class="equipment-table">
+                    <thead>
+                        <tr>
+                            <th>장비명</th>
+                            <th>모델명</th>
+                            <th>제조사</th>
+                            <th>위치</th>
+                            <th>상태</th>
+                            <th>관리</th>
+                        </tr>
+                    </thead>
+                    <tbody id="equipmentTableBody">
+                        <!-- JavaScript로 동적 생성 -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- 장비 예약 탭 -->
+        <div id="reservations" class="tab-content">
+            <div class="calendar-container">
+                <div id="calendar"></div>
+            </div>
+        </div>
+
+        <!-- 사용일지 탭 -->
+        <div id="usage-log" class="tab-content">
+            <div class="table-responsive">
+                <table class="usage-log-table">
+                    <thead>
+                        <tr>
+                            <th>장비명</th>
+                            <th>예약자</th>
+                            <th>사용 일시</th>
+                            <th>사용 내용</th>
+                            <th>특이사항</th>
+                            <th>저장</th>
+                        </tr>
+                    </thead>
+                    <tbody id="usageLogTableBody">
+                        <!-- JavaScript로 동적 생성 -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 장비 추가/수정 모달 -->
+<div class="modal fade" id="equipmentModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="equipmentModalTitle">장비 추가</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="equipmentForm">
+                    <input type="hidden" id="equipmentId">
+                    <div class="form-group">
+                        <label class="form-label">장비명 *</label>
+                        <input type="text" class="form-control" id="equipmentName" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">모델명</label>
+                        <input type="text" class="form-control" id="equipmentModel">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">제조사</label>
+                        <input type="text" class="form-control" id="equipmentManufacturer">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">위치</label>
+                        <input type="text" class="form-control" id="equipmentLocation">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">상태</label>
+                        <select class="form-control" id="equipmentStatus">
+                            <option value="사용가능">사용가능</option>
+                            <option value="점검중">점검중</option>
+                            <option value="고장">고장</option>
+                            <option value="대기">대기</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">구매일</label>
+                        <input type="date" class="form-control" id="equipmentPurchaseDate">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">비고</label>
+                        <textarea class="form-control" id="equipmentNotes" rows="3"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+                <button type="button" class="btn btn-danger" id="deleteEquipmentBtn" onclick="deleteEquipment()" style="display: none;">삭제</button>
+                <button type="button" class="btn btn-primary" onclick="saveEquipment()">저장</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 예약 추가/수정 모달 -->
+<div class="modal fade" id="reservationModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="reservationModalTitle">장비 예약</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="reservationForm">
+                    <input type="hidden" id="reservationId">
+                    <div class="form-group">
+                        <label class="form-label">예약자 이름 *</label>
+                        <input type="text" class="form-control" id="reserverName" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">장비 선택 *</label>
+                        <select class="form-control" id="reservationEquipment" required>
+                            <option value="">장비를 선택하세요</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">시작 일시 *</label>
+                        <input type="datetime-local" class="form-control" id="startDateTime" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">종료 일시 *</label>
+                        <input type="datetime-local" class="form-control" id="endDateTime" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">사용 목적 *</label>
+                        <textarea class="form-control" id="reservationPurpose" rows="3" required></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+                <button type="button" class="btn btn-danger" id="deleteReservationBtn" onclick="deleteReservation()" style="display: none;">삭제</button>
+                <button type="button" class="btn btn-primary" onclick="saveReservation()">저장</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- FullCalendar JS -->
+<script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js'></script>
+
+<script>
+let equipmentList = [];
+let reservationsList = [];
+let usageLogList = [];
+let calendar;
+let currentTab = 'equipment-list';
+
+// 페이지 로드 시 초기화
+document.addEventListener('DOMContentLoaded', function() {
+    loadEquipmentData();
+    loadReservationsData();
+    loadUsageLogData();
+    initializeCalendar();
+    updateAddButton();
+});
+
+// 탭 전환
+function switchTab(tabName) {
+    // 모든 탭 버튼 비활성화
+    document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+    // 모든 탭 컨텐츠 숨기기
+    document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+    
+    // 선택된 탭 활성화
+    event.target.classList.add('active');
+    document.getElementById(tabName).classList.add('active');
+    
+    currentTab = tabName;
+    updateAddButton();
+    
+    // 캘린더 탭이 활성화되면 캘린더 새로고침
+    if (tabName === 'reservations' && calendar) {
+        setTimeout(() => {
+            calendar.render();
+        }, 100);
+    }
+}
+
+// 추가 버튼 업데이트
+function updateAddButton() {
+    const addButton = document.getElementById('addButton');
+    const addButtonText = addButton.querySelector('span');
+    
+    if (currentTab === 'equipment-list') {
+        addButton.style.display = 'flex';
+        addButtonText.textContent = '장비 추가';
+        addButton.onclick = () => addEquipment();
+    } else if (currentTab === 'reservations') {
+        addButton.style.display = 'flex';
+        addButtonText.textContent = '예약 추가';
+        addButton.onclick = () => addReservation();
+    } else {
+        addButton.style.display = 'none';
+    }
+}
+
+// 장비 데이터 로드
+async function loadEquipmentData() {
+    try {
+        const response = await fetch('/equipment/api/equipment');
+        if (response.ok) {
+            equipmentList = await response.json();
+        } else {
+            console.error('장비 데이터 로드 실패');
+            equipmentList = [];
+        }
+    } catch (error) {
+        console.error('장비 데이터 로드 중 오류:', error);
+        equipmentList = [];
+    }
+    
+    renderEquipmentTable();
+    updateEquipmentDropdown();
+}
+
+// 장비 테이블 렌더링
+function renderEquipmentTable() {
+    const tbody = document.getElementById('equipmentTableBody');
+    let html = '';
+    
+    equipmentList.forEach(equipment => {
+        const statusClass = equipment.status.replace(/\s+/g, '');
+        html += `
+        <tr>
+            <td style="font-weight: 500;">${equipment.name}</td>
+            <td>${equipment.model || '-'}</td>
+            <td>${equipment.manufacturer || '-'}</td>
+            <td>${equipment.location || '-'}</td>
+            <td>
+                <span class="status-badge status-${statusClass}">${equipment.status}</span>
+            </td>
+            <td>
+                <div class="action-buttons">
+                    <button class="btn-icon btn-edit" onclick="editEquipment(${equipment.id})" title="수정">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="btn-icon btn-delete" onclick="deleteEquipment(${equipment.id})" title="삭제">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            </td>
+        </tr>`;
+    });
+    
+    tbody.innerHTML = html;
+}
+
+// 장비 드롭다운 업데이트
+function updateEquipmentDropdown() {
+    const select = document.getElementById('reservationEquipment');
+    const availableEquipment = equipmentList.filter(eq => eq.status === '사용가능');
+    
+    let html = '<option value="">장비를 선택하세요</option>';
+    availableEquipment.forEach(equipment => {
+        html += `<option value="${equipment.id}">${equipment.name} (${equipment.location})</option>`;
+    });
+    
+    select.innerHTML = html;
+}
+
+// 장비 추가
+function addEquipment() {
+    document.getElementById('equipmentModalTitle').textContent = '장비 추가';
+    document.getElementById('equipmentForm').reset();
+    document.getElementById('equipmentId').value = '';
+    document.getElementById('deleteEquipmentBtn').style.display = 'none';
+    
+    new bootstrap.Modal(document.getElementById('equipmentModal')).show();
+}
+
+// 장비 수정
+function editEquipment(id) {
+    const equipment = equipmentList.find(eq => eq.id === id);
+    if (!equipment) return;
+    
+    document.getElementById('equipmentModalTitle').textContent = '장비 수정';
+    document.getElementById('equipmentId').value = equipment.id;
+    document.getElementById('equipmentName').value = equipment.name;
+    document.getElementById('equipmentModel').value = equipment.model || '';
+    document.getElementById('equipmentManufacturer').value = equipment.manufacturer || '';
+    document.getElementById('equipmentLocation').value = equipment.location || '';
+    document.getElementById('equipmentStatus').value = equipment.status;
+    document.getElementById('equipmentPurchaseDate').value = equipment.purchase_date || '';
+    document.getElementById('equipmentNotes').value = equipment.notes || '';
+    document.getElementById('deleteEquipmentBtn').style.display = 'inline-block';
+    
+    new bootstrap.Modal(document.getElementById('equipmentModal')).show();
+}
+
+// 장비 저장
+async function saveEquipment() {
+    const id = document.getElementById('equipmentId').value;
+    const equipmentData = {
+        name: document.getElementById('equipmentName').value,
+        model: document.getElementById('equipmentModel').value,
+        manufacturer: document.getElementById('equipmentManufacturer').value,
+        location: document.getElementById('equipmentLocation').value,
+        status: document.getElementById('equipmentStatus').value,
+        purchase_date: document.getElementById('equipmentPurchaseDate').value,
+        notes: document.getElementById('equipmentNotes').value
+    };
+    
+    if (!equipmentData.name.trim()) {
+        alert('장비명을 입력해주세요.');
+        return;
+    }
+    
+    try {
+        let response;
+        if (id) {
+            // 수정
+            response = await fetch(`/equipment/api/equipment/${id}/update`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(equipmentData)
+            });
+        } else {
+            // 추가
+            response = await fetch('/equipment/api/equipment/add', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(equipmentData)
+            });
+        }
+        
+        const result = await response.json();
+        if (result.success) {
+            await loadEquipmentData();
+            bootstrap.Modal.getInstance(document.getElementById('equipmentModal')).hide();
+            alert('저장되었습니다.');
+        } else {
+            alert('오류: ' + (result.error || '저장에 실패했습니다.'));
+        }
+    } catch (error) {
+        console.error('저장 중 오류:', error);
+        alert('저장 중 오류가 발생했습니다.');
+    }
+}
+
+// 장비 삭제
+async function deleteEquipment(id) {
+    if (confirm('이 장비를 삭제하시겠습니까?')) {
+        try {
+            const response = await fetch(`/equipment/api/equipment/${id}/delete`, {
+                method: 'POST'
+            });
+            
+            const result = await response.json();
+            if (result.success) {
+                await loadEquipmentData();
+                
+                if (document.getElementById('equipmentModal').classList.contains('show')) {
+                    bootstrap.Modal.getInstance(document.getElementById('equipmentModal')).hide();
+                }
+                
+                alert('삭제되었습니다.');
+            } else {
+                alert('오류: ' + (result.error || '삭제에 실패했습니다.'));
+            }
+        } catch (error) {
+            console.error('삭제 중 오류:', error);
+            alert('삭제 중 오류가 발생했습니다.');
+        }
+    }
+}
+
+// 캘린더 초기화
+function initializeCalendar() {
+    const calendarEl = document.getElementById('calendar');
+    
+    calendar = new FullCalendar.Calendar(calendarEl, {
+        initialView: 'dayGridMonth',
+        locale: 'ko',
+        headerToolbar: {
+            left: 'prev,next today',
+            center: 'title',
+            right: 'dayGridMonth,timeGridWeek,timeGridDay'
+        },
+        events: [],
+        selectable: true,
+        selectMirror: true,
+        select: function(arg) {
+            const startDate = new Date(arg.start);
+            const endDate = new Date(arg.end);
+            endDate.setDate(endDate.getDate() - 1); // 종료일 조정
+            
+            // 예약 모달 열기
+            document.getElementById('startDateTime').value = formatDateTimeLocal(startDate);
+            document.getElementById('endDateTime').value = formatDateTimeLocal(endDate);
+            addReservation();
+        },
+        eventClick: function(arg) {
+            // 예약 클릭 시 수정 모달
+            const reservationId = parseInt(arg.event.id);
+            editReservation(reservationId);
+        }
+    });
+    
+    calendar.render();
+}
+
+// 예약 데이터 로드
+async function loadReservationsData() {
+    try {
+        const response = await fetch('/equipment/api/reservations');
+        if (response.ok) {
+            reservationsList = await response.json();
+        } else {
+            console.error('예약 데이터 로드 실패');
+            reservationsList = [];
+        }
+    } catch (error) {
+        console.error('예약 데이터 로드 중 오류:', error);
+        reservationsList = [];
+    }
+    
+    updateCalendarEvents();
+}
+
+// 캘린더 이벤트 업데이트
+function updateCalendarEvents() {
+    if (!calendar) return;
+    
+    const events = reservationsList.map(reservation => ({
+        id: reservation.id,
+        title: `${reservation.equipment_name} - ${reservation.reserver}`,
+        start: `${reservation.start_date}T${reservation.start_time}`,
+        end: `${reservation.end_date}T${reservation.end_time}`,
+        backgroundColor: '#3B82F6',
+        borderColor: '#2563EB'
+    }));
+    
+    calendar.removeAllEvents();
+    calendar.addEventSource(events);
+}
+
+// 예약 추가
+function addReservation() {
+    document.getElementById('reservationModalTitle').textContent = '장비 예약';
+    document.getElementById('reservationForm').reset();
+    document.getElementById('reservationId').value = '';
+    document.getElementById('deleteReservationBtn').style.display = 'none';
+    
+    new bootstrap.Modal(document.getElementById('reservationModal')).show();
+}
+
+// 예약 수정
+function editReservation(id) {
+    const reservation = reservationsList.find(res => res.id === id);
+    if (!reservation) return;
+    
+    document.getElementById('reservationModalTitle').textContent = '예약 수정';
+    document.getElementById('reservationId').value = reservation.id;
+    document.getElementById('reserverName').value = reservation.reserver;
+    
+    // 장비 선택
+    const equipmentSelect = document.getElementById('reservationEquipment');
+    const equipment = equipmentList.find(eq => eq.name === reservation.equipment_name);
+    if (equipment) {
+        equipmentSelect.value = equipment.id;
+    }
+    
+    document.getElementById('startDateTime').value = `${reservation.start_date}T${reservation.start_time}`;
+    document.getElementById('endDateTime').value = `${reservation.end_date}T${reservation.end_time}`;
+    document.getElementById('reservationPurpose').value = reservation.purpose;
+    document.getElementById('deleteReservationBtn').style.display = 'inline-block';
+    
+    new bootstrap.Modal(document.getElementById('reservationModal')).show();
+}
+
+// 예약 저장
+async function saveReservation() {
+    const id = document.getElementById('reservationId').value;
+    const equipmentId = document.getElementById('reservationEquipment').value;
+    const equipment = equipmentList.find(eq => eq.id == equipmentId);
+    
+    if (!equipment) {
+        alert('장비를 선택해주세요.');
+        return;
+    }
+    
+    const reservationData = {
+        equipment_id: equipmentId,
+        reserver: document.getElementById('reserverName').value,
+        start_date: document.getElementById('startDateTime').value.split('T')[0],
+        end_date: document.getElementById('endDateTime').value.split('T')[0],
+        start_time: document.getElementById('startDateTime').value.split('T')[1],
+        end_time: document.getElementById('endDateTime').value.split('T')[1],
+        purpose: document.getElementById('reservationPurpose').value
+    };
+    
+    if (!reservationData.reserver.trim() || !reservationData.purpose.trim()) {
+        alert('모든 필수 항목을 입력해주세요.');
+        return;
+    }
+    
+    try {
+        let response;
+        if (id) {
+            // 수정
+            response = await fetch(`/equipment/api/reservations/${id}/update`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(reservationData)
+            });
+        } else {
+            // 추가
+            response = await fetch('/equipment/api/reservations/add', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(reservationData)
+            });
+        }
+        
+        const result = await response.json();
+        if (result.success) {
+            await loadReservationsData();
+            await loadUsageLogData();
+            bootstrap.Modal.getInstance(document.getElementById('reservationModal')).hide();
+            alert('저장되었습니다.');
+        } else {
+            alert('오류: ' + (result.error || '저장에 실패했습니다.'));
+        }
+    } catch (error) {
+        console.error('저장 중 오류:', error);
+        alert('저장 중 오류가 발생했습니다.');
+    }
+}
+
+// 예약 삭제
+async function deleteReservation(id) {
+    if (confirm('이 예약을 삭제하시겠습니까?')) {
+        try {
+            const response = await fetch(`/equipment/api/reservations/${id}/delete`, {
+                method: 'POST'
+            });
+            
+            const result = await response.json();
+            if (result.success) {
+                await loadReservationsData();
+                await loadUsageLogData();
+                
+                if (document.getElementById('reservationModal').classList.contains('show')) {
+                    bootstrap.Modal.getInstance(document.getElementById('reservationModal')).hide();
+                }
+                
+                alert('삭제되었습니다.');
+            } else {
+                alert('오류: ' + (result.error || '삭제에 실패했습니다.'));
+            }
+        } catch (error) {
+            console.error('삭제 중 오류:', error);
+            alert('삭제 중 오류가 발생했습니다.');
+        }
+    }
+}
+
+// 사용일지에 자동 추가
+function addToUsageLog(reservation) {
+    const logEntry = {
+        id: Date.now(),
+        reservation_id: reservation.id,
+        equipment_name: reservation.equipment_name,
+        user: reservation.reserver,
+        usage_date: reservation.start_date,
+        start_time: reservation.start_time,
+        end_time: reservation.end_time,
+        purpose: reservation.purpose,
+        content: '',
+        issues: ''
+    };
+    
+    usageLogList.push(logEntry);
+}
+
+// 사용일지 데이터 로드
+async function loadUsageLogData() {
+    try {
+        const response = await fetch('/equipment/api/usage-logs');
+        if (response.ok) {
+            usageLogList = await response.json();
+        } else {
+            console.error('사용일지 데이터 로드 실패');
+            usageLogList = [];
+        }
+    } catch (error) {
+        console.error('사용일지 데이터 로드 중 오류:', error);
+        usageLogList = [];
+    }
+    
+    renderUsageLogTable();
+}
+
+// 사용일지 테이블 렌더링
+function renderUsageLogTable() {
+    const tbody = document.getElementById('usageLogTableBody');
+    let html = '';
+    
+    usageLogList.forEach(log => {
+        html += `
+        <tr>
+            <td style="font-weight: 500;">${log.equipment_name}</td>
+            <td>${log.user}</td>
+            <td>${log.usage_date} ${log.start_time}-${log.end_time}</td>
+            <td>
+                <textarea class="usage-textarea" id="content-${log.id}" placeholder="사용 내용을 입력하세요...">${log.content}</textarea>
+            </td>
+            <td>
+                <textarea class="usage-textarea" id="issues-${log.id}" placeholder="특이사항을 입력하세요...">${log.issues}</textarea>
+            </td>
+            <td>
+                <button class="btn-icon btn-edit" onclick="saveUsageLog(${log.id})" title="저장">
+                    <i class="fas fa-save"></i>
+                </button>
+            </td>
+        </tr>`;
+    });
+    
+    tbody.innerHTML = html;
+}
+
+// 사용일지 저장
+async function saveUsageLog(id) {
+    const log = usageLogList.find(l => l.id === id);
+    if (!log) return;
+    
+    const usageData = {
+        condition_before: document.getElementById(`content-${id}`).value,
+        condition_after: '',
+        issues: document.getElementById(`issues-${id}`).value
+    };
+    
+    try {
+        const response = await fetch(`/equipment/api/usage-logs/${id}/update`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(usageData)
+        });
+        
+        const result = await response.json();
+        if (result.success) {
+            alert('사용일지가 저장되었습니다.');
+        } else {
+            alert('오류: ' + (result.error || '저장에 실패했습니다.'));
+        }
+    } catch (error) {
+        console.error('저장 중 오류:', error);
+        alert('저장 중 오류가 발생했습니다.');
+    }
+}
+
+// 유틸리티 함수
+function formatDateTimeLocal(date) {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    
+    return `${year}-${month}-${day}T${hours}:${minutes}`;
+}
+</script>
+{% endblock %}
