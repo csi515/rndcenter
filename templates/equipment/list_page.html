@@ -267,15 +267,20 @@ async function loadEquipmentData() {
         const response = await fetch('/equipment/api/equipment');
         const data = await response.json();
         
+        console.log('장비 데이터 로드 결과:', data);
+        
         if (data.success && data.equipment) {
             equipmentList = data.equipment;
+            console.log('equipmentList 업데이트됨:', equipmentList);
             renderEquipmentTable(equipmentList);
         } else {
             console.error('장비 데이터 로드 실패:', data.error || '데이터 없음');
+            equipmentList = [];
             renderEquipmentTable([]);
         }
     } catch (error) {
         console.error('장비 데이터 로드 중 오류:', error);
+        equipmentList = [];
         renderEquipmentTable([]);
     }
 }
@@ -390,8 +395,13 @@ function editEquipmentFromDetail() {
 
 // 장비 수정
 function editEquipment(id) {
+    console.log('수정 요청 ID:', id, 'equipmentList:', equipmentList);
     const equipment = equipmentList.find(eq => eq.id === id);
-    if (!equipment) return;
+    if (!equipment) {
+        console.error('장비를 찾을 수 없습니다. ID:', id);
+        alert('장비를 찾을 수 없습니다.');
+        return;
+    }
     
     document.getElementById('equipmentModalTitle').textContent = '장비 수정';
     document.getElementById('hiddenEquipmentId').value = equipment.id;
@@ -417,6 +427,7 @@ function editEquipment(id) {
 // 장비 저장
 async function saveEquipment() {
     const id = document.getElementById('hiddenEquipmentId').value;
+    console.log('저장 요청 ID:', id);
     const equipmentData = {
         name: document.getElementById('equipmentName').value,
         model: document.getElementById('equipmentModel').value,
@@ -479,15 +490,24 @@ async function deleteEquipment(id) {
         id = document.getElementById('hiddenEquipmentId').value;
     }
     
-    if (!id) return;
+    console.log('삭제 요청 ID:', id);
+    
+    if (!id) {
+        console.error('삭제할 장비 ID가 없습니다.');
+        alert('삭제할 장비를 선택해주세요.');
+        return;
+    }
     
     if (confirm('이 장비를 삭제하시겠습니까?')) {
         try {
+            console.log('삭제 API 호출:', `/equipment/api/equipment/${id}/delete`);
             const response = await fetch(`/equipment/api/equipment/${id}/delete`, {
                 method: 'POST'
             });
             
             const result = await response.json();
+            console.log('삭제 API 응답:', result);
+            
             if (result.success) {
                 alert('삭제되었습니다.');
                 if (document.getElementById('equipmentModal').classList.contains('show')) {
