@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify
 from csv_manager import csv_manager
-from database import db, WeeklySchedule, Project, Researcher, ProjectSchedule
+from database import db, WeeklySchedule, Project, Researcher, ProjectSchedule, Week, WeeklyScheduleNew
 import pandas as pd
 from datetime import datetime, date
 import json
@@ -531,3 +531,34 @@ def move_project_schedule(schedule_id):
     except Exception as e:
         db.session.rollback()
         return jsonify({'success': False, 'error': str(e)})
+
+
+# 새로운 주간 일정 관리 페이지
+@research_bp.route("/weekly-schedule")
+def weekly_schedule():
+    """2단 테이블 헤더 구조의 주간 일정 관리 페이지"""
+    return render_template("research/weekly_schedule.html")
+
+@research_bp.route("/weekly-schedule/projects/api")
+def weekly_schedule_projects_api():
+    """프로젝트 목록 API (주간 일정용)"""
+    try:
+        # 기본 프로젝트들 (임시)
+        projects_list = [
+            {"id": 1, "name": "신약 개발 프로젝트", "researcher": "김연구"},
+            {"id": 2, "name": "바이오 센서 연구", "researcher": "이박사"},
+            {"id": 3, "name": "나노 소재 분석", "researcher": "박교수"}
+        ]
+        return jsonify(projects_list)
+    except Exception as e:
+        return jsonify([])
+
+@research_bp.route("/weekly-schedule/schedules/api")
+def weekly_schedule_schedules_api():
+    """주간 일정 데이터 API"""
+    try:
+        # 임시 일정 데이터
+        schedules_list = []
+        return jsonify(schedules_list)
+    except Exception as e:
+        return jsonify([])

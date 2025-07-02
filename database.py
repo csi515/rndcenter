@@ -302,3 +302,37 @@ class ProjectSchedule(db.Model):
     
     # Relationship with Project
     project = db.relationship('Project', backref='schedules')
+
+# 주차 테이블
+class Week(db.Model):
+    __tablename__ = 'weeks'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    month = db.Column(db.Integer, nullable=False)  # 1-12
+    year = db.Column(db.Integer, nullable=False)
+    week_number = db.Column(db.Integer, nullable=False)  # 1-5
+    start_date = db.Column(db.Date)
+    end_date = db.Column(db.Date)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+# 새로운 주간 일정 테이블
+class WeeklyScheduleNew(db.Model):
+    __tablename__ = 'weekly_schedule_new'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    project_name = db.Column(db.String(200), nullable=False)
+    researcher_name = db.Column(db.String(100))
+    week_id = db.Column(db.Integer, db.ForeignKey('weeks.id'), nullable=False)
+    title = db.Column(db.String(500), nullable=False)
+    description = db.Column(db.Text)
+    start_week_id = db.Column(db.Integer, db.ForeignKey('weeks.id'), nullable=False)
+    end_week_id = db.Column(db.Integer, db.ForeignKey('weeks.id'), nullable=False)
+    status = db.Column(db.String(50), default='계획')
+    priority = db.Column(db.String(50), default='보통')
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    
+    # 관계 설정
+    week = db.relationship('Week', foreign_keys=[week_id], backref='schedules')
+    start_week = db.relationship('Week', foreign_keys=[start_week_id])
+    end_week = db.relationship('Week', foreign_keys=[end_week_id])
