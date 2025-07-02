@@ -51,9 +51,17 @@
                 </div>
                 
                 <!-- 지식재산 관리 -->
-                <a class="list-group-item list-group-item-action bg-light text-dark" href="{{ url_for('patents.patent_list') }}">
-                    <i class="fas fa-certificate me-2"></i>특허 목록
-                </a>
+                <div class="list-group-item list-group-item-action bg-light text-dark dropdown-toggle" data-bs-toggle="collapse" data-bs-target="#patentMenu">
+                    <i class="fas fa-certificate me-2"></i>지식재산 관리
+                </div>
+                <div class="collapse" id="patentMenu">
+                    <a class="list-group-item list-group-item-action bg-white text-dark ps-4" href="{{ url_for('patents.patent_list') }}">
+                        <i class="fas fa-list me-2"></i>기본 특허 목록
+                    </a>
+                    <a class="list-group-item list-group-item-action bg-white text-dark ps-4" href="{{ url_for('patents.enhanced_patent_list') }}">
+                        <i class="fas fa-users me-2"></i>특허 관리 (출원인별)
+                    </a>
+                </div>
                 
                 <!-- 장비 관리 -->
                 <div class="list-group-item list-group-item-action bg-light text-dark dropdown-toggle" data-bs-toggle="collapse" data-bs-target="#equipmentMenu">

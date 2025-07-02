@@ -90,6 +90,8 @@ class Patent(db.Model):
     publication_number = db.Column(db.String(100))
     grant_date = db.Column(db.Date)
     patent_number = db.Column(db.String(100))
+    registration_number = db.Column(db.String(100))  # 등록번호 추가
+    registration_date = db.Column(db.Date)  # 등록일 추가
     status = db.Column(db.String(50))
     field = db.Column(db.String(200))
     abstract = db.Column(db.Text)
@@ -97,6 +99,23 @@ class Patent(db.Model):
     priority_date = db.Column(db.Date)
     priority_number = db.Column(db.String(100))
     created_date = db.Column(db.DateTime, default=datetime.utcnow)
+
+# 특허 출원인 테이블
+class PatentApplicant(db.Model):
+    __tablename__ = 'patent_applicants'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    patent_id = db.Column(db.Integer, db.ForeignKey('patents.id'), nullable=False)
+    name = db.Column(db.String(100), nullable=False)
+    affiliation = db.Column(db.String(200))  # 소속 (선택)
+    share_percentage = db.Column(db.Numeric(5, 2), nullable=False)  # 지분율 (%)
+    filing_reward = db.Column(db.Numeric(15, 2), default=0)  # 출원 보상금
+    registration_reward = db.Column(db.Numeric(15, 2), default=0)  # 등록 보상금
+    created_date = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_date = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    
+    # 관계 설정
+    patent = db.relationship('Patent', backref='applicants')
 
 class Equipment(db.Model):
     __tablename__ = 'equipment'
