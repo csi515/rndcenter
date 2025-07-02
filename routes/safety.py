@@ -368,11 +368,7 @@ def add_education():
     
     return redirect(url_for('safety.education'))
 
-@safety_bp.route('/excellence')
-def excellence():
-    excellence_data = csv_manager.read_csv('excellence.csv')
-    excellence_list = excellence_data.to_dict('records') if not excellence_data.empty else []
-    return render_template('safety/excellence.html', excellence=excellence_list)
+
 
 @safety_bp.route('/procedures')
 def procedures():
