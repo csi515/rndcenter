@@ -356,3 +356,14 @@ class WeeklyScheduleNew(db.Model):
     week = db.relationship('Week', foreign_keys=[week_id], backref='schedules')
     start_week = db.relationship('Week', foreign_keys=[start_week_id])
     end_week = db.relationship('Week', foreign_keys=[end_week_id])
+
+
+class SafetyMaterial(db.Model):
+    __tablename__ = 'safety_materials'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(500), nullable=False)
+    content = db.Column(db.Text, nullable=False)
+    link = db.Column(db.String(1000))
+    created_date = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_date = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)

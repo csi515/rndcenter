@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}교육자료 - R&D 센터 관리시스템{% endblock %}
+{% block title %}안전 교육자료 - R&D 센터 관리시스템{% endblock %}
 
 {% block content %}
 <div class="row">
@@ -9,112 +9,114 @@
     </div>
 </div>
 
-<!-- Educational Materials -->
-<div class="row">
-    <div class="col-lg-4 col-md-6 mb-4">
-        <div class="card">
-            <div class="card-header bg-primary text-white">
-                <h5 class="mb-0"><i class="fas fa-hard-hat"></i> 실험실 안전수칙</h5>
+<!-- 교육자료 추가 폼 -->
+<div class="card mb-4">
+    <div class="card-header">
+        <h5 class="mb-0"><i class="fas fa-plus"></i> 새 교육자료 추가</h5>
+    </div>
+    <div class="card-body">
+        <form id="addMaterialForm">
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="mb-3">
+                        <label for="title" class="form-label">제목 <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="title" name="title" required>
+                    </div>
+                </div>
+                <div class="col-md-5">
+                    <div class="mb-3">
+                        <label for="content" class="form-label">내용 <span class="text-danger">*</span></label>
+                        <textarea class="form-control" id="content" name="content" rows="2" required></textarea>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="mb-3">
+                        <label for="link" class="form-label">링크</label>
+                        <input type="url" class="form-control" id="link" name="link" placeholder="https://...">
+                    </div>
+                </div>
             </div>
-            <div class="card-body">
-                <p class="card-text">실험실에서 반드시 준수해야 할 기본 안전수칙 및 개인보호장비 착용법</p>
-                <ul class="list-unstyled">
-                    <li><i class="fas fa-file-pdf text-danger"></i> 실험실 안전수칙.pdf</li>
-                    <li><i class="fas fa-file-pdf text-danger"></i> 개인보호장비 가이드.pdf</li>
-                    <li><i class="fas fa-video text-info"></i> 안전수칙 교육영상</li>
-                </ul>
-                <a href="#" class="btn btn-primary btn-sm">자료 보기</a>
+            <div class="text-end">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save"></i> 등록
+                </button>
             </div>
+        </form>
+    </div>
+</div>
+
+<!-- 교육자료 목록 테이블 -->
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0"><i class="fas fa-list"></i> 교육자료 목록</h5>
+        <div>
+            <button class="btn btn-sm btn-outline-secondary" onclick="loadMaterials()">
+                <i class="fas fa-sync-alt"></i> 새로고침
+            </button>
         </div>
     </div>
-
-    <div class="col-lg-4 col-md-6 mb-4">
-        <div class="card">
-            <div class="card-header bg-warning text-dark">
-                <h5 class="mb-0"><i class="fas fa-fire"></i> 화학물질 안전관리</h5>
-            </div>
-            <div class="card-body">
-                <p class="card-text">화학물질 취급, 보관 및 폐기 시 안전관리 방법</p>
-                <ul class="list-unstyled">
-                    <li><i class="fas fa-file-pdf text-danger"></i> 화학물질 분류체계.pdf</li>
-                    <li><i class="fas fa-file-pdf text-danger"></i> MSDS 읽는 법.pdf</li>
-                    <li><i class="fas fa-file-pdf text-danger"></i> 화학폐기물 처리법.pdf</li>
-                </ul>
-                <a href="#" class="btn btn-warning btn-sm">자료 보기</a>
-            </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-striped table-hover align-middle" id="materialsTable">
+                <thead class="table-dark">
+                    <tr>
+                        <th style="width: 25%;">제목</th>
+                        <th style="width: 45%;">내용</th>
+                        <th style="width: 20%;">링크</th>
+                        <th style="width: 10%;">작업</th>
+                    </tr>
+                </thead>
+                <tbody id="materialsTableBody">
+                    <!-- 데이터가 여기에 동적으로 로드됩니다 -->
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- 빈 상태 메시지 -->
+        <div id="emptyMessage" class="text-center py-5 d-none">
+            <i class="fas fa-book fa-3x text-muted mb-3"></i>
+            <h5 class="text-muted">등록된 교육자료가 없습니다</h5>
+            <p class="text-muted">상단 폼을 통해 새로운 교육자료를 추가해보세요.</p>
         </div>
     </div>
+</div>
 
-    <div class="col-lg-4 col-md-6 mb-4">
-        <div class="card">
-            <div class="card-header bg-danger text-white">
-                <h5 class="mb-0"><i class="fas fa-fire-extinguisher"></i> 응급상황 대응</h5>
+<!-- 수정 모달 -->
+<div class="modal fade" id="editMaterialModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="fas fa-edit"></i> 교육자료 수정</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
-            <div class="card-body">
-                <p class="card-text">화재, 화학물질 노출 등 응급상황 발생 시 대응절차</p>
-                <ul class="list-unstyled">
-                    <li><i class="fas fa-file-pdf text-danger"></i> 응급처치 매뉴얼.pdf</li>
-                    <li><i class="fas fa-file-pdf text-danger"></i> 화재대응 절차.pdf</li>
-                    <li><i class="fas fa-file-pdf text-danger"></i> 대피경로 안내.pdf</li>
-                </ul>
-                <a href="#" class="btn btn-danger btn-sm">자료 보기</a>
+            <div class="modal-body">
+                <form id="editMaterialForm">
+                    <input type="hidden" id="editMaterialId">
+                    <div class="mb-3">
+                        <label for="editTitle" class="form-label">제목 <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="editTitle" name="title" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editContent" class="form-label">내용 <span class="text-danger">*</span></label>
+                        <textarea class="form-control" id="editContent" name="content" rows="4" required></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editLink" class="form-label">링크</label>
+                        <input type="url" class="form-control" id="editLink" name="link" placeholder="https://...">
+                    </div>
+                </form>
             </div>
-        </div>
-    </div>
-
-    <div class="col-lg-4 col-md-6 mb-4">
-        <div class="card">
-            <div class="card-header bg-info text-white">
-                <h5 class="mb-0"><i class="fas fa-tools"></i> 장비 안전운영</h5>
-            </div>
-            <div class="card-body">
-                <p class="card-text">각종 실험장비의 안전한 운영 및 점검 방법</p>
-                <ul class="list-unstyled">
-                    <li><i class="fas fa-file-pdf text-danger"></i> 실험장비 운영수칙.pdf</li>
-                    <li><i class="fas fa-file-pdf text-danger"></i> 정기점검 체크리스트.pdf</li>
-                    <li><i class="fas fa-video text-info"></i> 장비별 안전교육 영상</li>
-                </ul>
-                <a href="#" class="btn btn-info btn-sm">자료 보기</a>
-            </div>
-        </div>
-    </div>
-
-    <div class="col-lg-4 col-md-6 mb-4">
-        <div class="card">
-            <div class="card-header bg-success text-white">
-                <h5 class="mb-0"><i class="fas fa-recycle"></i> 환경안전</h5>
-            </div>
-            <div class="card-body">
-                <p class="card-text">폐기물 처리, 환경오염 방지 및 에너지 절약 방법</p>
-                <ul class="list-unstyled">
-                    <li><i class="fas fa-file-pdf text-danger"></i> 폐기물 분리수거 가이드.pdf</li>
-                    <li><i class="fas fa-file-pdf text-danger"></i> 환경오염 방지 수칙.pdf</li>
-                    <li><i class="fas fa-file-pdf text-danger"></i> 에너지 절약 가이드.pdf</li>
-                </ul>
-                <a href="#" class="btn btn-success btn-sm">자료 보기</a>
-            </div>
-        </div>
-    </div>
-
-    <div class="col-lg-4 col-md-6 mb-4">
-        <div class="card">
-            <div class="card-header bg-secondary text-white">
-                <h5 class="mb-0"><i class="fas fa-clipboard-check"></i> 안전점검</h5>
-            </div>
-            <div class="card-body">
-                <p class="card-text">정기 및 수시 안전점검 절차 및 체크리스트</p>
-                <ul class="list-unstyled">
-                    <li><i class="fas fa-file-pdf text-danger"></i> 일일안전점검표.pdf</li>
-                    <li><i class="fas fa-file-pdf text-danger"></i> 월간안전점검표.pdf</li>
-                    <li><i class="fas fa-file-pdf text-danger"></i> 안전점검 매뉴얼.pdf</li>
-                </ul>
-                <a href="#" class="btn btn-secondary btn-sm">자료 보기</a>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+                <button type="button" class="btn btn-primary" onclick="saveMaterialEdit()">
+                    <i class="fas fa-save"></i> 저장
+                </button>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Quick Access Panel -->
+<!-- 응급연락처 패널 -->
 <div class="card mt-4">
     <div class="card-header">
         <h5 class="mb-0"><i class="fas fa-phone"></i> 응급연락처</h5>
@@ -152,4 +154,221 @@
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// 페이지 로드 시 교육자료 목록 불러오기
+document.addEventListener('DOMContentLoaded', function() {
+    loadMaterials();
+    
+    // 폼 제출 이벤트 리스너
+    document.getElementById('addMaterialForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        addMaterial();
+    });
+});
+
+// 교육자료 목록 로드
+function loadMaterials() {
+    console.log('교육자료 목록 로드 시작');
+    
+    fetch('/safety/api/materials')
+        .then(response => response.json())
+        .then(data => {
+            console.log('교육자료 API 응답:', data);
+            
+            if (data.success) {
+                renderMaterialsTable(data.materials);
+            } else {
+                console.error('교육자료 로드 실패:', data.message);
+                showNotification(data.message || '교육자료 목록을 불러오는 중 오류가 발생했습니다.', 'danger');
+            }
+        })
+        .catch(error => {
+            console.error('교육자료 로드 오류:', error);
+            showNotification('교육자료 목록을 불러오는 중 오류가 발생했습니다.', 'danger');
+        });
+}
+
+// 테이블 렌더링
+function renderMaterialsTable(materials) {
+    const tbody = document.getElementById('materialsTableBody');
+    const emptyMessage = document.getElementById('emptyMessage');
+    
+    if (!materials || materials.length === 0) {
+        tbody.innerHTML = '';
+        emptyMessage.classList.remove('d-none');
+        return;
+    }
+    
+    emptyMessage.classList.add('d-none');
+    
+    tbody.innerHTML = materials.map(material => `
+        <tr>
+            <td>
+                <strong>${escapeHtml(material.title)}</strong>
+            </td>
+            <td>
+                <div style="max-width: 400px; word-wrap: break-word;">
+                    ${escapeHtml(material.content)}
+                </div>
+            </td>
+            <td>
+                ${material.link ? 
+                    `<a href="${escapeHtml(material.link)}" target="_blank" class="btn btn-sm btn-outline-primary">
+                        <i class="fas fa-external-link-alt"></i> 열기
+                    </a>` : 
+                    '<span class="text-muted">링크 없음</span>'
+                }
+            </td>
+            <td>
+                <div class="btn-group btn-group-sm">
+                    <button type="button" class="btn btn-outline-primary" onclick="editMaterial(${material.id})" title="수정">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button type="button" class="btn btn-outline-danger" onclick="deleteMaterial(${material.id})" title="삭제">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            </td>
+        </tr>
+    `).join('');
+}
+
+// 교육자료 추가
+function addMaterial() {
+    const form = document.getElementById('addMaterialForm');
+    const formData = new FormData(form);
+    
+    console.log('교육자료 추가 요청');
+    
+    fetch('/safety/api/materials/add', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log('교육자료 추가 응답:', data);
+        
+        if (data.success) {
+            showNotification(data.message || '교육자료가 성공적으로 추가되었습니다.', 'success');
+            form.reset();
+            loadMaterials();
+        } else {
+            showNotification(data.message || '교육자료 추가 중 오류가 발생했습니다.', 'danger');
+        }
+    })
+    .catch(error => {
+        console.error('교육자료 추가 오류:', error);
+        showNotification('교육자료 추가 중 오류가 발생했습니다.', 'danger');
+    });
+}
+
+// 교육자료 수정 모달 열기
+function editMaterial(materialId) {
+    console.log('교육자료 수정 모달 열기:', materialId);
+    
+    // 테이블에서 해당 교육자료 데이터 찾기
+    fetch('/safety/api/materials')
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const material = data.materials.find(m => m.id === materialId);
+                if (material) {
+                    document.getElementById('editMaterialId').value = material.id;
+                    document.getElementById('editTitle').value = material.title;
+                    document.getElementById('editContent').value = material.content;
+                    document.getElementById('editLink').value = material.link || '';
+                    
+                    new bootstrap.Modal(document.getElementById('editMaterialModal')).show();
+                }
+            }
+        })
+        .catch(error => {
+            console.error('교육자료 정보 로드 오류:', error);
+            showNotification('교육자료 정보를 불러오는 중 오류가 발생했습니다.', 'danger');
+        });
+}
+
+// 교육자료 수정 저장
+function saveMaterialEdit() {
+    const materialId = document.getElementById('editMaterialId').value;
+    const form = document.getElementById('editMaterialForm');
+    const formData = new FormData(form);
+    
+    console.log('교육자료 수정 저장:', materialId);
+    
+    fetch(`/safety/api/materials/${materialId}`, {
+        method: 'PUT',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log('교육자료 수정 응답:', data);
+        
+        if (data.success) {
+            showNotification(data.message || '교육자료가 성공적으로 수정되었습니다.', 'success');
+            bootstrap.Modal.getInstance(document.getElementById('editMaterialModal')).hide();
+            loadMaterials();
+        } else {
+            showNotification(data.message || '교육자료 수정 중 오류가 발생했습니다.', 'danger');
+        }
+    })
+    .catch(error => {
+        console.error('교육자료 수정 오류:', error);
+        showNotification('교육자료 수정 중 오류가 발생했습니다.', 'danger');
+    });
+}
+
+// 교육자료 삭제
+function deleteMaterial(materialId) {
+    if (!confirm('이 교육자료를 삭제하시겠습니까?')) {
+        return;
+    }
+    
+    console.log('교육자료 삭제:', materialId);
+    
+    fetch(`/safety/api/materials/${materialId}`, {
+        method: 'DELETE'
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log('교육자료 삭제 응답:', data);
+        
+        if (data.success) {
+            showNotification(data.message || '교육자료가 성공적으로 삭제되었습니다.', 'success');
+            loadMaterials();
+        } else {
+            showNotification(data.message || '교육자료 삭제 중 오류가 발생했습니다.', 'danger');
+        }
+    })
+    .catch(error => {
+        console.error('교육자료 삭제 오류:', error);
+        showNotification('교육자료 삭제 중 오류가 발생했습니다.', 'danger');
+    });
+}
+
+// HTML 이스케이프 함수
+function escapeHtml(text) {
+    const map = {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#039;'
+    };
+    return text.replace(/[&<>"']/g, function(m) { return map[m]; });
+}
+
+// 알림 표시 함수
+function showNotification(message, type = 'info') {
+    if (window.RDCenter && window.RDCenter.showNotification) {
+        window.RDCenter.showNotification(message, type);
+    } else {
+        // Fallback for simple alert
+        alert(message);
+    }
+}
+</script>
 {% endblock %}

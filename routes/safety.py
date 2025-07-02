@@ -1,12 +1,140 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash
+from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify
 from csv_manager import csv_manager
 from datetime import datetime
+from database import db, SafetyMaterial
 
 safety_bp = Blueprint('safety', __name__)
 
 @safety_bp.route('/materials')
 def materials():
-    return render_template('safety/materials.html')
+    """안전 교육자료 목록 페이지"""
+    materials = SafetyMaterial.query.order_by(SafetyMaterial.created_date.desc()).all()
+    return render_template('safety/materials.html', materials=materials)
+
+@safety_bp.route('/api/materials')
+def api_materials():
+    """교육자료 목록 API"""
+    try:
+        materials = SafetyMaterial.query.order_by(SafetyMaterial.created_date.desc()).all()
+        materials_list = []
+        
+        for material in materials:
+            materials_list.append({
+                'id': material.id,
+                'title': material.title,
+                'content': material.content,
+                'link': material.link,
+                'created_date': material.created_date.strftime('%Y-%m-%d %H:%M:%S') if material.created_date else '',
+                'updated_date': material.updated_date.strftime('%Y-%m-%d %H:%M:%S') if material.updated_date else ''
+            })
+        
+        return jsonify({
+            'success': True,
+            'materials': materials_list
+        })
+    except Exception as e:
+        print(f"Error in api_materials: {str(e)}")
+        return jsonify({
+            'success': False,
+            'message': f'교육자료 목록을 불러오는 중 오류가 발생했습니다: {str(e)}'
+        }), 500
+
+@safety_bp.route('/api/materials/add', methods=['POST'])
+def api_add_material():
+    """교육자료 추가 API"""
+    try:
+        title = request.form.get('title')
+        content = request.form.get('content')
+        link = request.form.get('link', '')
+        
+        if not title or not content:
+            return jsonify({
+                'success': False,
+                'message': '제목과 내용은 필수 입력 항목입니다.'
+            }), 400
+        
+        new_material = SafetyMaterial(
+            title=title,
+            content=content,
+            link=link
+        )
+        
+        db.session.add(new_material)
+        db.session.commit()
+        
+        return jsonify({
+            'success': True,
+            'message': '교육자료가 성공적으로 추가되었습니다.',
+            'material': {
+                'id': new_material.id,
+                'title': new_material.title,
+                'content': new_material.content,
+                'link': new_material.link
+            }
+        })
+    except Exception as e:
+        db.session.rollback()
+        print(f"Error in api_add_material: {str(e)}")
+        return jsonify({
+            'success': False,
+            'message': f'교육자료 추가 중 오류가 발생했습니다: {str(e)}'
+        }), 500
+
+@safety_bp.route('/api/materials/<int:material_id>', methods=['PUT'])
+def api_update_material(material_id):
+    """교육자료 수정 API"""
+    try:
+        material = SafetyMaterial.query.get_or_404(material_id)
+        
+        title = request.form.get('title')
+        content = request.form.get('content')
+        link = request.form.get('link', '')
+        
+        if not title or not content:
+            return jsonify({
+                'success': False,
+                'message': '제목과 내용은 필수 입력 항목입니다.'
+            }), 400
+        
+        material.title = title
+        material.content = content
+        material.link = link
+        material.updated_date = datetime.utcnow()
+        
+        db.session.commit()
+        
+        return jsonify({
+            'success': True,
+            'message': '교육자료가 성공적으로 수정되었습니다.'
+        })
+    except Exception as e:
+        db.session.rollback()
+        print(f"Error in api_update_material: {str(e)}")
+        return jsonify({
+            'success': False,
+            'message': f'교육자료 수정 중 오류가 발생했습니다: {str(e)}'
+        }), 500
+
+@safety_bp.route('/api/materials/<int:material_id>', methods=['DELETE'])
+def api_delete_material(material_id):
+    """교육자료 삭제 API"""
+    try:
+        material = SafetyMaterial.query.get_or_404(material_id)
+        
+        db.session.delete(material)
+        db.session.commit()
+        
+        return jsonify({
+            'success': True,
+            'message': '교육자료가 성공적으로 삭제되었습니다.'
+        })
+    except Exception as e:
+        db.session.rollback()
+        print(f"Error in api_delete_material: {str(e)}")
+        return jsonify({
+            'success': False,
+            'message': f'교육자료 삭제 중 오류가 발생했습니다: {str(e)}'
+        }), 500
 
 @safety_bp.route('/accidents')
 def accidents():
