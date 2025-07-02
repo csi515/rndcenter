@@ -16,8 +16,9 @@ def add_patent():
         'id': datetime.now().strftime('%Y%m%d%H%M%S'),
         'title': request.form.get('title'),
         'application_number': request.form.get('application_number'),
+        'registration_number': request.form.get('registration_number', ''),
         'application_date': request.form.get('application_date'),
-        'status': request.form.get('status', '출원'),
+        'status': request.form.get('status', '출원 준비 중'),
         'inventors': request.form.get('inventors'),
         'description': request.form.get('description'),
         'patent_office': request.form.get('patent_office', '특허청'),
@@ -37,6 +38,7 @@ def update_patent(index):
     data = {
         'title': request.form.get('title'),
         'application_number': request.form.get('application_number'),
+        'registration_number': request.form.get('registration_number', ''),
         'application_date': request.form.get('application_date'),
         'status': request.form.get('status'),
         'inventors': request.form.get('inventors'),
