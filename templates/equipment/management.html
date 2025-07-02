@@ -854,7 +854,7 @@ body {
                     <input type="hidden" id="reservationId">
                     <div class="form-group">
                         <label class="form-label">예약자 이름 *</label>
-                        <input type="text" class="form-control" id="reserverName" required>
+                        <input type="text" class="form-control" id="reservationReserver" required>
                     </div>
                     <div class="form-group">
                         <label class="form-label">장비 선택 *</label>
@@ -863,23 +863,31 @@ body {
                         </select>
                     </div>
                     <div class="form-group">
-                        <label class="form-label">시작 일시 *</label>
-                        <input type="datetime-local" class="form-control" id="startDateTime" required>
+                        <label class="form-label">예약 날짜 *</label>
+                        <input type="date" class="form-control" id="reservationDate" required>
                     </div>
                     <div class="form-group">
-                        <label class="form-label">종료 일시 *</label>
-                        <input type="datetime-local" class="form-control" id="endDateTime" required>
+                        <label class="form-label">시작 시간 *</label>
+                        <input type="time" class="form-control" id="reservationStartTime" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">종료 시간 *</label>
+                        <input type="time" class="form-control" id="reservationEndTime" required>
                     </div>
                     <div class="form-group">
                         <label class="form-label">사용 목적 *</label>
                         <textarea class="form-control" id="reservationPurpose" rows="3" required></textarea>
                     </div>
+                    <div class="form-group">
+                        <label class="form-label">비고</label>
+                        <textarea class="form-control" id="reservationNotes" rows="2"></textarea>
+                    </div>
                 </form>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
-                <button type="button" class="btn btn-danger" id="deleteReservationBtn" onclick="deleteReservation()" style="display: none;">삭제</button>
-                <button type="button" class="btn btn-primary" onclick="saveReservation()">저장</button>
+                <button type="button" class="btn btn-danger" id="deleteReservationBtn" onclick="deleteReservationNew()" style="display: none;">삭제</button>
+                <button type="button" class="btn btn-primary" onclick="saveReservationNew()">저장</button>
             </div>
         </div>
     </div>
@@ -898,11 +906,22 @@ let currentTab = 'equipment-list';
 // 페이지 로드 시 초기화
 document.addEventListener('DOMContentLoaded', function() {
     loadEquipmentData();
-    loadReservationsData();
-    loadUsageLogData();
-    initializeCalendar();
     updateAddButton();
 });
+
+// 장비 추가 모달 열기
+function addEquipment() {
+    document.getElementById('equipmentModalTitle').textContent = '장비 추가';
+    document.getElementById('equipmentForm').reset();
+    document.getElementById('hiddenEquipmentId').value = '';
+    document.getElementById('deleteEquipmentBtn').style.display = 'none';
+    
+    // 관리번호 자동 생성
+    const nextId = 'EQ' + String(Date.now()).slice(-6);
+    document.getElementById('equipmentId').value = nextId;
+    
+    new bootstrap.Modal(document.getElementById('equipmentModal')).show();
+}
 
 // 탭 전환
 function switchTab(tabName) {
@@ -938,7 +957,7 @@ function updateAddButton() {
     } else if (currentTab === 'reservations') {
         addButton.style.display = 'flex';
         addButtonText.textContent = '예약 추가';
-        addButton.onclick = () => addReservation();
+        addButton.onclick = () => openReservationModal();
     } else {
         addButton.style.display = 'none';
     }
@@ -1613,6 +1632,85 @@ function renderNewUsageLogTable(logs) {
     tbody.innerHTML = html;
 }
 
+// 예약 모달 저장 함수 
+async function saveReservationNew() {
+    const reservationData = {
+        equipment_name: document.getElementById('reservationEquipment').value,
+        reserver: document.getElementById('reservationReserver').value,
+        start_date: document.getElementById('reservationDate').value,
+        end_date: document.getElementById('reservationDate').value,
+        start_time: document.getElementById('reservationStartTime').value,
+        end_time: document.getElementById('reservationEndTime').value,
+        purpose: document.getElementById('reservationPurpose').value,
+        notes: document.getElementById('reservationNotes').value
+    };
+    
+    if (!reservationData.equipment_name || !reservationData.reserver || !reservationData.start_date || !reservationData.start_time || !reservationData.purpose) {
+        alert('필수 항목을 모두 입력해주세요.');
+        return;
+    }
+    
+    try {
+        const id = document.getElementById('reservationId').value;
+        let response;
+        
+        if (id) {
+            response = await fetch(`/equipment/api/reservations/${id}/update`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(reservationData)
+            });
+        } else {
+            response = await fetch('/equipment/api/reservations/add', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(reservationData)
+            });
+        }
+        
+        const result = await response.json();
+        if (result.success) {
+            alert('예약이 저장되었습니다.');
+            bootstrap.Modal.getInstance(document.getElementById('reservationModal')).hide();
+            loadReservationCalendar();
+        } else {
+            alert('오류: ' + (result.error || '저장에 실패했습니다.'));
+        }
+    } catch (error) {
+        console.error('예약 저장 중 오류:', error);
+        alert('저장 중 오류가 발생했습니다.');
+    }
+}
+
+async function deleteReservationNew() {
+    const id = document.getElementById('reservationId').value;
+    if (!id) return;
+    
+    if (confirm('이 예약을 삭제하시겠습니까?')) {
+        try {
+            const response = await fetch(`/equipment/api/reservations/${id}/delete`, {
+                method: 'POST'
+            });
+            
+            const result = await response.json();
+            if (result.success) {
+                alert('예약이 삭제되었습니다.');
+                bootstrap.Modal.getInstance(document.getElementById('reservationModal')).hide();
+                loadReservationCalendar();
+            } else {
+                alert('오류: ' + (result.error || '삭제에 실패했습니다.'));
+            }
+        } catch (error) {
+            console.error('예약 삭제 중 오류:', error);
+            alert('삭제 중 오류가 발생했습니다.');
+        }
+    }
+}
+
 // 예약 모달 관련 함수들
 function openReservationModal() {
     document.getElementById('reservationModalTitle').textContent = '장비 예약 추가';
@@ -1649,6 +1747,88 @@ async function loadEquipmentForReservation() {
     }
 }
 
+// 캘린더 초기화
+function loadReservationCalendar() {
+    const calendarEl = document.getElementById('reservationCalendar');
+    if (!calendarEl) return;
+    
+    const calendar = new FullCalendar.Calendar(calendarEl, {
+        initialView: 'dayGridMonth',
+        locale: 'ko',
+        headerToolbar: {
+            left: 'prev,next today',
+            center: 'title',
+            right: 'dayGridMonth,timeGridWeek,timeGridDay'
+        },
+        height: 'auto',
+        events: async function(info, successCallback, failureCallback) {
+            try {
+                const response = await fetch('/equipment/api/reservations');
+                const data = await response.json();
+                
+                if (data.success) {
+                    const events = data.reservations.map(reservation => ({
+                        id: reservation.id,
+                        title: `${reservation.equipment_name} - ${reservation.reserver}`,
+                        start: `${reservation.start_date}T${reservation.start_time}`,
+                        end: `${reservation.end_date}T${reservation.end_time}`,
+                        backgroundColor: getEquipmentColor(reservation.equipment_name),
+                        borderColor: getEquipmentColor(reservation.equipment_name),
+                        extendedProps: reservation
+                    }));
+                    successCallback(events);
+                } else {
+                    failureCallback();
+                }
+            } catch (error) {
+                console.error('예약 데이터 로드 중 오류:', error);
+                failureCallback();
+            }
+        },
+        eventClick: function(info) {
+            openEditReservationModal(info.event.extendedProps);
+        },
+        selectable: true,
+        select: function(info) {
+            openNewReservationModal(info.start, info.end);
+        }
+    });
+    
+    calendar.render();
+}
+
+function openNewReservationModal(start, end) {
+    document.getElementById('reservationModalTitle').textContent = '장비 예약 추가';
+    document.getElementById('reservationForm').reset();
+    document.getElementById('reservationId').value = '';
+    document.getElementById('deleteReservationBtn').style.display = 'none';
+    
+    document.getElementById('reservationDate').value = start.toISOString().split('T')[0];
+    document.getElementById('reservationStartTime').value = start.toTimeString().slice(0, 5);
+    if (end) {
+        document.getElementById('reservationEndTime').value = end.toTimeString().slice(0, 5);
+    }
+    
+    loadEquipmentForReservation();
+    new bootstrap.Modal(document.getElementById('reservationModal')).show();
+}
+
+function openEditReservationModal(reservation) {
+    document.getElementById('reservationModalTitle').textContent = '장비 예약 수정';
+    document.getElementById('reservationId').value = reservation.id;
+    document.getElementById('reservationEquipment').value = reservation.equipment_name;
+    document.getElementById('reservationReserver').value = reservation.reserver;
+    document.getElementById('reservationDate').value = reservation.start_date;
+    document.getElementById('reservationStartTime').value = reservation.start_time;
+    document.getElementById('reservationEndTime').value = reservation.end_time;
+    document.getElementById('reservationPurpose').value = reservation.purpose;
+    document.getElementById('reservationNotes').value = reservation.notes || '';
+    
+    document.getElementById('deleteReservationBtn').style.display = 'inline-block';
+    
+    new bootstrap.Modal(document.getElementById('reservationModal')).show();
+}
+
 // 탭 전환 시 해당 탭의 데이터 로드
 function switchTab(tabName) {
     document.querySelectorAll('.tab-button').forEach(btn => {
@@ -1665,8 +1845,10 @@ function switchTab(tabName) {
     if (tabName === 'equipment-list') {
         loadEquipmentData();
     } else if (tabName === 'equipment-reservation') {
-        loadReservationCalendar();
-        loadEquipmentForReservation();
+        setTimeout(() => {
+            loadReservationCalendar();
+            loadEquipmentForReservation();
+        }, 100);
     } else if (tabName === 'usage-log') {
         loadNewUsageLogs();
     }
@@ -1681,6 +1863,20 @@ function formatDateTimeLocal(date) {
     const minutes = String(date.getMinutes()).padStart(2, '0');
     
     return `${year}-${month}-${day}T${hours}:${minutes}`;
+}
+
+function getEquipmentColor(equipmentName) {
+    const colors = [
+        '#4F46E5', '#3B82F6', '#10B981', '#F59E0B', 
+        '#EF4444', '#8B5CF6', '#06B6D4', '#84CC16'
+    ];
+    let hash = 0;
+    for (let i = 0; i < equipmentName.length; i++) {
+        const char = equipmentName.charCodeAt(i);
+        hash = ((hash << 5) - hash) + char;
+        hash = hash & hash;
+    }
+    return colors[Math.abs(hash) % colors.length];
 }
 </script>
 {% endblock %}
