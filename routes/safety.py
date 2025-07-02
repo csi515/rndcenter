@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify
 from csv_manager import csv_manager
 from datetime import datetime
-from database import db, SafetyMaterial
+from database import db, SafetyMaterial, Accident, AccidentDocument
 
 safety_bp = Blueprint('safety', __name__)
 
@@ -138,9 +138,182 @@ def api_delete_material(material_id):
 
 @safety_bp.route('/accidents')
 def accidents():
-    accidents_data = csv_manager.read_csv('accidents.csv')
-    accidents_list = accidents_data.to_dict('records') if not accidents_data.empty else []
-    return render_template('safety/accidents.html', accidents=accidents_list)
+    """사고관리 페이지"""
+    accidents = Accident.query.order_by(Accident.incident_date.desc()).all()
+    return render_template('safety/accidents.html', accidents=accidents)
+
+@safety_bp.route('/api/accidents')
+def api_accidents():
+    """사고 목록 API"""
+    try:
+        accidents = Accident.query.order_by(Accident.incident_date.desc()).all()
+        accidents_list = []
+        
+        for accident in accidents:
+            accidents_list.append({
+                'id': accident.id,
+                'incident_date': accident.incident_date.strftime('%Y-%m-%d') if accident.incident_date else '',
+                'location': accident.location or '',
+                'involved_person': accident.involved_person or '',
+                'incident_type': accident.incident_type or '',
+                'severity': accident.severity or '',
+                'description': accident.description or '',
+                'immediate_action': accident.immediate_action or '',
+                'follow_up': accident.follow_up or '',
+                'prevention': accident.prevention or '',
+                'reporter': accident.reporter or '',
+                'status': accident.status or '',
+                'created_date': accident.created_date.strftime('%Y-%m-%d %H:%M:%S') if accident.created_date else '',
+                'documents': [{
+                    'id': doc.id,
+                    'title': doc.title,
+                    'url': doc.url
+                } for doc in accident.documents]
+            })
+        
+        return jsonify({
+            'success': True,
+            'accidents': accidents_list
+        })
+    except Exception as e:
+        print(f"Error in api_accidents: {str(e)}")
+        return jsonify({
+            'success': False,
+            'message': f'사고 목록을 불러오는 중 오류가 발생했습니다: {str(e)}'
+        }), 500
+
+@safety_bp.route('/api/accidents/<int:accident_id>', methods=['PUT'])
+def api_update_accident(accident_id):
+    """사고 정보 수정 API"""
+    try:
+        accident = Accident.query.get_or_404(accident_id)
+        
+        # 폼 데이터로부터 값 가져오기
+        if request.form.get('incident_date'):
+            accident.incident_date = datetime.strptime(request.form.get('incident_date'), '%Y-%m-%d').date()
+        if request.form.get('location'):
+            accident.location = request.form.get('location')
+        if request.form.get('involved_person'):
+            accident.involved_person = request.form.get('involved_person')
+        if request.form.get('incident_type'):
+            accident.incident_type = request.form.get('incident_type')
+        if request.form.get('severity'):
+            accident.severity = request.form.get('severity')
+        if request.form.get('description'):
+            accident.description = request.form.get('description')
+        if request.form.get('immediate_action'):
+            accident.immediate_action = request.form.get('immediate_action')
+        if request.form.get('follow_up'):
+            accident.follow_up = request.form.get('follow_up')
+        if request.form.get('prevention'):
+            accident.prevention = request.form.get('prevention')
+        if request.form.get('reporter'):
+            accident.reporter = request.form.get('reporter')
+        if request.form.get('status'):
+            accident.status = request.form.get('status')
+        
+        db.session.commit()
+        
+        return jsonify({
+            'success': True,
+            'message': '사고 정보가 성공적으로 수정되었습니다.'
+        })
+    except Exception as e:
+        db.session.rollback()
+        print(f"Error in api_update_accident: {str(e)}")
+        return jsonify({
+            'success': False,
+            'message': f'사고 정보 수정 중 오류가 발생했습니다: {str(e)}'
+        }), 500
+
+@safety_bp.route('/api/accidents/<int:accident_id>', methods=['DELETE'])
+def api_delete_accident(accident_id):
+    """사고 삭제 API"""
+    try:
+        accident = Accident.query.get_or_404(accident_id)
+        
+        # 관련 문서도 함께 삭제
+        AccidentDocument.query.filter_by(accident_id=accident_id).delete()
+        
+        db.session.delete(accident)
+        db.session.commit()
+        
+        return jsonify({
+            'success': True,
+            'message': '사고 정보가 성공적으로 삭제되었습니다.'
+        })
+    except Exception as e:
+        db.session.rollback()
+        print(f"Error in api_delete_accident: {str(e)}")
+        return jsonify({
+            'success': False,
+            'message': f'사고 삭제 중 오류가 발생했습니다: {str(e)}'
+        }), 500
+
+@safety_bp.route('/api/accidents/<int:accident_id>/documents', methods=['POST'])
+def api_add_accident_document(accident_id):
+    """사고 관련 문서 추가 API"""
+    try:
+        accident = Accident.query.get_or_404(accident_id)
+        
+        title = request.form.get('title')
+        url = request.form.get('url')
+        
+        if not title or not url:
+            return jsonify({
+                'success': False,
+                'message': '제목과 URL은 필수 입력 항목입니다.'
+            }), 400
+        
+        new_document = AccidentDocument(
+            accident_id=accident_id,
+            title=title,
+            url=url
+        )
+        
+        db.session.add(new_document)
+        db.session.commit()
+        
+        return jsonify({
+            'success': True,
+            'message': '관련 자료가 성공적으로 추가되었습니다.',
+            'document': {
+                'id': new_document.id,
+                'title': new_document.title,
+                'url': new_document.url
+            }
+        })
+    except Exception as e:
+        db.session.rollback()
+        print(f"Error in api_add_accident_document: {str(e)}")
+        return jsonify({
+            'success': False,
+            'message': f'관련 자료 추가 중 오류가 발생했습니다: {str(e)}'
+        }), 500
+
+@safety_bp.route('/api/accidents/<int:accident_id>/documents/<int:document_id>', methods=['DELETE'])
+def api_delete_accident_document(accident_id, document_id):
+    """사고 관련 문서 삭제 API"""
+    try:
+        document = AccidentDocument.query.filter_by(
+            id=document_id, 
+            accident_id=accident_id
+        ).first_or_404()
+        
+        db.session.delete(document)
+        db.session.commit()
+        
+        return jsonify({
+            'success': True,
+            'message': '관련 자료가 성공적으로 삭제되었습니다.'
+        })
+    except Exception as e:
+        db.session.rollback()
+        print(f"Error in api_delete_accident_document: {str(e)}")
+        return jsonify({
+            'success': False,
+            'message': f'관련 자료 삭제 중 오류가 발생했습니다: {str(e)}'
+        }), 500
 
 @safety_bp.route('/accidents/add', methods=['POST'])
 def add_accident():
