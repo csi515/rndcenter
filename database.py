@@ -316,6 +316,8 @@ class SafetyProcedure(db.Model):
     review_date = db.Column(db.Date)
     version = db.Column(db.String(20), default='1.0')
     status = db.Column(db.String(50), default='유효')
+    procedure_link = db.Column(db.String(1000))  # 절차서 링크
+    risk_assessment_link = db.Column(db.String(1000))  # 위험성평가 링크
     created_date = db.Column(db.DateTime, default=datetime.utcnow)
 
 class ProjectSchedule(db.Model):

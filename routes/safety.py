@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify
 from csv_manager import csv_manager
 from datetime import datetime
-from database import db, SafetyMaterial, Accident, AccidentDocument
+from database import db, SafetyMaterial, Accident, AccidentDocument, SafetyProcedure
 
 safety_bp = Blueprint('safety', __name__)
 
@@ -372,28 +372,50 @@ def add_education():
 
 @safety_bp.route('/procedures')
 def procedures():
-    procedures_data = csv_manager.read_csv('procedures.csv')
-    procedures_list = procedures_data.to_dict('records') if not procedures_data.empty else []
-    return render_template('safety/procedures.html', procedures=procedures_list)
+    """작업절차서 및 위험성평가 페이지"""
+    procedures_data = SafetyProcedure.query.order_by(SafetyProcedure.created_date.desc()).all()
+    
+    # 딕셔너리로 변환하여 JSON 직렬화 가능하게 만들기
+    procedures = []
+    for proc in procedures_data:
+        procedures.append({
+            'id': proc.id,
+            'title': proc.title,
+            'category': proc.category,
+            'description': proc.description,
+            'version': proc.version,
+            'created_by': proc.responsible_person,
+            'review_date': proc.review_date.strftime('%Y-%m-%d') if proc.review_date else '',
+            'status': proc.status,
+            'procedure_link': proc.procedure_link,
+            'risk_assessment_link': proc.risk_assessment_link
+        })
+    
+    return render_template('safety/procedures.html', procedures=procedures)
 
 @safety_bp.route('/procedures/add', methods=['POST'])
 def add_procedure():
-    data = {
-        'id': datetime.now().strftime('%Y%m%d%H%M%S'),
-        'title': request.form.get('title'),
-        'category': request.form.get('category'),
-        'description': request.form.get('description'),
-        'file_link': request.form.get('file_link'),
-        'version': request.form.get('version', '1.0'),
-        'created_by': request.form.get('created_by'),
-        'review_date': request.form.get('review_date'),
-        'status': request.form.get('status', '유효'),
-        'created_date': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-    }
-    
-    if csv_manager.append_to_csv('procedures.csv', data):
+    """작업절차서 추가"""
+    try:
+        new_procedure = SafetyProcedure(
+            title=request.form.get('title'),
+            category=request.form.get('category'),
+            description=request.form.get('description'),
+            version=request.form.get('version', '1.0'),
+            responsible_person=request.form.get('created_by'),
+            review_date=datetime.strptime(request.form.get('review_date'), '%Y-%m-%d').date() if request.form.get('review_date') else None,
+            status=request.form.get('status', '유효'),
+            procedure_link=request.form.get('procedure_link'),
+            risk_assessment_link=request.form.get('risk_assessment_link')
+        )
+        
+        db.session.add(new_procedure)
+        db.session.commit()
+        
         flash('작업절차서가 성공적으로 추가되었습니다.', 'success')
-    else:
+    except Exception as e:
+        db.session.rollback()
+        print(f"Error adding procedure: {str(e)}")
         flash('작업절차서 추가 중 오류가 발생했습니다.', 'error')
     
     return redirect(url_for('safety.procedures'))

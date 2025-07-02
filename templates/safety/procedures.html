@@ -50,7 +50,8 @@
                         <th>작성자</th>
                         <th>검토일</th>
                         <th>상태</th>
-                        <th>링크</th>
+                        <th>절차서 링크</th>
+                        <th>위험성평가 링크</th>
                         <th>액션</th>
                     </tr>
                 </thead>
@@ -73,10 +74,21 @@
                             </span>
                         </td>
                         <td>
-                            {% if procedure.file_link %}
-                            <a href="{{ procedure.file_link }}" target="_blank" class="btn btn-sm btn-outline-primary">
-                                <i class="fas fa-external-link-alt"></i>
+                            {% if procedure.procedure_link %}
+                            <a href="{{ procedure.procedure_link }}" target="_blank" class="btn btn-sm btn-outline-primary">
+                                <i class="fas fa-file-alt"></i> 절차서
                             </a>
+                            {% else %}
+                            <span class="text-muted">-</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if procedure.risk_assessment_link %}
+                            <a href="{{ procedure.risk_assessment_link }}" target="_blank" class="btn btn-sm btn-outline-danger">
+                                <i class="fas fa-exclamation-triangle"></i> 위험성평가
+                            </a>
+                            {% else %}
+                            <span class="text-muted">-</span>
                             {% endif %}
                         </td>
                         <td>
@@ -95,49 +107,7 @@
     </div>
 </div>
 
-<!-- Quick Access Cards -->
-<div class="row mt-4">
-    <div class="col-lg-3 col-md-6 mb-3">
-        <div class="card text-center">
-            <div class="card-body">
-                <i class="fas fa-flask fa-3x text-primary mb-3"></i>
-                <h6>실험 절차서</h6>
-                <p class="text-muted">각종 실험의 표준 작업절차</p>
-                <button class="btn btn-primary btn-sm">보기</button>
-            </div>
-        </div>
-    </div>
-    <div class="col-lg-3 col-md-6 mb-3">
-        <div class="card text-center">
-            <div class="card-body">
-                <i class="fas fa-exclamation-triangle fa-3x text-danger mb-3"></i>
-                <h6>위험성 평가</h6>
-                <p class="text-muted">작업별 위험요소 분석</p>
-                <button class="btn btn-danger btn-sm">보기</button>
-            </div>
-        </div>
-    </div>
-    <div class="col-lg-3 col-md-6 mb-3">
-        <div class="card text-center">
-            <div class="card-body">
-                <i class="fas fa-tools fa-3x text-info mb-3"></i>
-                <h6>장비 운영</h6>
-                <p class="text-muted">장비별 운영 매뉴얼</p>
-                <button class="btn btn-info btn-sm">보기</button>
-            </div>
-        </div>
-    </div>
-    <div class="col-lg-3 col-md-6 mb-3">
-        <div class="card text-center">
-            <div class="card-body">
-                <i class="fas fa-first-aid fa-3x text-success mb-3"></i>
-                <h6>응급 처치</h6>
-                <p class="text-muted">응급상황 대응 절차</p>
-                <button class="btn btn-success btn-sm">보기</button>
-            </div>
-        </div>
-    </div>
-</div>
+
 
 <!-- Add Procedure Modal -->
 <div class="modal fade" id="addProcedureModal" tabindex="-1">
@@ -186,9 +156,15 @@
                     </div>
                     <div class="row">
                         <div class="col-md-6 mb-3">
-                            <label class="form-label">파일 링크</label>
-                            <input type="url" class="form-control" name="file_link" placeholder="https://">
+                            <label class="form-label">절차서 링크</label>
+                            <input type="url" class="form-control" name="procedure_link" placeholder="https://...">
                         </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">위험성평가 링크</label>
+                            <input type="url" class="form-control" name="risk_assessment_link" placeholder="https://...">
+                        </div>
+                    </div>
+                    <div class="row">
                         <div class="col-md-6 mb-3">
                             <label class="form-label">상태</label>
                             <select class="form-select" name="status">
@@ -196,6 +172,9 @@
                                 <option value="검토중">검토중</option>
                                 <option value="폐기">폐기</option>
                             </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <!-- 빈 공간 -->
                         </div>
                     </div>
                 </div>
