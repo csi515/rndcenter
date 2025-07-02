@@ -393,6 +393,37 @@ def procedures():
     
     return render_template('safety/procedures.html', procedures=procedures)
 
+
+@safety_bp.route('/procedures/update', methods=['POST'])
+def update_procedure():
+    """절차서 수정"""
+    try:
+        procedure_id = request.form.get('procedure_id')
+        procedure = SafetyProcedure.query.get_or_404(procedure_id)
+        
+        procedure.title = request.form.get('title')
+        procedure.category = request.form.get('category')
+        procedure.description = request.form.get('description')
+        procedure.version = request.form.get('version')
+        procedure.responsible_person = request.form.get('created_by')
+        procedure.status = request.form.get('status')
+        procedure.procedure_link = request.form.get('procedure_link')
+        procedure.risk_assessment_link = request.form.get('risk_assessment_link')
+        
+        # 날짜 처리
+        review_date = request.form.get('review_date')
+        if review_date:
+            procedure.review_date = datetime.strptime(review_date, '%Y-%m-%d').date()
+        
+        db.session.commit()
+        flash('절차서가 성공적으로 수정되었습니다.', 'success')
+        
+    except Exception as e:
+        db.session.rollback()
+        flash(f'절차서 수정 중 오류가 발생했습니다: {str(e)}', 'error')
+    
+    return redirect(url_for('safety.procedures'))
+
 @safety_bp.route('/procedures/add', methods=['POST'])
 def add_procedure():
     """작업절차서 추가"""

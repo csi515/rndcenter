@@ -57,7 +57,7 @@
                 </thead>
                 <tbody>
                     {% for procedure in procedures %}
-                    <tr>
+                    <tr data-id="{{ procedure.id }}">
                         <td>{{ procedure.title }}</td>
                         <td>
                             <span class="badge {% if procedure.category == '위험성평가' %}bg-danger{% elif procedure.category == '안전관리' %}bg-warning{% else %}bg-info{% endif %}">
@@ -92,10 +92,10 @@
                             {% endif %}
                         </td>
                         <td>
-                            <button class="btn btn-sm btn-outline-primary">
+                            <button class="btn btn-sm btn-outline-primary" onclick="editProcedure({{ procedure.id }})" title="수정">
                                 <i class="fas fa-edit"></i>
                             </button>
-                            <button class="btn btn-sm btn-outline-info" onclick="viewProcedure({{ procedure|tojson }})">
+                            <button class="btn btn-sm btn-outline-info" onclick="viewProcedure({{ procedure|tojson }})" title="상세보기">
                                 <i class="fas fa-eye"></i>
                             </button>
                         </td>
@@ -205,6 +205,83 @@
         </div>
     </div>
 </div>
+
+<!-- Edit Procedure Modal -->
+<div class="modal fade" id="editProcedureModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">절차서 수정</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="POST" action="{{ url_for('safety.update_procedure') }}">
+                <div class="modal-body">
+                    <input type="hidden" id="editProcedureId" name="procedure_id">
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-8">
+                            <label for="editTitle" class="form-label">제목 *</label>
+                            <input type="text" class="form-control" id="editTitle" name="title" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="editCategory" class="form-label">카테고리 *</label>
+                            <select class="form-select" id="editCategory" name="category" required>
+                                <option value="안전관리">안전관리</option>
+                                <option value="장비운영">장비운영</option>
+                                <option value="응급처치">응급처치</option>
+                                <option value="위험성평가">위험성평가</option>
+                                <option value="기타">기타</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="editDescription" class="form-label">설명</label>
+                        <textarea class="form-control" id="editDescription" name="description" rows="3"></textarea>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <label for="editVersion" class="form-label">버전</label>
+                            <input type="text" class="form-control" id="editVersion" name="version" placeholder="1.0">
+                        </div>
+                        <div class="col-md-4">
+                            <label for="editCreatedBy" class="form-label">작성자</label>
+                            <input type="text" class="form-control" id="editCreatedBy" name="created_by">
+                        </div>
+                        <div class="col-md-4">
+                            <label for="editStatus" class="form-label">상태</label>
+                            <select class="form-select" id="editStatus" name="status">
+                                <option value="유효">유효</option>
+                                <option value="검토중">검토중</option>
+                                <option value="폐기">폐기</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="editReviewDate" class="form-label">검토 예정일</label>
+                        <input type="date" class="form-control" id="editReviewDate" name="review_date">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="editProcedureLink" class="form-label">절차서 링크</label>
+                        <input type="url" class="form-control" id="editProcedureLink" name="procedure_link" placeholder="https://example.com/procedure.pdf">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="editRiskAssessmentLink" class="form-label">위험성평가 링크</label>
+                        <input type="url" class="form-control" id="editRiskAssessmentLink" name="risk_assessment_link" placeholder="https://example.com/risk-assessment.pdf">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+                    <button type="submit" class="btn btn-primary">수정 완료</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 {% endblock %}
 
 {% block extra_js %}
@@ -243,16 +320,49 @@ function viewProcedure(procedure) {
             <strong>설명:</strong>
             <p class="mt-2">${procedure.description}</p>
         </div>
-        ${procedure.file_link ? `
+        ${procedure.procedure_link ? `
         <div class="mb-3">
-            <strong>파일 링크:</strong>
-            <p class="mt-2"><a href="${procedure.file_link}" target="_blank">${procedure.file_link}</a></p>
+            <strong>절차서 링크:</strong>
+            <p class="mt-2"><a href="${procedure.procedure_link}" target="_blank" class="btn btn-sm btn-outline-primary"><i class="fas fa-file-alt"></i> 절차서 보기</a></p>
+        </div>
+        ` : ''}
+        ${procedure.risk_assessment_link ? `
+        <div class="mb-3">
+            <strong>위험성평가 링크:</strong>
+            <p class="mt-2"><a href="${procedure.risk_assessment_link}" target="_blank" class="btn btn-sm btn-outline-danger"><i class="fas fa-exclamation-triangle"></i> 위험성평가 보기</a></p>
         </div>
         ` : ''}
     `;
     
     document.getElementById('procedureDetails').innerHTML = details;
     new bootstrap.Modal(document.getElementById('viewProcedureModal')).show();
+}
+
+// Edit procedure function
+function editProcedure(procedureId) {
+    // Find by ID in procedures array passed from backend
+    const procedures = {{ procedures|tojson }};
+    const procedure = procedures.find(p => p.id === procedureId);
+    if (procedure) {
+        fillEditForm(procedure);
+    } else {
+        alert('절차서 정보를 찾을 수 없습니다.');
+    }
+}
+
+function fillEditForm(procedure) {
+    document.getElementById('editProcedureId').value = procedure.id;
+    document.getElementById('editTitle').value = procedure.title;
+    document.getElementById('editCategory').value = procedure.category;
+    document.getElementById('editVersion').value = procedure.version;
+    document.getElementById('editCreatedBy').value = procedure.created_by;
+    document.getElementById('editReviewDate').value = procedure.review_date;
+    document.getElementById('editStatus').value = procedure.status;
+    document.getElementById('editDescription').value = procedure.description || '';
+    document.getElementById('editProcedureLink').value = procedure.procedure_link || '';
+    document.getElementById('editRiskAssessmentLink').value = procedure.risk_assessment_link || '';
+    
+    new bootstrap.Modal(document.getElementById('editProcedureModal')).show();
 }
 
 // Category filter
