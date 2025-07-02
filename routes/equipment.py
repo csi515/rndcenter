@@ -469,6 +469,31 @@ def api_delete_reservation_new(reservation_id):
         db.session.rollback()
         return jsonify({'error': str(e)}), 500
 
+@equipment_bp.route('/api/usage-logs/add', methods=['POST'])
+def api_add_usage_log():
+    """사용일지 추가 API"""
+    try:
+        data = request.get_json()
+        
+        new_log = UsageLog(
+            equipment_name=data['equipment_name'],
+            user=data['user'],
+            usage_date=datetime.strptime(data['usage_date'], '%Y-%m-%d').date(),
+            start_time=datetime.strptime(data['start_time'], '%H:%M').time() if data.get('start_time') else None,
+            end_time=datetime.strptime(data['end_time'], '%H:%M').time() if data.get('end_time') else None,
+            purpose=data['purpose'],
+            condition_after=data.get('condition_after', '정상'),
+            issues=data.get('issues')
+        )
+        
+        db.session.add(new_log)
+        db.session.commit()
+        
+        return jsonify({'success': True, 'id': new_log.id})
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500
+
 # 사용일지 API 엔드포인트
 @equipment_bp.route('/api/usage-logs')
 def api_usage_logs():

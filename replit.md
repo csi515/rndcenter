@@ -125,6 +125,13 @@ This is a Flask-based web application designed for managing a Research & Develop
   - Updated weekly schedule frontend to use database instead of localStorage
   - Maintained backward compatibility with localStorage as fallback
   - All schedule data now persists in PostgreSQL with proper error handling
+- July 02, 2025. Enhanced Equipment Management System
+  - Redesigned 3-tab structure: "장비 목록", "장비 예약", "사용일지"
+  - Enhanced equipment registration with detailed fields (serial number, purchase price, maintenance dates, specifications)
+  - Implemented equipment detail view modal with comprehensive information display
+  - Added usage log creation with real-time form and filtering capabilities
+  - Restructured reservation system with Google Calendar-style interface
+  - All equipment data integrated with PostgreSQL database with proper API endpoints
 
 ## User Preferences
 Preferred communication style: Simple, everyday language.
