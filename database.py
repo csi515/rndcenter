@@ -135,6 +135,7 @@ class Equipment(db.Model):
     maintenance_date = db.Column(db.Date)
     warranty_expiry = db.Column(db.Date)
     specifications = db.Column(db.Text)
+    notes = db.Column(db.Text)
     created_date = db.Column(db.DateTime, default=datetime.utcnow)
 
 class Reservation(db.Model):
