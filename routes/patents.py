@@ -63,41 +63,4 @@ def delete_patent(index):
     return redirect(url_for('patents.patent_list'))
 
 
-# 개선된 특허 관리 페이지
-@patents_bp.route("/enhanced")
-def enhanced_patent_list():
-    """출원인별 지분율 관리가 포함된 개선된 특허 관리 페이지"""
-    return render_template("patents/enhanced_list.html")
 
-@patents_bp.route("/enhanced/api")
-def enhanced_patents_api():
-    """개선된 특허 관리용 API"""
-    try:
-        # 임시 데이터 - 실제로는 데이터베이스에서 로드
-        patents_list = [
-            {
-                "id": 1,
-                "title": "나노 입자를 이용한 암 치료 시스템",
-                "status": "등록",
-                "application_number": "10-2024-0001234",
-                "registration_number": "10-2566789",
-                "application_date": "2024-03-15",
-                "registration_date": "2024-12-10",
-                "field": "바이오메디컬",
-                "abstract": "나노 입자를 이용하여 암세포를 선택적으로 타겟팅하는 혁신적인 치료 시스템",
-                "applicants": [
-                    {"name": "김연구", "affiliation": "연구소", "share_percentage": 60, "filing_reward": 300000, "registration_reward": 500000},
-                    {"name": "이박사", "affiliation": "대학교", "share_percentage": 40, "filing_reward": 200000, "registration_reward": 300000}
-                ]
-            }
-        ]
-        return jsonify(patents_list)
-    except Exception as e:
-        return jsonify([])
-
-
-# 간결한 특허 관리 페이지
-@patents_bp.route("/simplified")
-def simplified_patent_list():
-    """간결한 테이블 구조의 특허 관리 페이지"""
-    return render_template("patents/simplified_list.html")
