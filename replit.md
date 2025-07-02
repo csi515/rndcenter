@@ -132,6 +132,9 @@ This is a Flask-based web application designed for managing a Research & Develop
   - Added usage log creation with real-time form and filtering capabilities
   - Restructured reservation system with Google Calendar-style interface
   - All equipment data integrated with PostgreSQL database with proper API endpoints
+  - Fixed equipment dropdown loading issues with proper error handling and empty state messages
+  - Improved calendar UI with clean design, removed underlines, proper Sunday highlighting (red), date-only display
+  - Added sample equipment data for testing and demonstration
 
 ## User Preferences
 Preferred communication style: Simple, everyday language.

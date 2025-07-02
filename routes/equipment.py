@@ -290,12 +290,21 @@ def api_equipment():
                 'name': eq.name,
                 'model': eq.model,
                 'manufacturer': eq.manufacturer,
+                'serial_number': eq.serial_number,
                 'location': eq.location,
+                'manager': eq.manager,
                 'status': eq.status,
                 'purchase_date': eq.purchase_date.strftime('%Y-%m-%d') if eq.purchase_date else None,
-                'specifications': eq.specifications
+                'purchase_price': float(eq.purchase_price) if eq.purchase_price else None,
+                'maintenance_date': eq.maintenance_date.strftime('%Y-%m-%d') if eq.maintenance_date else None,
+                'warranty_expiry': eq.warranty_expiry.strftime('%Y-%m-%d') if eq.warranty_expiry else None,
+                'specifications': eq.specifications,
+                'notes': getattr(eq, 'notes', None)
             })
-        return jsonify(equipment_data)
+        return jsonify({
+            'success': True,
+            'equipment': equipment_data
+        })
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 

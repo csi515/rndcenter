@@ -267,14 +267,16 @@ async function loadEquipmentData() {
         const response = await fetch('/equipment/api/equipment');
         const data = await response.json();
         
-        if (data.success) {
+        if (data.success && data.equipment) {
             equipmentList = data.equipment;
             renderEquipmentTable(equipmentList);
         } else {
-            console.error('장비 데이터 로드 실패:', data.error);
+            console.error('장비 데이터 로드 실패:', data.error || '데이터 없음');
+            renderEquipmentTable([]);
         }
     } catch (error) {
         console.error('장비 데이터 로드 중 오류:', error);
+        renderEquipmentTable([]);
     }
 }
 
@@ -283,28 +285,41 @@ function renderEquipmentTable(equipment) {
     const tbody = document.getElementById('equipmentTableBody');
     let html = '';
     
-    equipment.forEach(eq => {
-        html += `
+    if (equipment.length === 0) {
+        html = `
         <tr>
-            <td>${eq.equipment_id}</td>
-            <td><a href="#" onclick="viewEquipmentDetail(${eq.id})" class="text-primary">${eq.name}</a></td>
-            <td>${eq.model || '-'}</td>
-            <td>${eq.manufacturer || '-'}</td>
-            <td>${eq.location}</td>
-            <td>${eq.manager || '-'}</td>
-            <td>
-                <span class="status-badge status-${eq.status.replace(/\s+/g, '')}">${eq.status}</span>
-            </td>
-            <td>
-                <button class="btn btn-sm btn-outline-primary me-1" onclick="editEquipment(${eq.id})">
-                    <i class="fas fa-edit"></i>
-                </button>
-                <button class="btn btn-sm btn-outline-danger" onclick="deleteEquipment(${eq.id})">
-                    <i class="fas fa-trash"></i>
+            <td colspan="8" class="text-center text-muted py-4">
+                <i class="fas fa-box-open fa-2x mb-2"></i><br>
+                등록된 장비가 없습니다.<br>
+                <button class="btn btn-primary mt-2" onclick="addEquipment()">
+                    <i class="fas fa-plus me-1"></i>첫 번째 장비 등록하기
                 </button>
             </td>
         </tr>`;
-    });
+    } else {
+        equipment.forEach(eq => {
+            html += `
+            <tr>
+                <td>${eq.equipment_id || '-'}</td>
+                <td><a href="#" onclick="viewEquipmentDetail(${eq.id})" class="text-primary">${eq.name}</a></td>
+                <td>${eq.model || '-'}</td>
+                <td>${eq.manufacturer || '-'}</td>
+                <td>${eq.location || '-'}</td>
+                <td>${eq.manager || '-'}</td>
+                <td>
+                    <span class="status-badge status-${eq.status ? eq.status.replace(/\s+/g, '') : 'unknown'}">${eq.status || '알 수 없음'}</span>
+                </td>
+                <td>
+                    <button class="btn btn-sm btn-outline-primary me-1" onclick="editEquipment(${eq.id})">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="btn btn-sm btn-outline-danger" onclick="deleteEquipment(${eq.id})">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </td>
+            </tr>`;
+        });
+    }
     
     tbody.innerHTML = html;
 }

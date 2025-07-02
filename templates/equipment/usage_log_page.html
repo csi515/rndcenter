@@ -140,24 +140,48 @@ async function loadEquipmentForUsage() {
         const response = await fetch('/equipment/api/equipment');
         const data = await response.json();
         
-        if (data.success) {
+        if (data.success && data.equipment) {
             const select = document.getElementById('usageEquipment');
             const filterSelect = document.getElementById('filterEquipment');
             let html = '<option value="">장비를 선택하세요</option>';
             let filterHtml = '<option value="">전체 장비</option>';
             
-            data.equipment.forEach(equipment => {
-                if (equipment.status === '사용가능') {
+            // 사용가능한 장비만 필터링 (사용일지용)
+            const availableEquipment = data.equipment.filter(equipment => 
+                equipment.status === '사용가능'
+            );
+            
+            if (availableEquipment.length === 0) {
+                html += '<option value="" disabled>등록된 사용가능 장비 없음</option>';
+            } else {
+                availableEquipment.forEach(equipment => {
                     html += `<option value="${equipment.name}">${equipment.name} (${equipment.location})</option>`;
-                }
-                filterHtml += `<option value="${equipment.name}">${equipment.name}</option>`;
-            });
+                });
+            }
+            
+            // 필터용에는 모든 장비 표시
+            if (data.equipment.length === 0) {
+                filterHtml += '<option value="" disabled>등록된 장비 없음</option>';
+            } else {
+                data.equipment.forEach(equipment => {
+                    filterHtml += `<option value="${equipment.name}">${equipment.name}</option>`;
+                });
+            }
             
             select.innerHTML = html;
             filterSelect.innerHTML = filterHtml;
+        } else {
+            const select = document.getElementById('usageEquipment');
+            const filterSelect = document.getElementById('filterEquipment');
+            select.innerHTML = '<option value="" disabled>장비 목록을 불러올 수 없습니다</option>';
+            filterSelect.innerHTML = '<option value="" disabled>장비 목록을 불러올 수 없습니다</option>';
         }
     } catch (error) {
         console.error('장비 목록 로드 중 오류:', error);
+        const select = document.getElementById('usageEquipment');
+        const filterSelect = document.getElementById('filterEquipment');
+        select.innerHTML = '<option value="" disabled>장비 목록 로드 오류</option>';
+        filterSelect.innerHTML = '<option value="" disabled>장비 목록 로드 오류</option>';
     }
 }
 
