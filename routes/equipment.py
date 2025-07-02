@@ -33,13 +33,27 @@ def add_equipment():
     
     return redirect(url_for('equipment.equipment_list'))
 
+@equipment_bp.route('/list')
+def equipment_list_page():
+    """장비 목록 페이지"""
+    equipment_list = Equipment.query.all()
+    return render_template('equipment/list_page.html', equipment=equipment_list)
+
 @equipment_bp.route('/reservations')
-def reservations():
-    # Get equipment list from database
+def reservations_page():
+    """장비 예약 페이지"""
     equipment_list = Equipment.query.filter_by(status='사용가능').all()
-    
-    return render_template('equipment/reservations.html', 
-                         equipment=equipment_list)
+    return render_template('equipment/reservations_page.html', equipment=equipment_list)
+
+@equipment_bp.route('/usage-log')
+def usage_log_page():
+    """사용일지 페이지"""
+    return render_template('equipment/usage_log_page.html')
+
+@equipment_bp.route('/all-in-one')
+def equipment_management():
+    """장비 관리 통합 페이지 (기존)"""
+    return render_template('equipment/management.html')
 
 @equipment_bp.route('/api/reservations')
 def api_reservations():
@@ -245,7 +259,7 @@ def add_usage_log():
 
 # 통합 장비 관리 페이지
 @equipment_bp.route('/management')
-def equipment_management():
+def equipment_management_old():
     return render_template('equipment/management.html')
 
 # 장비 API 엔드포인트

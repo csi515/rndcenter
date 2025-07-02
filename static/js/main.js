@@ -8,6 +8,7 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeDataTables();
     initializeFormValidation();
     initializeNotifications();
+    setActiveMenuItem();
 });
 
 // Sidebar functionality
@@ -356,6 +357,43 @@ function debounce(func, wait) {
         clearTimeout(timeout);
         timeout = setTimeout(later, wait);
     };
+}
+
+// 현재 페이지에 맞는 메뉴 아이템 활성화
+function setActiveMenuItem() {
+    const currentPath = window.location.pathname;
+    const menuItems = document.querySelectorAll('.list-group-item[href]');
+    
+    // 모든 메뉴 아이템에서 active 클래스 제거
+    menuItems.forEach(item => {
+        item.classList.remove('active');
+    });
+    
+    // 현재 경로와 일치하는 메뉴 아이템 찾기
+    let activeItem = null;
+    menuItems.forEach(item => {
+        const href = item.getAttribute('href');
+        if (href === currentPath) {
+            activeItem = item;
+        }
+    });
+    
+    // 활성 메뉴 아이템 설정
+    if (activeItem) {
+        activeItem.classList.add('active');
+        
+        // 상위 아코디언 메뉴가 있다면 열기
+        const parentCollapse = activeItem.closest('.collapse');
+        if (parentCollapse) {
+            parentCollapse.classList.add('show');
+            
+            // 아코디언 토글 버튼의 aria-expanded 속성 설정
+            const toggleButton = document.querySelector(`[data-bs-target="#${parentCollapse.id}"]`);
+            if (toggleButton) {
+                toggleButton.setAttribute('aria-expanded', 'true');
+            }
+        }
+    }
 }
 
 // Enhanced search functionality

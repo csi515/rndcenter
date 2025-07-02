@@ -1,0 +1,247 @@
+{% extends "base.html" %}
+
+{% block title %}사용일지{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2><i class="fas fa-clipboard-list me-2"></i>사용일지</h2>
+            </div>
+            
+            <div class="row">
+                <!-- 사용일지 작성 폼 -->
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0"><i class="fas fa-edit me-2"></i>사용일지 작성</h5>
+                        </div>
+                        <div class="card-body">
+                            <form id="usageLogForm">
+                                <div class="form-group mb-3">
+                                    <label class="form-label">장비 선택 *</label>
+                                    <select class="form-control" id="usageEquipment" required>
+                                        <option value="">장비를 선택하세요</option>
+                                    </select>
+                                </div>
+                                <div class="form-group mb-3">
+                                    <label class="form-label">사용자 *</label>
+                                    <input type="text" class="form-control" id="usageUser" required>
+                                </div>
+                                <div class="form-group mb-3">
+                                    <label class="form-label">사용일 *</label>
+                                    <input type="date" class="form-control" id="usageDate" required>
+                                </div>
+                                <div class="form-group mb-3">
+                                    <label class="form-label">시작 시간 *</label>
+                                    <input type="time" class="form-control" id="usageStartTime" required>
+                                </div>
+                                <div class="form-group mb-3">
+                                    <label class="form-label">종료 시간</label>
+                                    <input type="time" class="form-control" id="usageEndTime">
+                                </div>
+                                <div class="form-group mb-3">
+                                    <label class="form-label">사용 목적 *</label>
+                                    <textarea class="form-control" id="usagePurpose" rows="3" required placeholder="사용 목적을 간단히 기록하세요"></textarea>
+                                </div>
+                                <div class="form-group mb-3">
+                                    <label class="form-label">사용 후 상태</label>
+                                    <select class="form-control" id="usageCondition">
+                                        <option value="정상">정상</option>
+                                        <option value="주의">주의</option>
+                                        <option value="이상있음">이상있음</option>
+                                    </select>
+                                </div>
+                                <div class="form-group mb-3">
+                                    <label class="form-label">사용 중 특이사항</label>
+                                    <textarea class="form-control" id="usageIssues" rows="3" placeholder="사용 중 발생한 문제나 특이사항을 기록하세요"></textarea>
+                                </div>
+                                <div class="text-end">
+                                    <button type="button" class="btn btn-primary" onclick="saveNewUsageLog()">
+                                        <i class="fas fa-save me-2"></i>사용일지 저장
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 사용일지 목록 -->
+                <div class="col-md-8">
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <h5 class="mb-0"><i class="fas fa-list me-2"></i>사용일지 목록</h5>
+                                <div class="d-flex gap-2">
+                                    <select class="form-control form-control-sm" id="filterEquipment" onchange="filterUsageLogs()" style="width: 200px;">
+                                        <option value="">전체 장비</option>
+                                    </select>
+                                    <input type="date" class="form-control form-control-sm" id="filterDate" onchange="filterUsageLogs()" style="width: 150px;">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-hover table-sm">
+                                    <thead class="table-dark">
+                                        <tr>
+                                            <th>날짜</th>
+                                            <th>장비명</th>
+                                            <th>사용자</th>
+                                            <th>시작시간</th>
+                                            <th>종료시간</th>
+                                            <th>목적</th>
+                                            <th>상태</th>
+                                            <th>특이사항</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="usageLogTableBody">
+                                        <!-- 사용일지 목록이 여기에 동적으로 로드됩니다 -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// 페이지 로드 시 초기화
+document.addEventListener('DOMContentLoaded', function() {
+    loadNewUsageLogs();
+});
+
+// 새로운 사용일지 함수들
+function loadNewUsageLogs() {
+    loadUsageLogsData();
+    loadEquipmentForUsage();
+    setCurrentDateTime();
+}
+
+async function loadUsageLogsData() {
+    try {
+        const response = await fetch('/equipment/api/usage-logs');
+        const data = await response.json();
+        
+        if (data.success) {
+            renderNewUsageLogTable(data.logs);
+        }
+    } catch (error) {
+        console.error('사용일지 로드 중 오류:', error);
+    }
+}
+
+async function loadEquipmentForUsage() {
+    try {
+        const response = await fetch('/equipment/api/equipment');
+        const data = await response.json();
+        
+        if (data.success) {
+            const select = document.getElementById('usageEquipment');
+            const filterSelect = document.getElementById('filterEquipment');
+            let html = '<option value="">장비를 선택하세요</option>';
+            let filterHtml = '<option value="">전체 장비</option>';
+            
+            data.equipment.forEach(equipment => {
+                if (equipment.status === '사용가능') {
+                    html += `<option value="${equipment.name}">${equipment.name} (${equipment.location})</option>`;
+                }
+                filterHtml += `<option value="${equipment.name}">${equipment.name}</option>`;
+            });
+            
+            select.innerHTML = html;
+            filterSelect.innerHTML = filterHtml;
+        }
+    } catch (error) {
+        console.error('장비 목록 로드 중 오류:', error);
+    }
+}
+
+function setCurrentDateTime() {
+    const now = new Date();
+    const today = now.toISOString().split('T')[0];
+    const currentTime = now.toTimeString().slice(0, 5);
+    
+    document.getElementById('usageDate').value = today;
+    document.getElementById('usageStartTime').value = currentTime;
+}
+
+async function saveNewUsageLog() {
+    const usageData = {
+        equipment_name: document.getElementById('usageEquipment').value,
+        user: document.getElementById('usageUser').value,
+        usage_date: document.getElementById('usageDate').value,
+        start_time: document.getElementById('usageStartTime').value,
+        end_time: document.getElementById('usageEndTime').value,
+        purpose: document.getElementById('usagePurpose').value,
+        condition_after: document.getElementById('usageCondition').value,
+        issues: document.getElementById('usageIssues').value
+    };
+    
+    if (!usageData.equipment_name || !usageData.user || !usageData.usage_date || !usageData.start_time || !usageData.purpose) {
+        alert('필수 항목을 모두 입력해주세요.');
+        return;
+    }
+    
+    try {
+        const response = await fetch('/equipment/api/usage-logs/add', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(usageData)
+        });
+        
+        const result = await response.json();
+        if (result.success) {
+            alert('사용일지가 저장되었습니다.');
+            document.getElementById('usageLogForm').reset();
+            setCurrentDateTime();
+            loadUsageLogsData();
+        } else {
+            alert('오류: ' + (result.error || '저장에 실패했습니다.'));
+        }
+    } catch (error) {
+        console.error('사용일지 저장 중 오류:', error);
+        alert('저장 중 오류가 발생했습니다.');
+    }
+}
+
+function filterUsageLogs() {
+    const equipment = document.getElementById('filterEquipment').value;
+    const date = document.getElementById('filterDate').value;
+    
+    // 필터링 로직은 여기서 구현
+    loadUsageLogsData();
+}
+
+function renderNewUsageLogTable(logs) {
+    const tbody = document.getElementById('usageLogTableBody');
+    let html = '';
+    
+    logs.forEach(log => {
+        html += `
+        <tr>
+            <td>${log.usage_date}</td>
+            <td>${log.equipment_name}</td>
+            <td>${log.user}</td>
+            <td>${log.start_time}</td>
+            <td>${log.end_time || '-'}</td>
+            <td>${log.purpose}</td>
+            <td>
+                <span class="status-badge ${log.condition_after === '정상' ? 'status-사용가능' : 'status-이상있음'}">
+                    ${log.condition_after}
+                </span>
+            </td>
+            <td>${log.issues || '-'}</td>
+        </tr>`;
+    });
+    
+    tbody.innerHTML = html;
+}
+</script>
+{% endblock %}

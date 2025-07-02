@@ -56,9 +56,20 @@
                 </a>
                 
                 <!-- 장비 관리 -->
-                <a class="list-group-item list-group-item-action bg-light text-dark" href="{{ url_for('equipment.equipment_management') }}">
+                <div class="list-group-item list-group-item-action bg-light text-dark dropdown-toggle" data-bs-toggle="collapse" data-bs-target="#equipmentMenu" style="cursor: pointer;">
                     <i class="fas fa-tools me-2"></i>장비 관리
-                </a>
+                </div>
+                <div class="collapse" id="equipmentMenu">
+                    <a class="list-group-item list-group-item-action bg-white text-dark ps-4" href="{{ url_for('equipment.equipment_list_page') }}">
+                        <i class="fas fa-list me-2"></i>장비 목록
+                    </a>
+                    <a class="list-group-item list-group-item-action bg-white text-dark ps-4" href="{{ url_for('equipment.reservations_page') }}">
+                        <i class="fas fa-calendar-alt me-2"></i>장비 예약
+                    </a>
+                    <a class="list-group-item list-group-item-action bg-white text-dark ps-4" href="{{ url_for('equipment.usage_log_page') }}">
+                        <i class="fas fa-clipboard-list me-2"></i>사용일지
+                    </a>
+                </div>
                 
                 <!-- 재고 관리 -->
                 <a class="list-group-item list-group-item-action bg-light text-dark" href="{{ url_for('inventory.current_inventory') }}">

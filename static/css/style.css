@@ -39,6 +39,60 @@
     font-size: 1.2rem;
 }
 
+/* 아코디언 메뉴 스타일 */
+.list-group-item.dropdown-toggle {
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.list-group-item.dropdown-toggle:hover {
+    background-color: #e9ecef !important;
+    transform: translateX(2px);
+}
+
+.list-group-item.dropdown-toggle::after {
+    content: '\f107';
+    font-family: 'Font Awesome 5 Free';
+    font-weight: 900;
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    transition: transform 0.3s ease;
+}
+
+.list-group-item.dropdown-toggle[aria-expanded="true"]::after {
+    transform: translateY(-50%) rotate(180deg);
+}
+
+/* 하위 메뉴 스타일 */
+.collapse .list-group-item {
+    border-left: 3px solid transparent;
+    transition: all 0.2s ease;
+    padding-left: 2rem !important;
+}
+
+.collapse .list-group-item:hover {
+    border-left-color: var(--bs-primary);
+    background-color: #f8f9fa !important;
+    transform: translateX(3px);
+}
+
+.collapse .list-group-item.active {
+    border-left-color: var(--bs-primary);
+    background-color: #e3f2fd !important;
+    font-weight: 600;
+}
+
+/* 부드러운 아코디언 애니메이션 */
+.collapse {
+    transition: height 0.35s ease;
+}
+
+.collapsing {
+    transition: height 0.35s ease;
+}
+
 #page-content-wrapper {
     min-width: 100vw;
 }
