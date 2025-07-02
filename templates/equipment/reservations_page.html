@@ -328,5 +328,17 @@ document.addEventListener('DOMContentLoaded', function() {
     loadReservationCalendar();
     loadEquipmentForReservation(); // 장비 목록 미리 로드
 });
+
+// 페이지가 보여질 때마다 장비 목록 새로고침 (탭 전환 시)
+document.addEventListener('visibilitychange', function() {
+    if (!document.hidden) {
+        loadEquipmentForReservation();
+    }
+});
+
+// 포커스를 받을 때마다 장비 목록 새로고침
+window.addEventListener('focus', function() {
+    loadEquipmentForReservation();
+});
 </script>
 {% endblock %}

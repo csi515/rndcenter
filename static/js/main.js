@@ -9,6 +9,7 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeFormValidation();
     initializeNotifications();
     setActiveMenuItem();
+    initializeEquipmentTabSwitching();
 });
 
 // Sidebar functionality
@@ -502,6 +503,33 @@ window.addEventListener('error', function(e) {
     console.error('JavaScript Error:', e.error);
     showNotification('예기치 않은 오류가 발생했습니다.', 'danger');
 });
+
+// Equipment management tab switching
+function initializeEquipmentTabSwitching() {
+    const equipmentMenuLinks = document.querySelectorAll('#equipmentMenu a');
+    
+    equipmentMenuLinks.forEach(link => {
+        link.addEventListener('click', function() {
+            // 장비 관리 탭 전환 시 잠시 후 데이터 새로고침
+            setTimeout(() => {
+                // 현재 페이지에 따라 적절한 함수 호출
+                if (window.location.pathname.includes('/equipment/reservations')) {
+                    if (typeof loadEquipmentForReservation === 'function') {
+                        loadEquipmentForReservation();
+                    }
+                } else if (window.location.pathname.includes('/equipment/list')) {
+                    if (typeof loadEquipmentData === 'function') {
+                        loadEquipmentData();
+                    }
+                } else if (window.location.pathname.includes('/equipment/usage')) {
+                    if (typeof loadEquipmentForUsage === 'function') {
+                        loadEquipmentForUsage();
+                    }
+                }
+            }, 500);
+        });
+    });
+}
 
 // Expose global functions
 window.RDCenter = {
