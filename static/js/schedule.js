@@ -105,27 +105,46 @@ function initializeScheduleForm() {
 
     scheduleForm.addEventListener('submit', function(e) {
         e.preventDefault();
-        
         const formData = new FormData(scheduleForm);
-        
-        fetch('/research/schedule/add', {
-            method: 'POST',
-            body: formData
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                showNotification(data.message, 'success');
-                calendar.refetchEvents();
-                bootstrap.Modal.getInstance(document.getElementById('addScheduleModal')).hide();
-                scheduleForm.reset();
-            } else {
-                showNotification(data.message, 'danger');
-            }
-        })
-        .catch(error => {
-            console.error('Error adding schedule:', error);
-            showNotification('일정 추가 중 오류가 발생했습니다.', 'danger');
+        // 여러 주차 선택 지원
+        const weekSelect = document.getElementById('scheduleWeek');
+        const selectedWeeks = Array.from(weekSelect.selectedOptions).map(opt => opt.value);
+        if (selectedWeeks.length === 0) {
+            showNotification('주차를 선택하세요.', 'danger');
+            return;
+        }
+        let successCount = 0;
+        let failCount = 0;
+        let total = selectedWeeks.length;
+        selectedWeeks.forEach(week => {
+            const fd = new FormData(scheduleForm);
+            fd.set('week', week);
+            fetch('/research/schedule/add', {
+                method: 'POST',
+                body: fd
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) successCount++;
+                else failCount++;
+                if (successCount + failCount === total) {
+                    if (successCount) showNotification('일정이 추가되었습니다.', 'success');
+                    if (failCount) showNotification('일부 일정 추가에 실패했습니다.', 'danger');
+                    calendar.refetchEvents();
+                    bootstrap.Modal.getInstance(document.getElementById('addScheduleModal')).hide();
+                    scheduleForm.reset();
+                }
+            })
+            .catch(error => {
+                failCount++;
+                if (successCount + failCount === total) {
+                    if (successCount) showNotification('일정이 추가되었습니다.', 'success');
+                    if (failCount) showNotification('일부 일정 추가에 실패했습니다.', 'danger');
+                    calendar.refetchEvents();
+                    bootstrap.Modal.getInstance(document.getElementById('addScheduleModal')).hide();
+                    scheduleForm.reset();
+                }
+            });
         });
     });
 }

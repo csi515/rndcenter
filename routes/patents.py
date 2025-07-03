@@ -8,6 +8,11 @@ patents_bp = Blueprint('patents', __name__)
 def patent_list():
     patents_data = csv_manager.read_csv('patents.csv')
     patents_list = patents_data.to_dict('records') if not patents_data.empty else []
+    # NaN, None, nan, undefined, Infinity 등 비정상 값 보정
+    for row in patents_list:
+        for k, v in row.items():
+            if v in [None, 'NaN', 'nan', 'undefined', 'Infinity'] or (isinstance(v, float) and (v != v)):
+                row[k] = ''
     return render_template('patents/list.html', patents=patents_list)
 
 @patents_bp.route('/add', methods=['POST'])

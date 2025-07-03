@@ -206,7 +206,7 @@ class WeeklyScheduleManager {
         };
         
         try {
-            const response = await fetch('/research/api/weekly-schedule/add', {
+            const response = await fetch('/research/schedule/add', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

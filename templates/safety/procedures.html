@@ -46,7 +46,7 @@
                         <th>제목</th>
                         <th>카테고리</th>
                         <th>설명</th>
-                        <th>버전</th>
+                        <th>버전(연도)</th>
                         <th>작성자</th>
                         <th>검토일</th>
                         <th>상태</th>
@@ -65,7 +65,7 @@
                             </span>
                         </td>
                         <td>{{ procedure.description[:50] }}{% if procedure.description|length > 50 %}...{% endif %}</td>
-                        <td>{{ procedure.version }}</td>
+                        <td>{{ procedure.version }}년</td>
                         <td>{{ procedure.created_by }}</td>
                         <td>{{ procedure.review_date }}</td>
                         <td>
@@ -125,15 +125,7 @@
                             <input type="text" class="form-control" name="title" required>
                         </div>
                         <div class="col-md-4 mb-3">
-                            <label class="form-label">카테고리 *</label>
-                            <select class="form-select" name="category" required>
-                                <option value="">선택하세요</option>
-                                <option value="실험절차">실험절차</option>
-                                <option value="장비운영">장비운영</option>
-                                <option value="안전관리">안전관리</option>
-                                <option value="위험성평가">위험성평가</option>
-                                <option value="응급처치">응급처치</option>
-                            </select>
+                            <!-- 카테고리 입력란 제거 -->
                         </div>
                     </div>
                     <div class="mb-3">
@@ -142,8 +134,8 @@
                     </div>
                     <div class="row">
                         <div class="col-md-4 mb-3">
-                            <label class="form-label">버전</label>
-                            <input type="text" class="form-control" name="version" value="1.0">
+                            <label class="form-label">버전(연도)</label>
+                            <input type="text" class="form-control" name="version" placeholder="예: 2025" pattern="[0-9]{4}" title="연도 4자리로 입력" required>
                         </div>
                         <div class="col-md-4 mb-3">
                             <label class="form-label">작성자 *</label>
@@ -224,14 +216,7 @@
                             <input type="text" class="form-control" id="editTitle" name="title" required>
                         </div>
                         <div class="col-md-4">
-                            <label for="editCategory" class="form-label">카테고리 *</label>
-                            <select class="form-select" id="editCategory" name="category" required>
-                                <option value="안전관리">안전관리</option>
-                                <option value="장비운영">장비운영</option>
-                                <option value="응급처치">응급처치</option>
-                                <option value="위험성평가">위험성평가</option>
-                                <option value="기타">기타</option>
-                            </select>
+                            <!-- 카테고리 입력란 제거 -->
                         </div>
                     </div>
                     
@@ -242,8 +227,8 @@
                     
                     <div class="row mb-3">
                         <div class="col-md-4">
-                            <label for="editVersion" class="form-label">버전</label>
-                            <input type="text" class="form-control" id="editVersion" name="version" placeholder="1.0">
+                            <label for="editVersion" class="form-label">버전(연도)</label>
+                            <input type="text" class="form-control" id="editVersion" name="version" placeholder="예: 2025" pattern="[0-9]{4}" title="연도 4자리로 입력" required>
                         </div>
                         <div class="col-md-4">
                             <label for="editCreatedBy" class="form-label">작성자</label>
@@ -301,7 +286,7 @@ function viewProcedure(procedure) {
         </div>
         <div class="row mb-3">
             <div class="col-6"><strong>버전:</strong></div>
-            <div class="col-6">${procedure.version}</div>
+            <div class="col-6">${procedure.version}년</div>
         </div>
         <div class="row mb-3">
             <div class="col-6"><strong>작성자:</strong></div>
@@ -353,7 +338,6 @@ function editProcedure(procedureId) {
 function fillEditForm(procedure) {
     document.getElementById('editProcedureId').value = procedure.id;
     document.getElementById('editTitle').value = procedure.title;
-    document.getElementById('editCategory').value = procedure.category;
     document.getElementById('editVersion').value = procedure.version;
     document.getElementById('editCreatedBy').value = procedure.created_by;
     document.getElementById('editReviewDate').value = procedure.review_date;

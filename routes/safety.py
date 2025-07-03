@@ -2,6 +2,7 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash,
 from csv_manager import csv_manager
 from datetime import datetime
 from database import db, SafetyMaterial, Accident, AccidentDocument, SafetyProcedure
+import math
 
 safety_bp = Blueprint('safety', __name__)
 
@@ -144,33 +145,34 @@ def accidents():
 
 @safety_bp.route('/api/accidents')
 def api_accidents():
-    """사고 목록 API"""
+    """사고 목록 API (CSV 기반, NaN 안전 변환)"""
+    def safe_value(val):
+        if val is None:
+            return ''
+        if isinstance(val, float) and math.isnan(val):
+            return ''
+        return str(val)
     try:
-        accidents = Accident.query.order_by(Accident.incident_date.desc()).all()
+        df = csv_manager.read_csv('accidents.csv')
         accidents_list = []
-        
-        for accident in accidents:
-            accidents_list.append({
-                'id': accident.id,
-                'incident_date': accident.incident_date.strftime('%Y-%m-%d') if accident.incident_date else '',
-                'location': accident.location or '',
-                'involved_person': accident.involved_person or '',
-                'incident_type': accident.incident_type or '',
-                'severity': accident.severity or '',
-                'description': accident.description or '',
-                'immediate_action': accident.immediate_action or '',
-                'follow_up': accident.follow_up or '',
-                'prevention': accident.prevention or '',
-                'reporter': accident.reporter or '',
-                'status': accident.status or '',
-                'created_date': accident.created_date.strftime('%Y-%m-%d %H:%M:%S') if accident.created_date else '',
-                'documents': [{
-                    'id': doc.id,
-                    'title': doc.title,
-                    'url': doc.url
-                } for doc in accident.documents]
-            })
-        
+        if not df.empty:
+            for _, row in df.iterrows():
+                accidents_list.append({
+                    'id': safe_value(row.get('id', '')),
+                    'incident_date': safe_value(row.get('incident_date', ''))[:10],
+                    'location': safe_value(row.get('location', '')),
+                    'involved_person': safe_value(row.get('involved_person', '')),
+                    'incident_type': safe_value(row.get('incident_type', '')),
+                    'severity': safe_value(row.get('severity', '')),
+                    'description': safe_value(row.get('description', '')),
+                    'immediate_action': safe_value(row.get('action_taken', '')),
+                    'follow_up': safe_value(row.get('cause', '')),
+                    'prevention': safe_value(row.get('prevention_measures', '')),
+                    'reporter': safe_value(row.get('reporter', '')),
+                    'status': safe_value(row.get('status', '')),
+                    'created_date': safe_value(row.get('created_date', '')),
+                    'documents': []
+                })
         return jsonify({
             'success': True,
             'accidents': accidents_list
@@ -368,8 +370,6 @@ def add_education():
     
     return redirect(url_for('safety.education'))
 
-
-
 @safety_bp.route('/procedures')
 def procedures():
     """작업절차서 및 위험성평가 페이지"""
@@ -392,7 +392,6 @@ def procedures():
         })
     
     return render_template('safety/procedures.html', procedures=procedures)
-
 
 @safety_bp.route('/procedures/update', methods=['POST'])
 def update_procedure():

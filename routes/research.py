@@ -5,8 +5,33 @@ import pandas as pd
 from datetime import datetime, date
 import json
 import calendar
+import os
+import csv
 
 research_bp = Blueprint('research', __name__)
+
+SCHEDULE_JSON = os.path.join('data', 'schedule.json')
+PROJECTS_CSV = os.path.join('data', 'projects.csv')
+
+def read_schedules():
+    if not os.path.exists(SCHEDULE_JSON):
+        return []
+    with open(SCHEDULE_JSON, 'r', encoding='utf-8') as f:
+        return json.load(f)
+
+def write_schedules(schedules):
+    with open(SCHEDULE_JSON, 'w', encoding='utf-8') as f:
+        json.dump(schedules, f, ensure_ascii=False, indent=2)
+
+def get_year_month_week(date_str):
+    try:
+        d = datetime.strptime(date_str, "%Y-%m-%d")
+        year = d.year
+        month = d.month
+        week = (d.day - 1) // 7 + 1
+        return str(year), str(month), str(week)
+    except Exception:
+        return "", "", ""
 
 @research_bp.route('/projects')
 def projects():
@@ -16,26 +41,16 @@ def projects():
 
 @research_bp.route('/projects/api')
 def projects_api():
-    """API endpoint for projects data"""
-    try:
-        projects = Project.query.all()
-        projects_list = []
-        for project in projects:
-            projects_list.append({
-                'id': project.id,
-                'project_id': project.project_id,
-                'name': project.name,
-                'description': project.description,
-                'leader': project.leader,
-                'department': project.department,
-                'start_date': project.start_date.isoformat() if project.start_date else None,
-                'end_date': project.end_date.isoformat() if project.end_date else None,
-                'status': project.status,
-                'progress': project.progress
-            })
-        return jsonify(projects_list)
-    except Exception as e:
-        return jsonify([])
+    projects = []
+    with open('data/projects.csv', encoding='utf-8') as f:
+        reader = csv.DictReader(f)
+        for row in reader:
+            # participants 등 NaN, None, Infinity 등 비정상 값 보정
+            for k, v in row.items():
+                if v in [None, 'NaN', 'nan', 'undefined', 'Infinity']:
+                    row[k] = ""
+            projects.append(row)
+    return jsonify(projects)
 
 @research_bp.route('/projects/add', methods=['POST'])
 def add_project():
@@ -76,14 +91,27 @@ def update_project(index):
     
     return redirect(url_for('research.projects'))
 
-@research_bp.route('/projects/delete/<int:index>')
-def delete_project(index):
-    if csv_manager.delete_row('projects.csv', index):
-        flash('프로젝트가 성공적으로 삭제되었습니다.', 'success')
+@research_bp.route('/projects/delete', methods=['POST'])
+def delete_project_api():
+    data = request.get_json()
+    name = (data.get('name') or '').strip()
+    if not name:
+        return jsonify({'success': False, 'message': '프로젝트명 누락'})
+    # projects.csv에서 삭제 (있을 때만)
+    projects_df = csv_manager.read_csv('projects.csv')
+    existed = (projects_df['name'] == name).any() if not projects_df.empty else False
+    projects_df = projects_df[projects_df['name'] != name] if not projects_df.empty else projects_df
+    csv_manager.write_csv('projects.csv', projects_df)
+    # schedule.json에서도 해당 프로젝트 일정 삭제 (항상 시도)
+    schedules = read_schedules()
+    before = len(schedules)
+    schedules = [s for s in schedules if (s.get('project_name') or s.get('project')) != name]
+    write_schedules(schedules)
+    after = len(schedules)
+    if existed or before != after:
+        return jsonify({'success': True})
     else:
-        flash('프로젝트 삭제 중 오류가 발생했습니다.', 'error')
-    
-    return redirect(url_for('research.projects'))
+        return jsonify({'success': False, 'message': '해당 프로젝트를 찾을 수 없음'})
 
 @research_bp.route('/researchers')
 def researchers():
@@ -162,62 +190,104 @@ def researchers_api():
 
 @research_bp.route('/schedule')
 def schedule():
-    schedule_data = csv_manager.read_csv('schedule.csv')
-    researchers_data = csv_manager.read_csv('researchers.csv')
     projects_data = csv_manager.read_csv('projects.csv')
-    
-    schedule_list = schedule_data.to_dict('records') if not schedule_data.empty else []
-    researchers_list = researchers_data.to_dict('records') if not researchers_data.empty else []
     projects_list = projects_data.to_dict('records') if not projects_data.empty else []
-    
-    return render_template('research/schedule.html', 
-                         schedule=schedule_list,
-                         researchers=researchers_list,
-                         projects=projects_list)
+    return render_template('research/schedule.html', projects=projects_list)
 
 @research_bp.route('/schedule/add', methods=['POST'])
 def add_schedule():
-    data = {
+    schedules = read_schedules()
+    if request.is_json:
+        data = request.get_json()
+        get = lambda k, default='': data.get(k, default)
+    else:
+        get = lambda k, default='': request.form.get(k, default)
+    new_schedule = {
         'id': datetime.now().strftime('%Y%m%d%H%M%S'),
-        'researcher_name': request.form.get('researcher_name'),
-        'project_name': request.form.get('project_name'),
-        'task': request.form.get('task'),
-        'start_date': request.form.get('start_date'),
-        'end_date': request.form.get('end_date'),
-        'start_time': request.form.get('start_time'),
-        'end_time': request.form.get('end_time'),
-        'status': request.form.get('status', '예정'),
-        'notes': request.form.get('notes', ''),
+        'researcher_name': get('researcher_name'),
+        'project_name': get('project_name') or get('project'),
+        'task': get('task'),
+        'start_date': get('start_date'),
+        'end_date': get('end_date'),
+        'start_time': get('start_time'),
+        'end_time': get('end_time'),
+        'year': get('year', ''),
+        'month': get('month', ''),
+        'week': get('week', ''),
+        'priority': get('priority', '보통'),
+        'status': get('status', '예정'),
+        'notes': get('notes', ''),
         'created_date': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     }
-    
-    if csv_manager.append_to_csv('schedule.csv', data):
-        return jsonify({'success': True, 'message': '일정이 성공적으로 추가되었습니다.'})
+    schedules.append(new_schedule)
+    write_schedules(schedules)
+    return jsonify({'success': True, 'message': '일정이 성공적으로 추가되었습니다.'})
+
+@research_bp.route('/schedule/update/<schedule_id>', methods=['PUT'])
+def update_schedule(schedule_id):
+    schedules = read_schedules()
+    updated = False
+    for schedule in schedules:
+        if str(schedule.get('id', '')) == str(schedule_id):
+            schedule['researcher_name'] = request.form.get('researcher_name', schedule.get('researcher_name', ''))
+            schedule['project_name'] = request.form.get('project_name', schedule.get('project_name', ''))
+            schedule['task'] = request.form.get('task', schedule.get('task', ''))
+            schedule['start_date'] = request.form.get('start_date', schedule.get('start_date', ''))
+            schedule['end_date'] = request.form.get('end_date', schedule.get('end_date', ''))
+            schedule['start_time'] = request.form.get('start_time', schedule.get('start_time', ''))
+            schedule['end_time'] = request.form.get('end_time', schedule.get('end_time', ''))
+            schedule['year'] = request.form.get('year', schedule.get('year', ''))
+            schedule['month'] = request.form.get('month', schedule.get('month', ''))
+            schedule['week'] = request.form.get('week', schedule.get('week', ''))
+            schedule['priority'] = request.form.get('priority', schedule.get('priority', '보통'))
+            schedule['status'] = request.form.get('status', schedule.get('status', '예정'))
+            schedule['notes'] = request.form.get('notes', schedule.get('notes', ''))
+            schedule['updated_date'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            updated = True
+            break
+    if updated:
+        write_schedules(schedules)
+        return jsonify({'success': True, 'message': '일정이 성공적으로 수정되었습니다.'})
     else:
-        return jsonify({'success': False, 'message': '일정 추가 중 오류가 발생했습니다.'})
+        return jsonify({'success': False, 'message': '일정을 찾을 수 없습니다.'})
+
+@research_bp.route('/schedule/delete/<schedule_id>', methods=['DELETE'])
+def delete_schedule(schedule_id):
+    schedules = read_schedules()
+    new_schedules = [s for s in schedules if str(s.get('id', '')) != str(schedule_id)]
+    if len(new_schedules) == len(schedules):
+        return jsonify({'success': False, 'message': '일정을 찾을 수 없습니다.'})
+    write_schedules(new_schedules)
+    return jsonify({'success': True, 'message': '일정이 성공적으로 삭제되었습니다.'})
 
 @research_bp.route('/api/schedule')
 def api_schedule():
-    """API endpoint for calendar data"""
-    schedule_data = csv_manager.read_csv('schedule.csv')
+    schedules = read_schedules()
     events = []
-    
-    if not schedule_data.empty:
-        for _, row in schedule_data.iterrows():
-            event = {
-                'id': row.get('id', ''),
-                'title': f"{row.get('researcher_name', '')} - {row.get('task', '')}",
-                'start': f"{row.get('start_date', '')}T{row.get('start_time', '09:00')}",
-                'end': f"{row.get('end_date', '')}T{row.get('end_time', '18:00')}",
-                'resourceId': row.get('researcher_name', ''),
-                'extendedProps': {
-                    'project': row.get('project_name', ''),
-                    'status': row.get('status', ''),
-                    'notes': row.get('notes', '')
-                }
+    for row in schedules:
+        # year, month, week가 없으면 start_date에서 계산
+        year = row.get('year') or ""
+        month = row.get('month') or ""
+        week = row.get('week') or ""
+        if not (year and month and week):
+            year, month, week = get_year_month_week(row.get('start_date', ''))
+        event = {
+            'id': row.get('id', ''),
+            'title': f"{row.get('researcher_name', '')} - {row.get('task', '')}",
+            'start': f"{row.get('start_date', '')}T{row.get('start_time', '09:00')}",
+            'end': f"{row.get('end_date', '')}T{row.get('end_time', '18:00')}",
+            'resourceId': row.get('researcher_name', ''),
+            'extendedProps': {
+                'project': row.get('project_name', ''),
+                'status': row.get('status', ''),
+                'notes': row.get('notes', ''),
+                'year': year,
+                'month': month,
+                'week': week,
+                'priority': row.get('priority', '보통')
             }
-            events.append(event)
-    
+        }
+        events.append(event)
     return jsonify(events)
 
 # Weekly Schedule API endpoints
@@ -562,3 +632,117 @@ def weekly_schedule_schedules_api():
         return jsonify(schedules_list)
     except Exception as e:
         return jsonify([])
+
+@research_bp.route('/project-schedule')
+def project_schedule_page():
+    # 연구원, 프로젝트 목록 불러오기
+    researchers_data = csv_manager.read_csv('researchers.csv')
+    projects_data = csv_manager.read_csv('projects.csv')
+    researchers = researchers_data.to_dict('records') if not researchers_data.empty else []
+    projects = projects_data.to_dict('records') if not projects_data.empty else []
+    return render_template('research/project_schedule.html', researchers=researchers, projects=projects)
+
+@research_bp.route('/api/project-schedule', methods=['GET'])
+def get_project_schedule():
+    import pandas as pd
+    year = request.args.get('year', type=int)
+    month = request.args.get('month', type=int)
+    project_id = request.args.get('project_id')
+    csv_path = os.path.join('data', 'project_schedule.csv')
+    if not os.path.exists(csv_path):
+        # 템플릿 생성
+        df = pd.DataFrame(columns=['id','researcher_id','researcher_name','project_id','project_name','year','month','week','summary','detail','merged_weeks','created_at','updated_at'])
+        df.to_csv(csv_path, index=False, encoding='utf-8-sig')
+    df = pd.read_csv(csv_path, dtype=str)
+    if year:
+        df = df[df['year'] == str(year)]
+    if month:
+        df = df[df['month'] == str(month)]
+    if project_id:
+        df = df[df['project_id'] == str(project_id)]
+    return jsonify(df.to_dict('records'))
+
+@research_bp.route('/api/project-schedule/save', methods=['POST'])
+def save_project_schedule():
+    import pandas as pd
+    import uuid
+    csv_path = os.path.join('data', 'project_schedule.csv')
+    if not os.path.exists(csv_path):
+        df = pd.DataFrame(columns=['id','researcher_id','researcher_name','project_id','project_name','year','month','week','summary','detail','merged_weeks','created_at','updated_at'])
+        df.to_csv(csv_path, index=False, encoding='utf-8-sig')
+    df = pd.read_csv(csv_path, dtype=str)
+    data = request.get_json()
+    # id가 있으면 수정, 없으면 추가
+    now = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    if data.get('id') and data['id'] in df['id'].values:
+        idx = df.index[df['id'] == data['id']][0]
+        for k in ['researcher_id','researcher_name','project_id','project_name','year','month','week','summary','detail','merged_weeks']:
+            df.at[idx, k] = data.get(k, '')
+        df.at[idx, 'updated_at'] = now
+    else:
+        data['id'] = str(uuid.uuid4())
+        data['created_at'] = now
+        data['updated_at'] = now
+        for k in ['researcher_id','researcher_name','project_id','project_name','year','month','week','summary','detail','merged_weeks']:
+            if k not in data:
+                data[k] = ''
+        df = pd.concat([df, pd.DataFrame([data])], ignore_index=True)
+    df.to_csv(csv_path, index=False, encoding='utf-8-sig')
+    return jsonify({'success': True, 'id': data['id']})
+
+@research_bp.route('/api/project-schedule/delete', methods=['POST'])
+def delete_project_schedule_api():
+    import pandas as pd
+    csv_path = os.path.join('data', 'project_schedule.csv')
+    if not os.path.exists(csv_path):
+        return jsonify({'success': False, 'error': '파일 없음'})
+    df = pd.read_csv(csv_path, dtype=str)
+    data = request.get_json()
+    if 'id' not in data:
+        return jsonify({'success': False, 'error': 'id 없음'})
+    df = df[df['id'] != data['id']]
+    df.to_csv(csv_path, index=False, encoding='utf-8-sig')
+    return jsonify({'success': True})
+
+# 프로젝트 관리 API (프론트엔드 연동용)
+@research_bp.route('/projects/manage', methods=['POST'])
+def manage_project_api():
+    data = request.get_json()
+    old_name = (data.get('old_name') or '').strip()
+    new_name = (data.get('new_name') or '').strip()
+    color = data.get('color', '#1976d2')
+    if not new_name:
+        return jsonify({'success': False, 'message': '프로젝트명 누락'})
+    # projects.csv 읽기
+    projects_df = csv_manager.read_csv('projects.csv')
+    # 수정
+    if old_name and old_name != new_name:
+        if not (projects_df['name'] == old_name).any():
+            return jsonify({'success': False, 'message': '기존 프로젝트를 찾을 수 없음'})
+        projects_df.loc[projects_df['name'] == old_name, 'name'] = new_name
+        projects_df.loc[projects_df['name'] == new_name, 'color'] = color
+    # 추가
+    elif not old_name:
+        if (not projects_df.empty) and (projects_df['name'] == new_name).any():
+            return jsonify({'success': False, 'message': '이미 존재하는 프로젝트명'})
+        from datetime import datetime
+        new_row = {
+            'id': datetime.now().strftime('%Y%m%d%H%M%S'),
+            'name': new_name,
+            'description': '',
+            'start_date': '',
+            'end_date': '',
+            'status': '진행중',
+            'participants': '',
+            'created_date': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+            'color': color
+        }
+        # DataFrame이 비어 있으면 컬럼 지정
+        if projects_df.empty:
+            columns = ['id','name','description','start_date','end_date','status','participants','created_date','color']
+            projects_df = pd.DataFrame([new_row], columns=columns)
+        else:
+            projects_df = pd.concat([projects_df, pd.DataFrame([new_row])], ignore_index=True)
+    # 저장
+    csv_manager.write_csv('projects.csv', projects_df)
+    return jsonify({'success': True})

@@ -198,41 +198,33 @@ async function loadEquipmentForReservation() {
     try {
         const response = await fetch('/equipment/api/equipment');
         const data = await response.json();
-        
-        console.log('예약용 장비 목록 로드:', data); // 디버깅용 로그
-        
-        if (data.success && data.equipment) {
             const select = document.getElementById('reservationEquipment');
-            let html = '<option value="">장비를 선택하세요</option>';
-            
-            // 모든 장비를 표시하되, 상태를 표시
-            data.equipment.forEach(equipment => {
-                const statusText = equipment.status === '사용가능' ? '' : ` (${equipment.status})`;
-                const disabled = equipment.status !== '사용가능' ? ' disabled' : '';
-                html += `<option value="${equipment.name}"${disabled}>${equipment.name} - ${equipment.location}${statusText}</option>`;
+        select.innerHTML = '<option value="">장비를 선택하세요</option>';
+        if (data.success && Array.isArray(data.equipment)) {
+            data.equipment.forEach(eq => {
+                // 장비 상태가 '사용가능'인 것만 표시
+                if (!eq.status || eq.status === '사용가능' || eq.status === '사용 가능') {
+                    const option = document.createElement('option');
+                    option.value = eq.id;
+                    option.textContent = `${eq.name} (${eq.model || ''})`;
+                    option.setAttribute('data-name', eq.name);
+                    select.appendChild(option);
+                }
             });
-            
-            if (data.equipment.length === 0) {
-                html += '<option value="" disabled>등록된 장비 없음</option>';
-            }
-            
-            select.innerHTML = html;
-        } else {
-            // API 응답에 문제가 있을 때
-            const select = document.getElementById('reservationEquipment');
-            select.innerHTML = '<option value="" disabled>장비 목록을 불러올 수 없습니다</option>';
         }
     } catch (error) {
-        console.error('장비 목록 로드 중 오류:', error);
-        const select = document.getElementById('reservationEquipment');
-        select.innerHTML = '<option value="" disabled>장비 목록 로드 오류</option>';
+        console.error('장비 목록 로드 오류:', error);
     }
 }
 
 // 예약 저장
 async function saveReservationNew() {
+    const equipmentSelect = document.getElementById('reservationEquipment');
+    const selectedOption = equipmentSelect.options[equipmentSelect.selectedIndex];
+    
     const reservationData = {
-        equipment_name: document.getElementById('reservationEquipment').value,
+        equipment_id: equipmentSelect.value,
+        equipment_name: selectedOption ? selectedOption.getAttribute('data-name') : '',
         reserver: document.getElementById('reservationReserver').value,
         start_date: document.getElementById('reservationDate').value,
         end_date: document.getElementById('reservationDate').value,
@@ -242,7 +234,7 @@ async function saveReservationNew() {
         notes: document.getElementById('reservationNotes').value
     };
     
-    if (!reservationData.equipment_name || !reservationData.reserver || !reservationData.start_date || !reservationData.start_time || !reservationData.purpose) {
+    if (!reservationData.equipment_id || !reservationData.reserver || !reservationData.start_date || !reservationData.start_time || !reservationData.purpose) {
         alert('필수 항목을 모두 입력해주세요.');
         return;
     }

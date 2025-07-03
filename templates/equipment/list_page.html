@@ -21,6 +21,7 @@
                             <thead class="table-dark">
                                 <tr>
                                     <th>관리번호</th>
+                                    <th>자산번호</th>
                                     <th>장비명</th>
                                     <th>모델명</th>
                                     <th>제조사</th>
@@ -31,7 +32,30 @@
                                 </tr>
                             </thead>
                             <tbody id="equipmentTableBody">
-                                <!-- 장비 목록이 여기에 동적으로 로드됩니다 -->
+                                <!--
+                                {% if equipment %}
+                                    {% for eq in equipment %}
+                                    <tr>
+                                        <td>{{ eq.id }}</td>
+                                        <td>{{ eq.asset_number or '-' }}</td>
+                                        <td>{{ eq.name }}</td>
+                                        <td>{{ eq.model }}</td>
+                                        <td>{{ eq.manufacturer }}</td>
+                                        <td>{{ eq.location }}</td>
+                                        <td>{{ eq.manager or '-' }}</td>
+                                        <td>{{ eq.status or '-' }}</td>
+                                        <td>
+                                            <button class="btn btn-sm btn-outline-primary me-1" onclick="editEquipment({{ eq.id }})">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="btn btn-sm btn-outline-danger" onclick="deleteEquipment({{ eq.id }})">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                {% endif %}
+                                -->
                             </tbody>
                         </table>
                     </div>
@@ -69,38 +93,46 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group mb-3">
+                                <label class="form-label">자산번호</label>
+                                <input type="text" class="form-control" id="equipmentAssetNumber" placeholder="AS-YYYY-XXX">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
                                 <label class="form-label">모델명</label>
                                 <input type="text" class="form-control" id="equipmentModel">
                             </div>
                         </div>
+                    </div>
+                    <div class="row">
                         <div class="col-md-6">
                             <div class="form-group mb-3">
                                 <label class="form-label">제조사</label>
                                 <input type="text" class="form-control" id="equipmentManufacturer">
                             </div>
                         </div>
-                    </div>
-                    <div class="row">
                         <div class="col-md-6">
                             <div class="form-group mb-3">
                                 <label class="form-label">시리얼 번호</label>
                                 <input type="text" class="form-control" id="equipmentSerial">
                             </div>
                         </div>
+                    </div>
+                    <div class="row">
                         <div class="col-md-6">
                             <div class="form-group mb-3">
                                 <label class="form-label">위치 *</label>
                                 <input type="text" class="form-control" id="equipmentLocation" required>
                             </div>
                         </div>
-                    </div>
-                    <div class="row">
                         <div class="col-md-6">
                             <div class="form-group mb-3">
                                 <label class="form-label">담당자</label>
                                 <input type="text" class="form-control" id="equipmentManager">
                             </div>
                         </div>
+                    </div>
+                    <div class="row">
                         <div class="col-md-6">
                             <div class="form-group mb-3">
                                 <label class="form-label">상태</label>
@@ -113,28 +145,28 @@
                                 </select>
                             </div>
                         </div>
-                    </div>
-                    <div class="row">
                         <div class="col-md-6">
                             <div class="form-group mb-3">
                                 <label class="form-label">구매일</label>
                                 <input type="date" class="form-control" id="equipmentPurchaseDate">
                             </div>
                         </div>
+                    </div>
+                    <div class="row">
                         <div class="col-md-6">
                             <div class="form-group mb-3">
                                 <label class="form-label">구매가격</label>
                                 <input type="number" class="form-control" id="equipmentPrice">
                             </div>
                         </div>
-                    </div>
-                    <div class="row">
                         <div class="col-md-6">
                             <div class="form-group mb-3">
                                 <label class="form-label">정기점검일</label>
                                 <input type="date" class="form-control" id="equipmentMaintenanceDate">
                             </div>
                         </div>
+                    </div>
+                    <div class="row">
                         <div class="col-md-6">
                             <div class="form-group mb-3">
                                 <label class="form-label">보증만료일</label>
@@ -306,6 +338,9 @@ function renderEquipmentTable(equipment) {
             html += `
             <tr>
                 <td>${eq.equipment_id || '-'}</td>
+                <td>
+                    ${(typeof eq.asset_number !== 'undefined' && eq.asset_number && eq.asset_number.trim()) ? eq.asset_number : '-'}
+                </td>
                 <td><a href="#" onclick="viewEquipmentDetail(${eq.id})" class="text-primary">${eq.name}</a></td>
                 <td>${eq.model || '-'}</td>
                 <td>${eq.manufacturer || '-'}</td>
@@ -409,6 +444,7 @@ function editEquipment(id) {
     document.getElementById('equipmentModel').value = equipment.model || '';
     document.getElementById('equipmentManufacturer').value = equipment.manufacturer || '';
     document.getElementById('equipmentId').value = equipment.equipment_id || '';
+    document.getElementById('equipmentAssetNumber').value = equipment.asset_number || '';
     document.getElementById('equipmentSerial').value = equipment.serial_number || '';
     document.getElementById('equipmentLocation').value = equipment.location || '';
     document.getElementById('equipmentManager').value = equipment.manager || '';
@@ -433,6 +469,7 @@ async function saveEquipment() {
         model: document.getElementById('equipmentModel').value,
         manufacturer: document.getElementById('equipmentManufacturer').value,
         equipment_id: document.getElementById('equipmentId').value,
+        asset_number: document.getElementById('equipmentAssetNumber').value,
         serial_number: document.getElementById('equipmentSerial').value,
         location: document.getElementById('equipmentLocation').value,
         manager: document.getElementById('equipmentManager').value,

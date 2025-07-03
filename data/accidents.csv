@@ -1,2 +1,5 @@
 ﻿id,incident_date,location,description,severity,involved_person,cause,action_taken,prevention_measures,status,reporter,created_date
 20250702033601,2025-07-03T14:38,ㄹ,ㄹ,경미,ㄹ,ㄹ,ㄹ,ㄹ,조사중,ㄹ,2025-07-02 03:36:01
+20250703114318,2025-07-03,test,test,경미,test,,,,완료,test,2025-07-03 11:43:18
+20250703160016,2025-07-12,ff,ff,경미,ff,,,,진행중,f,2025-07-03 16:00:16
+20250703160607,2025-07-04,fff,f,경미,f,,,,조사중,f,2025-07-03 16:06:07

@@ -2,6 +2,8 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash,
 from csv_manager import csv_manager
 from datetime import datetime
 from database import db, Equipment, Reservation, UsageLog
+import pandas as pd
+import csv
 
 equipment_bp = Blueprint('equipment', __name__)
 
@@ -35,14 +37,14 @@ def add_equipment():
 
 @equipment_bp.route('/list')
 def equipment_list_page():
-    """장비 목록 페이지"""
-    equipment_list = Equipment.query.all()
+    df = pd.read_csv('data/equipment.csv')
+    equipment_list = df.to_dict('records') if not df.empty else []
     return render_template('equipment/list_page.html', equipment=equipment_list)
 
 @equipment_bp.route('/reservations')
 def reservations_page():
-    """장비 예약 페이지"""
-    equipment_list = Equipment.query.filter_by(status='사용가능').all()
+    df = pd.read_csv('data/equipment.csv')
+    equipment_list = [row for _, row in df.iterrows() if row['status'] in ['사용 가능', '사용가능']]
     return render_template('equipment/reservations_page.html', equipment=equipment_list)
 
 @equipment_bp.route('/usage-log')
@@ -57,49 +59,36 @@ def equipment_management():
 
 @equipment_bp.route('/api/reservations')
 def api_reservations():
-    """API endpoint for calendar reservations"""
     try:
-        reservations = Reservation.query.all()
-        events = []
+        # CSV 파일이 없거나 비어있는 경우 처리
+        try:
+            df = pd.read_csv('data/reservations.csv')
+            if df.empty:
+                return jsonify({'success': True, 'reservations': []})
+        except FileNotFoundError:
+            return jsonify({'success': True, 'reservations': []})
+        except pd.errors.EmptyDataError:
+            return jsonify({'success': True, 'reservations': []})
         
-        for reservation in reservations:
-            # Combine date and time for start/end datetime
-            start_datetime = datetime.combine(reservation.start_date, reservation.start_time or datetime.min.time())
-            end_datetime = datetime.combine(reservation.end_date, reservation.end_time or datetime.max.time())
-            
-            events.append({
-                'id': reservation.id,
-                'title': f"{reservation.equipment_name} - {reservation.reserver}",
-                'start': start_datetime.isoformat(),
-                'end': end_datetime.isoformat(),
-                'backgroundColor': get_equipment_color(reservation.equipment_name),
-                'borderColor': get_equipment_color(reservation.equipment_name),
-                'extendedProps': {
-                    'equipment_name': reservation.equipment_name,
-                    'reserver': reservation.reserver,
-                    'purpose': reservation.purpose,
-                    'notes': reservation.notes,
-                    'status': reservation.status
-                }
+        reservations = []
+        for _, row in df.iterrows():
+            reservations.append({
+                'id': str(row['id']) if pd.notna(row['id']) else '',
+                'equipment_id': str(row['equipment_id']) if pd.notna(row['equipment_id']) else '',
+                'equipment_name': str(row['equipment_name']) if pd.notna(row['equipment_name']) else '',
+                'reserver': str(row['reserver']) if pd.notna(row['reserver']) else '',
+                'purpose': str(row['purpose']) if pd.notna(row['purpose']) else '',
+                'start_date': str(row['start_date']) if pd.notna(row['start_date']) else '',
+                'end_date': str(row['end_date']) if pd.notna(row['end_date']) else '',
+                'start_time': str(row['start_time']) if pd.notna(row['start_time']) else '',
+                'end_time': str(row['end_time']) if pd.notna(row['end_time']) else '',
+                'status': str(row['status']) if pd.notna(row['status']) else '',
+                'notes': str(row['notes']) if pd.notna(row['notes']) else '',
+                'created_date': str(row['created_date']) if pd.notna(row['created_date']) else ''
             })
-        
-        return jsonify({
-            'success': True,
-            'reservations': [{
-                'id': reservation.id,
-                'equipment_name': reservation.equipment_name,
-                'reserver': reservation.reserver,
-                'start_date': reservation.start_date.strftime('%Y-%m-%d'),
-                'end_date': reservation.end_date.strftime('%Y-%m-%d'),
-                'start_time': reservation.start_time.strftime('%H:%M') if reservation.start_time else None,
-                'end_time': reservation.end_time.strftime('%H:%M') if reservation.end_time else None,
-                'purpose': reservation.purpose,
-                'notes': reservation.notes,
-                'status': reservation.status
-            } for reservation in reservations]
-        })
+        return jsonify({'success': True, 'reservations': reservations})
     except Exception as e:
-        return jsonify({'error': str(e)}), 500
+        return jsonify({'success': False, 'error': str(e)})
 
 def get_equipment_color(equipment_name):
     """Get consistent color for equipment"""
@@ -279,70 +268,60 @@ def equipment_management_old():
 # 장비 API 엔드포인트
 @equipment_bp.route('/api/equipment')
 def api_equipment():
-    """장비 목록 API"""
     try:
-        equipment_list = Equipment.query.all()
+        df = pd.read_csv('data/equipment.csv')
         equipment_data = []
-        for eq in equipment_list:
+        for _, row in df.iterrows():
             equipment_data.append({
-                'id': eq.id,
-                'equipment_id': eq.equipment_id,
-                'name': eq.name,
-                'model': eq.model,
-                'manufacturer': eq.manufacturer,
-                'serial_number': eq.serial_number,
-                'location': eq.location,
-                'manager': eq.manager,
-                'status': eq.status,
-                'purchase_date': eq.purchase_date.strftime('%Y-%m-%d') if eq.purchase_date else None,
-                'purchase_price': float(eq.purchase_price) if eq.purchase_price else None,
-                'maintenance_date': eq.maintenance_date.strftime('%Y-%m-%d') if eq.maintenance_date else None,
-                'warranty_expiry': eq.warranty_expiry.strftime('%Y-%m-%d') if eq.warranty_expiry else None,
-                'specifications': eq.specifications,
-                'notes': getattr(eq, 'notes', None)
+                'id': str(row['id']) if pd.notna(row['id']) else '',
+                'name': str(row['name']) if pd.notna(row['name']) else '',
+                'model': str(row['model']) if pd.notna(row['model']) else '',
+                'manufacturer': str(row['manufacturer']) if pd.notna(row['manufacturer']) else '',
+                'location': str(row['location']) if pd.notna(row['location']) else '',
+                'status': str(row['status']) if pd.notna(row['status']) else '',
+                'asset_number': str(row['asset_number']) if pd.notna(row['asset_number']) else '',
+                'purchase_date': str(row['purchase_date']) if pd.notna(row['purchase_date']) else '',
+                'maintenance_date': str(row['maintenance_date']) if pd.notna(row['maintenance_date']) else '',
+                'notes': str(row['notes']) if pd.notna(row['notes']) else '',
+                'created_date': str(row['created_date']) if pd.notna(row['created_date']) else ''
             })
-        return jsonify({
-            'success': True,
-            'equipment': equipment_data
-        })
+        return jsonify({'success': True, 'equipment': equipment_data})
     except Exception as e:
-        return jsonify({'error': str(e)}), 500
+        return jsonify({'success': False, 'error': str(e)})
 
 @equipment_bp.route('/api/equipment/add', methods=['POST'])
 def api_add_equipment():
-    """장비 추가 API"""
+    data = request.get_json()
+    new_row = {
+        'id': datetime.now().strftime('%Y%m%d%H%M%S'),
+        'name': data['name'],
+        'model': data.get('model', ''),
+        'manufacturer': data.get('manufacturer', ''),
+        'location': data.get('location', ''),
+        'status': data.get('status', '사용 가능'),
+        'asset_number': data.get('asset_number', ''),
+        'purchase_date': data.get('purchase_date', ''),
+        'maintenance_date': data.get('maintenance_date', ''),
+        'notes': data.get('notes', ''),
+        'created_date': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    }
+    file_path = 'data/equipment.csv'
     try:
-        data = request.get_json()
-        
-        # 장비 ID 생성
-        last_equipment = Equipment.query.order_by(Equipment.id.desc()).first()
-        next_id = (last_equipment.id + 1) if last_equipment else 1
-        equipment_id = f"EQ{next_id:03d}"
-        
-        new_equipment = Equipment(
-            equipment_id=data.get('equipment_id', equipment_id),
-            name=data['name'],
-            model=data.get('model'),
-            manufacturer=data.get('manufacturer'),
-            serial_number=data.get('serial_number'),
-            location=data.get('location'),
-            manager=data.get('manager'),
-            status=data.get('status', '사용가능'),
-            purchase_date=datetime.strptime(data['purchase_date'], '%Y-%m-%d').date() if data.get('purchase_date') else None,
-            purchase_price=float(data['purchase_price']) if data.get('purchase_price') else None,
-            maintenance_date=datetime.strptime(data['maintenance_date'], '%Y-%m-%d').date() if data.get('maintenance_date') else None,
-            warranty_expiry=datetime.strptime(data['warranty_expiry'], '%Y-%m-%d').date() if data.get('warranty_expiry') else None,
-            specifications=data.get('specifications'),
-            notes=data.get('notes')
-        )
-        
-        db.session.add(new_equipment)
-        db.session.commit()
-        
-        return jsonify({'success': True, 'id': new_equipment.id})
+        # 파일이 없으면 헤더 추가
+        try:
+            with open(file_path, 'r', encoding='utf-8') as f:
+                pass
+        except FileNotFoundError:
+            with open(file_path, 'w', newline='', encoding='utf-8') as f:
+                writer = csv.DictWriter(f, fieldnames=new_row.keys())
+                writer.writeheader()
+        # 데이터 추가
+        with open(file_path, 'a', newline='', encoding='utf-8') as f:
+            writer = csv.DictWriter(f, fieldnames=new_row.keys())
+            writer.writerow(new_row)
+        return jsonify({'success': True})
     except Exception as e:
-        db.session.rollback()
-        return jsonify({'error': str(e)}), 500
+        return jsonify({'success': False, 'error': str(e)})
 
 @equipment_bp.route('/api/equipment/<int:equipment_id>/update', methods=['POST'])
 def api_update_equipment(equipment_id):
@@ -394,46 +373,38 @@ def api_delete_equipment(equipment_id):
 # 예약 API 엔드포인트  
 @equipment_bp.route('/api/reservations/add', methods=['POST'])
 def api_add_reservation():
-    """예약 추가 API"""
+    data = request.get_json()
+    new_row = {
+        'id': datetime.now().strftime('%Y%m%d%H%M%S'),
+        'equipment_id': data['equipment_id'],
+        'equipment_name': data['equipment_name'],
+        'reserver': data['reserver'],
+        'purpose': data['purpose'],
+        'start_date': data['start_date'],
+        'end_date': data['end_date'],
+        'start_time': data.get('start_time', ''),
+        'end_time': data.get('end_time', ''),
+        'status': '예약',
+        'notes': data.get('notes', ''),
+        'created_date': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    }
+    file_path = 'data/reservations.csv'
     try:
-        data = request.get_json()
-        
-        # 장비 정보 조회
-        equipment = Equipment.query.get(data['equipment_id'])
-        if not equipment:
-            return jsonify({'error': '장비를 찾을 수 없습니다.'}), 400
-        
-        new_reservation = Reservation(
-            equipment_name=equipment.name,
-            reserver=data['reserver'],
-            purpose=data['purpose'],
-            start_date=datetime.strptime(data['start_date'], '%Y-%m-%d').date(),
-            end_date=datetime.strptime(data['end_date'], '%Y-%m-%d').date(),
-            start_time=datetime.strptime(data['start_time'], '%H:%M').time() if data.get('start_time') else None,
-            end_time=datetime.strptime(data['end_time'], '%H:%M').time() if data.get('end_time') else None,
-            status='예약'
-        )
-        
-        db.session.add(new_reservation)
-        db.session.flush()  # ID를 얻기 위해 flush
-        
-        # 사용일지에 자동 추가
-        new_usage_log = UsageLog(
-            equipment_name=equipment.name,
-            user=data['reserver'],
-            usage_date=new_reservation.start_date,
-            start_time=new_reservation.start_time,
-            end_time=new_reservation.end_time,
-            purpose=data['purpose']
-        )
-        
-        db.session.add(new_usage_log)
-        db.session.commit()
-        
-        return jsonify({'success': True, 'id': new_reservation.id})
+        # 파일이 없으면 헤더 추가
+        try:
+            with open(file_path, 'r', encoding='utf-8') as f:
+                pass
+        except FileNotFoundError:
+            with open(file_path, 'w', newline='', encoding='utf-8') as f:
+                writer = csv.DictWriter(f, fieldnames=new_row.keys())
+                writer.writeheader()
+        # 데이터 추가
+        with open(file_path, 'a', newline='', encoding='utf-8') as f:
+            writer = csv.DictWriter(f, fieldnames=new_row.keys())
+            writer.writerow(new_row)
+        return jsonify({'success': True})
     except Exception as e:
-        db.session.rollback()
-        return jsonify({'error': str(e)}), 500
+        return jsonify({'success': False, 'error': str(e)})
 
 @equipment_bp.route('/api/reservations/<int:reservation_id>/update', methods=['POST'])
 def api_update_reservation_new(reservation_id):
@@ -511,64 +482,120 @@ def api_add_usage_log():
     """사용일지 추가 API"""
     try:
         data = request.get_json()
-        
-        new_log = UsageLog(
-            equipment_name=data['equipment_name'],
-            user=data['user'],
-            usage_date=datetime.strptime(data['usage_date'], '%Y-%m-%d').date(),
-            start_time=datetime.strptime(data['start_time'], '%H:%M').time() if data.get('start_time') else None,
-            end_time=datetime.strptime(data['end_time'], '%H:%M').time() if data.get('end_time') else None,
-            purpose=data['purpose'],
-            condition_after=data.get('condition_after', '정상'),
-            issues=data.get('issues')
-        )
-        
-        db.session.add(new_log)
-        db.session.commit()
-        
-        return jsonify({'success': True, 'id': new_log.id})
+        new_row = {
+            'id': datetime.now().strftime('%Y%m%d%H%M%S'),
+            'equipment_name': data['equipment_name'],
+            'user': data['user'],
+            'usage_date': data['usage_date'],
+            'start_time': data.get('start_time', ''),
+            'end_time': data.get('end_time', ''),
+            'purpose': data['purpose'],
+            'condition_before': data.get('condition_before', '정상'),
+            'condition_after': data.get('condition_after', '정상'),
+            'issues': data.get('issues', ''),
+            'created_date': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        }
+        file_path = 'data/usage_logs.csv'
+        try:
+            # 파일이 없으면 헤더 추가
+            try:
+                with open(file_path, 'r', encoding='utf-8') as f:
+                    pass
+            except FileNotFoundError:
+                with open(file_path, 'w', newline='', encoding='utf-8') as f:
+                    writer = csv.DictWriter(f, fieldnames=new_row.keys())
+                    writer.writeheader()
+            # 데이터 추가
+            with open(file_path, 'a', newline='', encoding='utf-8') as f:
+                writer = csv.DictWriter(f, fieldnames=new_row.keys())
+                writer.writerow(new_row)
+            return jsonify({'success': True, 'id': new_row['id']})
+        except Exception as e:
+            return jsonify({'success': False, 'error': str(e)})
     except Exception as e:
-        db.session.rollback()
-        return jsonify({'error': str(e)}), 500
+        return jsonify({'success': False, 'error': str(e)})
 
 # 사용일지 API 엔드포인트
 @equipment_bp.route('/api/usage-logs')
 def api_usage_logs():
     """사용일지 목록 API"""
     try:
-        usage_logs = UsageLog.query.order_by(UsageLog.usage_date.desc()).all()
+        # CSV 파일이 없거나 비어있는 경우 처리
+        try:
+            df = pd.read_csv('data/usage_logs.csv')
+            if df.empty:
+                return jsonify({'success': True, 'logs': []})
+        except FileNotFoundError:
+            return jsonify({'success': True, 'logs': []})
+        except pd.errors.EmptyDataError:
+            return jsonify({'success': True, 'logs': []})
+        
         logs_data = []
-        for log in usage_logs:
+        for _, row in df.iterrows():
             logs_data.append({
-                'id': log.id,
-                'equipment_name': log.equipment_name,
-                'user': log.user,
-                'usage_date': log.usage_date.strftime('%Y-%m-%d'),
-                'start_time': log.start_time.strftime('%H:%M') if log.start_time else None,
-                'end_time': log.end_time.strftime('%H:%M') if log.end_time else None,
-                'purpose': log.purpose,
-                'condition_before': log.condition_before,
-                'condition_after': log.condition_after,
-                'issues': log.issues
+                'id': str(row['id']) if pd.notna(row['id']) else '',
+                'equipment_name': str(row['equipment_name']) if pd.notna(row['equipment_name']) else '',
+                'user': str(row['user']) if pd.notna(row['user']) else '',
+                'usage_date': str(row['usage_date']) if pd.notna(row['usage_date']) else '',
+                'start_time': str(row['start_time']) if pd.notna(row['start_time']) else '',
+                'end_time': str(row['end_time']) if pd.notna(row['end_time']) else '',
+                'purpose': str(row['purpose']) if pd.notna(row['purpose']) else '',
+                'condition_before': str(row['condition_before']) if pd.notna(row['condition_before']) else '',
+                'condition_after': str(row['condition_after']) if pd.notna(row['condition_after']) else '',
+                'issues': str(row['issues']) if pd.notna(row['issues']) else ''
             })
-        return jsonify(logs_data)
+        # 최신 날짜 순으로 정렬
+        logs_data.sort(key=lambda x: x['usage_date'], reverse=True)
+        return jsonify({'success': True, 'logs': logs_data})
     except Exception as e:
-        return jsonify({'error': str(e)}), 500
+        return jsonify({'success': False, 'error': str(e)})
 
-@equipment_bp.route('/api/usage-logs/<int:log_id>/update', methods=['POST'])
+@equipment_bp.route('/api/usage-logs/<log_id>/update', methods=['POST'])
 def api_update_usage_log(log_id):
     """사용일지 수정 API"""
     try:
-        usage_log = UsageLog.query.get_or_404(log_id)
+        df = pd.read_csv('data/usage_logs.csv')
         data = request.get_json()
-        
-        usage_log.condition_before = data.get('condition_before', '')
-        usage_log.condition_after = data.get('condition_after', '')
-        usage_log.issues = data.get('issues', '')
-        
-        db.session.commit()
-        
+        # 해당 ID의 행 찾기 (타입 일치 보장)
+        mask = df['id'].astype(str) == str(log_id).strip()
+        if not mask.any():
+            return jsonify({'success': False, 'error': '사용일지를 찾을 수 없습니다.'})
+        # 데이터 업데이트
+        if 'condition_before' in data:
+            df.loc[mask, 'condition_before'] = data['condition_before']
+        if 'condition_after' in data:
+            df.loc[mask, 'condition_after'] = data['condition_after']
+        if 'issues' in data:
+            df.loc[mask, 'issues'] = data['issues']
+        if 'equipment_name' in data:
+            df.loc[mask, 'equipment_name'] = data['equipment_name']
+        if 'user' in data:
+            df.loc[mask, 'user'] = data['user']
+        if 'usage_date' in data:
+            df.loc[mask, 'usage_date'] = data['usage_date']
+        if 'start_time' in data:
+            df.loc[mask, 'start_time'] = data['start_time']
+        if 'end_time' in data:
+            df.loc[mask, 'end_time'] = data['end_time']
+        if 'purpose' in data:
+            df.loc[mask, 'purpose'] = data['purpose']
+        # CSV 파일에 저장
+        df.to_csv('data/usage_logs.csv', index=False, encoding='utf-8')
         return jsonify({'success': True})
     except Exception as e:
-        db.session.rollback()
-        return jsonify({'error': str(e)}), 500
+        return jsonify({'success': False, 'error': str(e)})
+
+@equipment_bp.route('/api/usage-logs/<log_id>/delete', methods=['POST'])
+def api_delete_usage_log(log_id):
+    """사용일지 삭제 API"""
+    try:
+        df = pd.read_csv('data/usage_logs.csv')
+        # 해당 ID의 행 찾기 (타입 일치 보장)
+        mask = df['id'].astype(str) == str(log_id).strip()
+        if not mask.any():
+            return jsonify({'success': False, 'error': '사용일지를 찾을 수 없습니다.'})
+        df = df[~mask]  # 해당 행 삭제
+        df.to_csv('data/usage_logs.csv', index=False, encoding='utf-8')
+        return jsonify({'success': True})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)})

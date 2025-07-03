@@ -9,40 +9,53 @@
     </div>
 </div>
 
-<!-- 교육자료 추가 폼 -->
-<div class="card mb-4">
-    <div class="card-header">
-        <h5 class="mb-0"><i class="fas fa-plus"></i> 새 교육자료 추가</h5>
-    </div>
-    <div class="card-body">
+<!-- 교육자료 추가 버튼 -->
+<div class="mb-3 text-end">
+  <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addMaterialModal">
+    <i class="fas fa-plus"></i> 새 교육자료 추가
+  </button>
+</div>
+
+<!-- 교육자료 추가 모달 -->
+<div class="modal fade" id="addMaterialModal" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title"><i class="fas fa-plus"></i> 새 교육자료 추가</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
         <form id="addMaterialForm">
-            <div class="row">
-                <div class="col-md-4">
-                    <div class="mb-3">
-                        <label for="title" class="form-label">제목 <span class="text-danger">*</span></label>
-                        <input type="text" class="form-control" id="title" name="title" required>
-                    </div>
-                </div>
-                <div class="col-md-5">
-                    <div class="mb-3">
-                        <label for="content" class="form-label">내용 <span class="text-danger">*</span></label>
-                        <textarea class="form-control" id="content" name="content" rows="2" required></textarea>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="mb-3">
-                        <label for="link" class="form-label">링크</label>
-                        <input type="url" class="form-control" id="link" name="link" placeholder="https://...">
-                    </div>
-                </div>
+          <div class="row">
+            <div class="col-md-4">
+              <div class="mb-3">
+                <label for="title" class="form-label">제목 <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" id="title" name="title" required>
+              </div>
             </div>
-            <div class="text-end">
-                <button type="submit" class="btn btn-primary">
-                    <i class="fas fa-save"></i> 등록
-                </button>
+            <div class="col-md-5">
+              <div class="mb-3">
+                <label for="content" class="form-label">내용 <span class="text-danger">*</span></label>
+                <textarea class="form-control" id="content" name="content" rows="2" required></textarea>
+              </div>
             </div>
+            <div class="col-md-3">
+              <div class="mb-3">
+                <label for="link" class="form-label">링크</label>
+                <input type="url" class="form-control" id="link" name="link" placeholder="https://...">
+              </div>
+            </div>
+          </div>
         </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+        <button type="submit" class="btn btn-primary" form="addMaterialForm">
+          <i class="fas fa-save"></i> 등록
+        </button>
+      </div>
     </div>
+  </div>
 </div>
 
 <!-- 교육자료 목록 테이블 -->
@@ -111,45 +124,6 @@
                 <button type="button" class="btn btn-primary" onclick="saveMaterialEdit()">
                     <i class="fas fa-save"></i> 저장
                 </button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- 응급연락처 패널 -->
-<div class="card mt-4">
-    <div class="card-header">
-        <h5 class="mb-0"><i class="fas fa-phone"></i> 응급연락처</h5>
-    </div>
-    <div class="card-body">
-        <div class="row">
-            <div class="col-md-3">
-                <div class="text-center">
-                    <i class="fas fa-fire-extinguisher fa-2x text-danger mb-2"></i>
-                    <h6>소방서</h6>
-                    <strong>119</strong>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="text-center">
-                    <i class="fas fa-ambulance fa-2x text-success mb-2"></i>
-                    <h6>응급실</h6>
-                    <strong>119</strong>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="text-center">
-                    <i class="fas fa-shield-alt fa-2x text-primary mb-2"></i>
-                    <h6>안전관리자</h6>
-                    <strong>내선 1234</strong>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="text-center">
-                    <i class="fas fa-tools fa-2x text-warning mb-2"></i>
-                    <h6>시설관리</h6>
-                    <strong>내선 5678</strong>
-                </div>
             </div>
         </div>
     </div>

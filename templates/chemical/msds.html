@@ -103,10 +103,7 @@
                             {% endif %}
                         </td>
                         <td>
-                            <button class="btn btn-sm btn-outline-primary" onclick="viewMsds({{ msds|tojson }})">
-                                <i class="fas fa-eye"></i>
-                            </button>
-                            <button class="btn btn-sm btn-outline-secondary" onclick="editMsds({{ loop.index0 }}, {{ msds|tojson }})">
+                            <button class="btn btn-sm btn-outline-secondary" onclick="editMsds('{{ msds.id }}', JSON.parse(this.dataset.msds))" data-msds='{{ msds|tojson }}'>
                                 <i class="fas fa-edit"></i>
                             </button>
                         </td>
@@ -114,89 +111,6 @@
                     {% endfor %}
                 </tbody>
             </table>
-        </div>
-    </div>
-</div>
-
-<!-- Quick Safety Info -->
-<div class="row mt-4">
-    <div class="col-lg-3 col-md-6 mb-3">
-        <div class="card text-center">
-            <div class="card-body">
-                <i class="fas fa-fire fa-3x text-danger mb-3"></i>
-                <h6>인화성 물질</h6>
-                <h3 class="text-danger">{{ msds_list|selectattr('hazard_class', 'equalto', '1급')|list|length }}</h3>
-                <p class="text-muted">1급 위험물질</p>
-            </div>
-        </div>
-    </div>
-    <div class="col-lg-3 col-md-6 mb-3">
-        <div class="card text-center">
-            <div class="card-body">
-                <i class="fas fa-skull-crossbones fa-3x text-warning mb-3"></i>
-                <h6>독성 물질</h6>
-                <h3 class="text-warning">{{ msds_list|selectattr('hazard_class', 'equalto', '2급')|list|length }}</h3>
-                <p class="text-muted">2급 위험물질</p>
-            </div>
-        </div>
-    </div>
-    <div class="col-lg-3 col-md-6 mb-3">
-        <div class="card text-center">
-            <div class="card-body">
-                <i class="fas fa-exclamation-triangle fa-3x text-info mb-3"></i>
-                <h6>일반 위험</h6>
-                <h3 class="text-info">{{ msds_list|selectattr('hazard_class', 'equalto', '3급')|list|length }}</h3>
-                <p class="text-muted">3급 위험물질</p>
-            </div>
-        </div>
-    </div>
-    <div class="col-lg-3 col-md-6 mb-3">
-        <div class="card text-center">
-            <div class="card-body">
-                <i class="fas fa-check-circle fa-3x text-success mb-3"></i>
-                <h6>안전 물질</h6>
-                <h3 class="text-success">{{ msds_list|selectattr('hazard_class', 'equalto', '4급')|list|length }}</h3>
-                <p class="text-muted">4급 위험물질</p>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Safety Guidelines -->
-<div class="card mt-4">
-    <div class="card-header">
-        <h5 class="mb-0"><i class="fas fa-shield-alt"></i> 화학물질 안전 가이드라인</h5>
-    </div>
-    <div class="card-body">
-        <div class="row">
-            <div class="col-md-3">
-                <div class="text-center">
-                    <i class="fas fa-eye fa-2x text-info mb-2"></i>
-                    <h6>사용 전 확인</h6>
-                    <p class="text-muted">MSDS 내용을 반드시 숙지하고 사용하세요</p>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="text-center">
-                    <i class="fas fa-hard-hat fa-2x text-warning mb-2"></i>
-                    <h6>보호장비 착용</h6>
-                    <p class="text-muted">적절한 개인보호장비를 착용하세요</p>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="text-center">
-                    <i class="fas fa-wind fa-2x text-success mb-2"></i>
-                    <h6>환기 유지</h6>
-                    <p class="text-muted">충분한 환기를 유지하며 작업하세요</p>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="text-center">
-                    <i class="fas fa-recycle fa-2x text-primary mb-2"></i>
-                    <h6>안전한 폐기</h6>
-                    <p class="text-muted">폐기물은 규정에 따라 안전하게 처리하세요</p>
-                </div>
-            </div>
         </div>
     </div>
 </div>
@@ -371,6 +285,7 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
                     <button type="submit" class="btn btn-primary">수정</button>
+                    <button type="button" class="btn btn-danger ms-auto" id="deleteMsdsBtn">삭제</button>
                 </div>
             </form>
         </div>
@@ -401,8 +316,8 @@
 
 {% block extra_js %}
 <script>
-function editMsds(index, msds) {
-    document.getElementById('editMsdsForm').action = `/chemical/msds/update/${index}`;
+function editMsds(id, msds) {
+    document.getElementById('editMsdsForm').action = `/chemical/msds/update/${id}`;
     document.getElementById('editChemicalName').value = msds.chemical_name || '';
     document.getElementById('editCasNumber').value = msds.cas_number || '';
     document.getElementById('editManufacturer').value = msds.manufacturer || '';
@@ -416,8 +331,23 @@ function editMsds(index, msds) {
     document.getElementById('editFirstAid').value = msds.first_aid || '';
     document.getElementById('editDisposalMethod').value = msds.disposal_method || '';
     document.getElementById('editMsdsFileLink').value = msds.msds_file_link || '';
-    
+    document.getElementById('deleteMsdsBtn').onclick = function() { deleteMsds(id); };
     new bootstrap.Modal(document.getElementById('editMsdsModal')).show();
+}
+
+function deleteMsds(id) {
+    if (!confirm('정말 삭제하시겠습니까?')) return;
+    fetch(`/chemical/msds/delete/${id}`, { method: 'POST' })
+        .then(r => r.json())
+        .then(res => {
+            if (res.success) {
+                alert('삭제되었습니다.');
+                location.reload();
+            } else {
+                alert(res.message || '삭제 중 오류 발생');
+            }
+        })
+        .catch(() => alert('삭제 중 오류 발생'));
 }
 
 function viewMsds(msds) {

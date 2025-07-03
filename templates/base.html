@@ -10,7 +10,7 @@
     <!-- Font Awesome -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <!-- FullCalendar CSS -->
-    <link href='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css' rel='stylesheet'>
+    {# <link href='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css' rel='stylesheet'> #}
     <!-- Custom CSS -->
     <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
     
@@ -41,12 +41,6 @@
                     </a>
                     <a class="list-group-item list-group-item-action bg-white text-dark ps-4" href="{{ url_for('research.schedule') }}">
                         <i class="fas fa-calendar-week me-2"></i>주간 일정
-                    </a>
-                    <a class="list-group-item list-group-item-action bg-white text-dark ps-4" href="{{ url_for('research.project_schedule') }}">
-                        <i class="fas fa-calendar-alt me-2"></i>연구 일정 관리
-                    </a>
-                    <a class="list-group-item list-group-item-action bg-white text-dark ps-4" href="{{ url_for('research.weekly_schedule') }}">
-                        <i class="fas fa-table me-2"></i>주간 일정표
                     </a>
                 </div>
                 
@@ -86,9 +80,6 @@
                     </a>
                     <a class="list-group-item list-group-item-action bg-white text-dark ps-4" href="{{ url_for('safety.accidents') }}">
                         <i class="fas fa-exclamation-triangle me-2"></i>사고관리
-                    </a>
-                    <a class="list-group-item list-group-item-action bg-white text-dark ps-4" href="{{ url_for('safety.education') }}">
-                        <i class="fas fa-graduation-cap me-2"></i>교육 이력
                     </a>
                     <a class="list-group-item list-group-item-action bg-white text-dark ps-4" href="{{ url_for('safety.procedures') }}">
                         <i class="fas fa-file-alt me-2"></i>작업절차서 및 위험성평가
@@ -170,5 +161,6 @@
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
     
     {% block extra_js %}{% endblock %}
+    {% block scripts %}{% endblock %}
 </body>
 </html>
