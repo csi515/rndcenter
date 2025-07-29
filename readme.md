@@ -22,17 +22,21 @@ Render Dashboard에서 다음 환경 변수를 설정하세요:
 
 ```bash
 # 필수 설정
-DATABASE_URL=postgresql://username:password@your-db-host:port/dbname
 SESSION_SECRET=your-super-secret-session-key-here
 
 # 선택 설정
 FLASK_ENV=production
 FLASK_DEBUG=false
 LOG_LEVEL=INFO
+
+# 데이터베이스 (선택사항)
+# DATABASE_URL=postgresql://username:password@your-db-host:port/dbname
+# 설정하지 않으면 SQLite를 사용합니다 (app.db 파일)
 ```
 
 ### 3. 데이터베이스 연결
-- PostgreSQL 데이터베이스 서버 정보를 `DATABASE_URL`에 설정
+- **기본**: SQLite 데이터베이스 (app.db 파일) 자동 생성
+- **PostgreSQL 사용 시**: `DATABASE_URL` 환경변수 설정
 - 데이터베이스 테이블은 자동으로 생성됩니다
 
 ### 4. 보안 기능
@@ -52,15 +56,17 @@ LOG_LEVEL=INFO
 ### 백엔드 아키텍처
 - **프레임워크**: Flask (파이썬 웹 프레임워크)
 - **구조 패턴**: Blueprint 기반 모듈 구조
-- **데이터베이스**: PostgreSQL + SQLAlchemy ORM
+- **데이터베이스**: SQLite (기본) / PostgreSQL (선택)
+- **ORM**: SQLAlchemy를 통한 객체 관계 매핑
 - **세션 관리**: 환경변수로 설정 가능한 Flask 세션
 - **에러 처리**: Flash 메시지로 사용자 피드백
 - **로깅**: Python logging 모듈 활용
 
 ### 데이터 저장
-- **주 저장소**: PostgreSQL 데이터베이스
+- **기본 저장소**: SQLite 데이터베이스 (app.db)
+- **PostgreSQL**: 환경변수 설정 시 사용
 - **ORM**: SQLAlchemy를 통한 객체 관계 매핑
-- **마이그레이션**: CSV에서 PostgreSQL로 데이터 이전 지원
+- **마이그레이션**: CSV에서 데이터베이스로 데이터 이전 지원
 - **백업**: 기존 CSV 파일은 백업용으로 보관
 
 ## 주요 구성 요소
@@ -122,7 +128,6 @@ LOG_LEVEL=INFO
 ### 파이썬 패키지
 - **Flask**: 웹 프레임워크
 - **Flask-SQLAlchemy**: ORM
-- **psycopg2-binary**: PostgreSQL 연결
 - **gunicorn**: WSGI 서버
 - **python-dotenv**: 환경변수 관리
 - **openpyxl**: Excel 파일 처리

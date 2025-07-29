@@ -52,7 +52,7 @@ def https_redirect():
 # Configure the database
 app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get(
     "DATABASE_URL",
-    "postgresql://username:password@172.28.12.47:5987/dbname"
+    "sqlite:///app.db"  # Use SQLite as fallback
 )
 app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
     "pool_recycle": 300,
