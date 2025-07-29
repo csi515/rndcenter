@@ -1,22 +1,13 @@
 from flask import Blueprint, render_template, request, jsonify, send_file
-from csv_manager import csv_manager
 from datetime import datetime
 import os
 import uuid
 import math
 import json
-import pandas as pd
 import io
 from database import db, PurchaseRequest, ProjectType
 
 purchasing_bp = Blueprint('purchasing', __name__)
-
-PURCHASE_CSV = 'purchase_requests.csv'
-PROJECT_TYPE_CSV = 'project_types.csv'
-
-PURCHASE_FIELDS = [
-    'id','item','spec','item_number','unit','project_type','required_qty','safety_stock','purchase_qty','unit_price','total_price','purchase_status','note','reason','requester','request_date'
-]
 
 # 커스텀 JSON 인코더 (NaN, inf 값을 안전하게 처리)
 class SafeJSONEncoder(json.JSONEncoder):
@@ -50,16 +41,6 @@ def safe_jsonify(data):
     json_str = json.dumps(data, cls=SafeJSONEncoder, ensure_ascii=False)
     from flask import Response
     return Response(json_str, mimetype='application/json')
-
-# CSV 파일 자동 생성
-for fname, fields in [
-    (PURCHASE_CSV, PURCHASE_FIELDS),
-    (PROJECT_TYPE_CSV, ['id','project_type'])
-]:
-    path = os.path.join('data', fname)
-    if not os.path.exists(path):
-        import pandas as pd
-        pd.DataFrame(columns=fields).to_csv(path, index=False, encoding='utf-8-sig')
 
 @purchasing_bp.route('/requests')
 def purchase_requests():
@@ -223,24 +204,14 @@ def delete_project_type(type_id):
 def toggle_purchase_status(req_id):
     try:
         print(f"구매 상태 변경 요청: {req_id}")
-        import pandas as pd
-        df = csv_manager.read_csv(PURCHASE_CSV)
-        print(f"CSV 읽기 완료, 총 {len(df)}개 행")
         
-        # purchase_status 컬럼이 없으면 추가
-        if 'purchase_status' not in df.columns:
-            print("purchase_status 컬럼이 없어서 추가합니다.")
-            df['purchase_status'] = '대기'
-        
-        idx = df.index[df['id']==req_id].tolist()
-        if not idx:
+        # 데이터베이스에서 요청 찾기
+        request = PurchaseRequest.query.filter_by(request_id=req_id).first()
+        if not request:
             print(f"해당 ID를 찾을 수 없음: {req_id}")
             return safe_jsonify({'success': False, 'error': '해당 요청을 찾을 수 없습니다.'})
         
-        i = idx[0]
-        print(f"찾은 인덱스: {i}")
-        
-        current_status = str(df.at[i, 'purchase_status']) if pd.notna(df.at[i, 'purchase_status']) else '대기'
+        current_status = request.status if request.status else '대기'
         print(f"현재 상태: {current_status}")
         
         # 상태 순환: 대기 -> 완료 -> 취소 -> 대기
@@ -253,9 +224,9 @@ def toggle_purchase_status(req_id):
         
         print(f"새 상태: {new_status}")
         
-        df.at[i, 'purchase_status'] = new_status
-        csv_manager.write_csv(PURCHASE_CSV, df)
-        print("CSV 저장 완료")
+        request.status = new_status
+        db.session.commit()
+        print("데이터베이스 저장 완료")
         
         return safe_jsonify({'success': True, 'new_status': new_status})
         
@@ -268,15 +239,8 @@ def toggle_purchase_status(req_id):
 @purchasing_bp.route('/requests/export-excel', methods=['GET'])
 def export_purchase_requests_excel():
     try:
-        # CSV 데이터 읽기
-        df = csv_manager.read_csv(PURCHASE_CSV)
-        
-        if df.empty:
-            return safe_jsonify({'success': False, 'error': '내보낼 데이터가 없습니다.'})
-        
-        # purchase_status 컬럼이 없으면 추가
-        if 'purchase_status' not in df.columns:
-            df['purchase_status'] = '대기'
+        # 데이터베이스에서 데이터 읽기
+        query = PurchaseRequest.query
         
         # 필터링 (URL 파라미터 적용)
         item = request.args.get('item')
@@ -285,37 +249,54 @@ def export_purchase_requests_excel():
         project_type = request.args.get('project_type')
         
         if item:
-            df = df[df['item_name'].fillna('').str.contains(item, na=False) | df['item'].fillna('').str.contains(item, na=False) | df['spec'].fillna('').str.contains(item, na=False)]
+            query = query.filter(
+                db.or_(
+                    PurchaseRequest.item_name.contains(item),
+                    PurchaseRequest.spec.contains(item)
+                )
+            )
         if spec:
-            df = df[df['spec'].str.contains(spec, na=False)]
+            query = query.filter(PurchaseRequest.spec.contains(spec))
         if requester:
-            df = df[df['requester'].str.contains(requester, na=False)]
+            query = query.filter(PurchaseRequest.requester.contains(requester))
         if project_type:
-            df = df[df['project_type'] == project_type]
+            query = query.filter(PurchaseRequest.project_type == project_type)
         
-        # 실제 CSV 헤더에 맞는 컬럼 매핑
-        column_mapping = {
-            'item_name': '품목',
-            'spec': '사양',
-            'item_number': '품목번호',
-            'unit': '단위',
-            'project_type': '국책과제',
-            'quantity': '구매수량',
-            'unit_price': '단가',
-            'total_price': '총가격',
-            'notes': '비고',
-            'reason': '사유',
-            'requester': '요청자',
-            'request_date': '요청일',
-            'purchase_status': '구매여부'
-        }
+        requests = query.all()
         
-        # 실제로 존재하는 컬럼만 추출
-        export_columns = [col for col in column_mapping.keys() if col in df.columns]
-        df_export = df[export_columns].copy()
+        if not requests:
+            return safe_jsonify({'success': False, 'error': '내보낼 데이터가 없습니다.'})
         
-        # 컬럼명을 한글로 변경
-        df_export.rename(columns=column_mapping, inplace=True)
+        # Excel 파일 생성
+        from openpyxl import Workbook
+        from openpyxl.styles import Font, Alignment
+        
+        wb = Workbook()
+        ws = wb.active
+        ws.title = "구매요청목록"
+        
+        # 헤더 설정
+        headers = ['품목', '사양', '품목번호', '단위', '국책과제', '구매수량', '단가', '총가격', '비고', '사유', '요청자', '요청일', '구매여부']
+        for col, header in enumerate(headers, 1):
+            cell = ws.cell(row=1, column=col, value=header)
+            cell.font = Font(bold=True)
+            cell.alignment = Alignment(horizontal='center')
+        
+        # 데이터 입력
+        for row, req in enumerate(requests, 2):
+            ws.cell(row=row, column=1, value=req.item_name or '')
+            ws.cell(row=row, column=2, value=getattr(req, 'spec', '') or '')
+            ws.cell(row=row, column=3, value=getattr(req, 'item_number', '') or '')
+            ws.cell(row=row, column=4, value=getattr(req, 'unit', '') or '')
+            ws.cell(row=row, column=5, value=getattr(req, 'project_type', '') or '')
+            ws.cell(row=row, column=6, value=req.quantity or 0)
+            ws.cell(row=row, column=7, value=float(req.unit_price) if req.unit_price else 0)
+            ws.cell(row=row, column=8, value=float(req.total_price) if req.total_price else 0)
+            ws.cell(row=row, column=9, value=getattr(req, 'notes', '') or '')
+            ws.cell(row=row, column=10, value=getattr(req, 'reason', '') or '')
+            ws.cell(row=row, column=11, value=req.requester or '')
+            ws.cell(row=row, column=12, value=req.request_date.strftime('%Y-%m-%d') if req.request_date else '')
+            ws.cell(row=row, column=13, value=req.status or '대기')
         
         # 숫자 컬럼 포맷팅
         for col in ['구매수량', '단가', '총가격']:

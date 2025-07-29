@@ -1,8 +1,6 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify
-from csv_manager import csv_manager
 from datetime import datetime, date
 from database import db, Equipment, Reservation, UsageLog
-import pandas as pd
 import csv
 
 equipment_bp = Blueprint('equipment', __name__)
