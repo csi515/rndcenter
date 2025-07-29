@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify
 from datetime import datetime, date
-from database import db, Equipment, Reservation, UsageLog
+from app import db, Equipment, Reservation, UsageLog
 import csv
 
 equipment_bp = Blueprint('equipment', __name__)

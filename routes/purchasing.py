@@ -5,7 +5,7 @@ import uuid
 import math
 import json
 import io
-from database import db, PurchaseRequest, ProjectType
+from app import db, PurchaseRequest, ProjectType
 
 purchasing_bp = Blueprint('purchasing', __name__)
 

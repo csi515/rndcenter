@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, request, jsonify
-from database import db, CoalTarPitchLog
+from app import db, CoalTarPitchLog
 from datetime import datetime
 
 coal_log_bp = Blueprint('coal_log', __name__)

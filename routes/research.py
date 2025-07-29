@@ -1,7 +1,39 @@
 from flask import Blueprint, render_template, request, redirect, url_for, jsonify
-from database import db, Project, Researcher, WeeklyScheduleNew, Week
+from app import db, Project, Researcher
 import uuid
 from datetime import datetime
+
+# Define additional models for this blueprint
+class Week(db.Model):
+    __tablename__ = 'weeks'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    month = db.Column(db.Integer, nullable=False)
+    year = db.Column(db.Integer, nullable=False)
+    week_number = db.Column(db.Integer, nullable=False)
+    start_date = db.Column(db.Date)
+    end_date = db.Column(db.Date)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+class WeeklyScheduleNew(db.Model):
+    __tablename__ = 'weekly_schedule_new'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    project_name = db.Column(db.String(200), nullable=False)
+    researcher_name = db.Column(db.String(100))
+    week_id = db.Column(db.Integer, db.ForeignKey('weeks.id'), nullable=False)
+    title = db.Column(db.String(500), nullable=False)
+    description = db.Column(db.Text)
+    start_week_id = db.Column(db.Integer, db.ForeignKey('weeks.id'), nullable=False)
+    end_week_id = db.Column(db.Integer, db.ForeignKey('weeks.id'), nullable=False)
+    status = db.Column(db.String(50), default='계획')
+    priority = db.Column(db.String(50), default='보통')
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    
+    week = db.relationship('Week', foreign_keys=[week_id], backref='schedules')
+    start_week = db.relationship('Week', foreign_keys=[start_week_id])
+    end_week = db.relationship('Week', foreign_keys=[end_week_id])
 
 research_bp = Blueprint('research', __name__)
 
