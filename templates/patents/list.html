@@ -49,13 +49,11 @@
                         <td>{{ patent.inventors }}</td>
                         <td>{{ patent.patent_office }}</td>
                         <td>
-                            <button class="btn btn-sm btn-outline-info view-detail-btn" data-index="{{ loop.index0 }}" data-patent='{{ patent|tojson|escape }}' title="상세보기">
-                                <i class="fas fa-eye"></i>
-                            </button>
-                            <button class="btn btn-sm btn-outline-primary edit-patent-btn" data-index="{{ loop.index0 }}" data-patent='{{ patent|tojson|escape }}' title="수정">
+                            <!-- 상세보기 버튼 제거 -->
+                            <button class="btn btn-sm btn-outline-primary edit-patent-btn" data-id="{{ patent.id }}" data-patent='{{ patent|tojson|escape }}' title="수정">
                                 <i class="fas fa-edit"></i>
                             </button>
-                            <a href="{{ url_for('patents.delete_patent', index=loop.index0) }}" 
+                            <a href="{{ url_for('patents.delete_patent', patent_id=patent.id) }}" 
                                class="btn btn-sm btn-outline-danger" 
                                onclick="return confirm('정말 삭제하시겠습니까?')" title="삭제">
                                 <i class="fas fa-trash"></i>
@@ -121,19 +119,34 @@
                         </div>
                         <div class="col-md-6"></div>
                     </div>
-                    <div class="mb-3">
+                    <!-- Add Patent Modal 내 대표 발명자 -->
+                    <div class="mb-3 row g-2 align-items-center">
+                      <div class="col-6">
                         <label class="form-label">대표 발명자 *</label>
-                        <input type="text" class="form-control" name="main_inventor" required placeholder="대표 발명자명을 입력하세요">
+                        <input type="text" class="form-control form-control-sm" name="main_inventor" required placeholder="대표 발명자명">
+                      </div>
+                      <div class="col-3">
+                        <label class="form-label">지분율(%)</label>
+                        <input type="number" class="form-control form-control-sm" name="main_inventor_share" min="0" max="100" placeholder="지분율">
+                      </div>
                     </div>
+                    <!-- Add Patent Modal 내 공동 발명자 -->
                     <div class="mb-3">
-                        <label class="form-label">공동 발명자</label>
-                        <div id="coInventorsContainer">
-                            <div class="input-group mb-1 co-inventor-row">
-                                <input type="text" class="form-control" name="co_inventors" placeholder="공동 발명자명">
-                                <button type="button" class="btn btn-outline-danger btn-sm remove-co-inventor" tabindex="-1" style="display:none;">삭제</button>
-                            </div>
+                      <label class="form-label">공동 발명자</label>
+                      <div id="coInventorsContainer">
+                        <div class="row g-2 mb-1 co-inventor-row">
+                          <div class="col-6">
+                            <input type="text" class="form-control form-control-sm" name="co_inventors" placeholder="공동 발명자명">
+                          </div>
+                          <div class="col-3">
+                            <input type="number" class="form-control form-control-sm" name="co_inventors_share[]" min="0" max="100" placeholder="지분율(%)">
+                          </div>
+                          <div class="col-auto">
+                            <button type="button" class="btn btn-outline-danger btn-sm remove-co-inventor" tabindex="-1" style="display:none;">삭제</button>
+                          </div>
                         </div>
-                        <button type="button" class="btn btn-outline-primary btn-sm mt-1" id="addCoInventorBtn">+ 공동 발명자 추가</button>
+                      </div>
+                      <button type="button" class="btn btn-outline-primary btn-sm mt-1" id="addCoInventorBtn">+ 공동 발명자 추가</button>
                     </div>
                     <div class="mb-3">
                         <label class="form-label">설명</label>
@@ -205,16 +218,31 @@
                         </div>
                         <div class="col-md-6"></div>
                     </div>
-                    <div class="mb-3">
+                    <!-- Edit Patent Modal 내 대표 발명자 -->
+                    <div class="mb-3 row g-2 align-items-center">
+                      <div class="col-6">
                         <label class="form-label">대표 발명자 *</label>
-                        <input type="text" class="form-control" name="main_inventor" id="editMainInventor" required placeholder="대표 발명자명을 입력하세요">
+                        <input type="text" class="form-control form-control-sm" name="main_inventor" id="editMainInventor" required placeholder="대표 발명자명">
+                      </div>
+                      <div class="col-3">
+                        <label class="form-label">지분율(%)</label>
+                        <input type="number" class="form-control form-control-sm" name="main_inventor_share" id="editMainInventorShare" min="0" max="100" placeholder="지분율">
+                      </div>
                     </div>
+                    <!-- Edit Patent Modal 내 공동 발명자 -->
                     <div class="mb-3">
                         <label class="form-label">공동 발명자</label>
                         <div id="editCoInventorsContainer">
-                            <div class="input-group mb-1 co-inventor-row">
-                                <input type="text" class="form-control" name="co_inventors" placeholder="공동 발명자명">
-                                <button type="button" class="btn btn-outline-danger btn-sm remove-co-inventor" tabindex="-1" style="display:none;">삭제</button>
+                            <div class="row g-2 mb-1 co-inventor-row">
+                                <div class="col-6">
+                                    <input type="text" class="form-control form-control-sm" name="co_inventors" placeholder="공동 발명자명">
+                                </div>
+                                <div class="col-3">
+                                    <input type="number" class="form-control form-control-sm" name="co_inventors_share[]" min="0" max="100" placeholder="지분율(%)">
+                                </div>
+                                <div class="col-auto">
+                                    <button type="button" class="btn btn-outline-danger btn-sm remove-co-inventor" tabindex="-1" style="display:none;">삭제</button>
+                                </div>
                             </div>
                         </div>
                         <button type="button" class="btn btn-outline-primary btn-sm mt-1" id="editAddCoInventorBtn">+ 공동 발명자 추가</button>
@@ -237,104 +265,12 @@
     </div>
 </div>
 
-<!-- Patent Detail Modal -->
-<div class="modal fade" id="patentDetailModal" tabindex="-1">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">특허 상세정보</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <div class="row">
-                    <div class="col-md-12 mb-3">
-                        <label class="form-label fw-bold">특허명</label>
-                        <p id="detailTitle" class="form-control-plaintext"></p>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label fw-bold">출원번호</label>
-                        <p id="detailApplicationNumber" class="form-control-plaintext"></p>
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label fw-bold">등록번호</label>
-                        <p id="detailRegistrationNumber" class="form-control-plaintext"></p>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label fw-bold">출원일</label>
-                        <p id="detailApplicationDate" class="form-control-plaintext"></p>
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label fw-bold">상태</label>
-                        <p id="detailStatus" class="form-control-plaintext"></p>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label fw-bold">발명자</label>
-                        <p id="detailInventors" class="form-control-plaintext"></p>
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label fw-bold">특허청</label>
-                        <p id="detailPatentOffice" class="form-control-plaintext"></p>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-12 mb-3">
-                        <label class="form-label fw-bold">설명</label>
-                        <p id="detailDescription" class="form-control-plaintext"></p>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-12 mb-3">
-                        <label class="form-label fw-bold">관련 링크</label>
-                        <p id="detailLink" class="form-control-plaintext"></p>
-                    </div>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
-            </div>
-        </div>
-    </div>
-</div>
 {% endblock %}
 
 {% block extra_js %}
 <script>
-function viewPatentDetail(index, patent) {
-    document.getElementById('detailTitle').textContent = patent.title || '-';
-    document.getElementById('detailApplicationNumber').textContent = patent.application_number || '-';
-    document.getElementById('detailRegistrationNumber').textContent = patent.registration_number || '-';
-    document.getElementById('detailApplicationDate').textContent = patent.application_date || '-';
-    document.getElementById('detailStatus').innerHTML = `<span class="badge ${getStatusBadgeClass(patent.status)}">${patent.status || '-'}</span>`;
-    let main = patent.main_inventor || '';
-    let co = Array.isArray(patent.co_inventors) ? patent.co_inventors : (typeof patent.co_inventors === 'string' ? patent.co_inventors.split(',').map(s=>s.trim()).filter(Boolean) : []);
-    if (!main && patent.inventors) {
-      const arr = patent.inventors.split(',').map(s=>s.trim()).filter(Boolean);
-      main = arr[0] || '';
-      co = arr.slice(1);
-    }
-    let inventorsText = main;
-    if (co.length > 0) inventorsText += ' (공동: ' + co.join(', ') + ')';
-    document.getElementById('detailInventors').textContent = inventorsText || '-';
-    document.getElementById('detailPatentOffice').textContent = patent.patent_office || '-';
-    document.getElementById('detailDescription').textContent = patent.description || '-';
-    
-    if (patent.link) {
-        document.getElementById('detailLink').innerHTML = `<a href="${patent.link}" target="_blank">${patent.link}</a>`;
-    } else {
-        document.getElementById('detailLink').textContent = '-';
-    }
-    
-    new bootstrap.Modal(document.getElementById('patentDetailModal')).show();
-}
-
-function editPatent(index, patent) {
-    document.getElementById('editPatentForm').action = `/patents/update/${index}`;
+function editPatent(id, patent) {
+    document.getElementById('editPatentForm').action = `/patents/update/${id}`;
     document.getElementById('editTitle').value = patent.title || '';
     document.getElementById('editApplicationNumber').value = patent.application_number || '';
     document.getElementById('editRegistrationNumber').value = patent.registration_number || '';
@@ -354,8 +290,8 @@ function editPatent(index, patent) {
     if (co.length === 0) co = [''];
     co.forEach((name, idx) => {
       const row = document.createElement('div');
-      row.className = 'input-group mb-1 co-inventor-row';
-      row.innerHTML = `<input type="text" class="form-control" name="co_inventors" placeholder="공동 발명자명" value="${name}"><button type="button" class="btn btn-outline-danger btn-sm remove-co-inventor" tabindex="-1">삭제</button>`;
+      row.className = 'row g-2 mb-1 co-inventor-row';
+      row.innerHTML = `<div class="col-6"><input type="text" class="form-control form-control-sm" name="co_inventors" placeholder="공동 발명자명" value="${name}"></div><div class="col-3"><input type="number" class="form-control form-control-sm" name="co_inventors_share[]" min="0" max="100" placeholder="지분율(%)"></div><div class="col-auto"><button type="button" class="btn btn-outline-danger btn-sm remove-co-inventor" tabindex="-1">삭제</button></div>`;
       row.querySelector('.remove-co-inventor').onclick = function() { row.remove(); };
       editCoContainer.appendChild(row);
     });
@@ -390,8 +326,8 @@ document.addEventListener('DOMContentLoaded', function() {
     if (addBtn) {
         addBtn.onclick = function() {
             const row = document.createElement('div');
-            row.className = 'input-group mb-1 co-inventor-row';
-            row.innerHTML = `<input type="text" class="form-control" name="co_inventors" placeholder="공동 발명자명"><button type="button" class="btn btn-outline-danger btn-sm remove-co-inventor" tabindex="-1">삭제</button>`;
+            row.className = 'row g-2 mb-1 co-inventor-row';
+            row.innerHTML = `<div class="col-6"><input type="text" class="form-control form-control-sm" name="co_inventors" placeholder="공동 발명자명"></div><div class="col-3"><input type="number" class="form-control form-control-sm" name="co_inventors_share[]" min="0" max="100" placeholder="지분율(%)"></div><div class="col-auto"><button type="button" class="btn btn-outline-danger btn-sm remove-co-inventor" tabindex="-1">삭제</button></div>`;
             row.querySelector('.remove-co-inventor').onclick = function() { row.remove(); };
             coContainer.appendChild(row);
             updateRemoveBtnVisibility(coContainer);
@@ -412,8 +348,8 @@ document.addEventListener('DOMContentLoaded', function() {
     if (editAddBtn) {
         editAddBtn.onclick = function() {
             const row = document.createElement('div');
-            row.className = 'input-group mb-1 co-inventor-row';
-            row.innerHTML = `<input type="text" class="form-control" name="co_inventors" placeholder="공동 발명자명"><button type="button" class="btn btn-outline-danger btn-sm remove-co-inventor" tabindex="-1">삭제</button>`;
+            row.className = 'row g-2 mb-1 co-inventor-row';
+            row.innerHTML = `<div class="col-6"><input type="text" class="form-control form-control-sm" name="co_inventors" placeholder="공동 발명자명"></div><div class="col-3"><input type="number" class="form-control form-control-sm" name="co_inventors_share[]" min="0" max="100" placeholder="지분율(%)"></div><div class="col-auto"><button type="button" class="btn btn-outline-danger btn-sm remove-co-inventor" tabindex="-1">삭제</button></div>`;
             row.querySelector('.remove-co-inventor').onclick = function() { row.remove(); };
             editCoContainer.appendChild(row);
             updateRemoveBtnVisibility(editCoContainer);
@@ -421,19 +357,11 @@ document.addEventListener('DOMContentLoaded', function() {
         updateRemoveBtnVisibility(editCoContainer);
     }
 
-    document.querySelectorAll('.view-detail-btn').forEach(btn => {
-        btn.onclick = function() {
-            const idx = btn.getAttribute('data-index');
-            const patent = JSON.parse(btn.getAttribute('data-patent'));
-            viewPatentDetail(idx, patent);
-        };
-    });
-
     document.querySelectorAll('.edit-patent-btn').forEach(btn => {
         btn.onclick = function() {
-            const idx = btn.getAttribute('data-index');
+            const id = btn.getAttribute('data-id');
             const patent = JSON.parse(btn.getAttribute('data-patent'));
-            editPatent(idx, patent);
+            editPatent(id, patent);
         };
     });
 });

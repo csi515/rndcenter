@@ -7,6 +7,7 @@ import math
 import json
 import pandas as pd
 import io
+from database import db, PurchaseRequest, ProjectType
 
 purchasing_bp = Blueprint('purchasing', __name__)
 
@@ -62,139 +63,160 @@ for fname, fields in [
 
 @purchasing_bp.route('/requests')
 def purchase_requests():
-    req_df = csv_manager.read_csv(PURCHASE_CSV)
-    proj_df = csv_manager.read_csv(PROJECT_TYPE_CSV)
-    requests = req_df.to_dict('records') if not req_df.empty else []
-    project_types = proj_df['project_type'].tolist() if not proj_df.empty else []
-    return render_template('purchasing/requests.html', requests=requests, project_types=project_types)
+    requests = PurchaseRequest.query.order_by(PurchaseRequest.request_date.desc()).all()
+    requests_list = []
+    for r in requests:
+        requests_list.append({
+            'id': r.request_id,
+            'item': r.item_name,
+            'spec': getattr(r, 'spec', ''),
+            'item_number': getattr(r, 'item_number', ''),
+            'unit': getattr(r, 'unit', ''),
+            'project_type': getattr(r, 'project_type', ''),
+            'required_qty': r.quantity,
+            'safety_stock': getattr(r, 'safety_stock', 0),
+            'purchase_qty': r.quantity,
+            'unit_price': float(r.unit_price) if r.unit_price else 0,
+            'total_price': float(r.total_price) if r.total_price else 0,
+            'purchase_status': r.status,
+            'note': getattr(r, 'notes', ''),
+            'reason': getattr(r, 'reason', ''),
+            'requester': r.requester,
+            'request_date': r.request_date.strftime('%Y-%m-%d') if r.request_date else ''
+        })
+    # project_types는 별도 구현 필요
+    return render_template('purchasing/requests.html', requests=requests_list, project_types=[])
 
 @purchasing_bp.route('/requests/add', methods=['POST'])
 def add_purchase_request():
     try:
         data = request.json if request.is_json else request.form
         now = datetime.now()
-        
-        def safe_str(val):
-            """문자열 필드 안전 처리"""
-            if val is None or val == '' or (isinstance(val, float) and (math.isnan(val) or math.isinf(val))):
-                return ''
-            return str(val).strip()
-        
-        def safe_num(val):
-            """숫자 필드 안전 처리"""
-            try:
-                if val in [None, '', 'NaN', 'nan'] or (isinstance(val, float) and (math.isnan(val) or math.isinf(val))):
-                    return 0.0
-                num_val = float(val)
-                if math.isnan(num_val) or math.isinf(num_val):
-                    return 0.0
-                return num_val
-            except (ValueError, TypeError):
-                return 0.0
-        
-        # 모든 필드를 안전하게 처리
-        req = {
-            'id': str(uuid.uuid4()),
-            'item': safe_str(data.get('item','')),
-            'spec': safe_str(data.get('spec','')),
-            'item_number': safe_str(data.get('item_number','')),
-            'unit': safe_str(data.get('unit','')),
-            'project_type': safe_str(data.get('project_type','')),
-            'required_qty': safe_num(data.get('required_qty',0)),
-            'safety_stock': safe_num(data.get('safety_stock',0)),
-            'purchase_qty': safe_num(data.get('purchase_qty',0)),
-            'unit_price': safe_num(data.get('unit_price',0)),
-            'total_price': safe_num(data.get('purchase_qty',0)) * safe_num(data.get('unit_price',0)),
-            'purchase_status': safe_str(data.get('purchase_status','대기')),
-            'note': safe_str(data.get('note','')),
-            'reason': safe_str(data.get('reason','')),
-            'requester': safe_str(data.get('requester','')),
-            'request_date': now.strftime('%Y-%m-%d')
-        }
-        
-        # 디버깅: 서버에서 받은 데이터와 처리된 데이터 로그
-        print(f"받은 데이터: {data}")
-        print(f"처리된 데이터: {req}")
-        
-        csv_manager.append_to_csv(PURCHASE_CSV, req)
-        return safe_jsonify({'success': True, 'data': req})
-        
+        req = PurchaseRequest(
+            request_id=str(uuid.uuid4()),
+            item_name=data.get('item',''),
+            quantity=float(data.get('purchase_qty',0)),
+            unit_price=float(data.get('unit_price',0)),
+            total_price=float(data.get('purchase_qty',0)) * float(data.get('unit_price',0)),
+            status=data.get('purchase_status','대기'),
+            notes=data.get('note',''),
+            reason=data.get('reason',''),
+            requester=data.get('requester',''),
+            request_date=now.date()
+        )
+        db.session.add(req)
+        db.session.commit()
+        return safe_jsonify({'success': True, 'data': {
+            'id': req.request_id,
+            'item': req.item_name,
+            'purchase_qty': req.quantity,
+            'unit_price': float(req.unit_price) if req.unit_price else 0,
+            'total_price': float(req.total_price) if req.total_price else 0,
+            'purchase_status': req.status,
+            'note': req.notes,
+            'reason': req.reason,
+            'requester': req.requester,
+            'request_date': req.request_date.strftime('%Y-%m-%d') if req.request_date else ''
+        }})
     except Exception as e:
-        print(f"구매 요청 추가 에러: {str(e)}")
+        db.session.rollback()
         return safe_jsonify({'success': False, 'error': str(e)})
 
 @purchasing_bp.route('/requests/update/<req_id>', methods=['POST'])
 def update_purchase_request(req_id):
-    import pandas as pd
-    df = csv_manager.read_csv(PURCHASE_CSV)
-    idx = df.index[df['id']==req_id].tolist()
-    if not idx:
-        return safe_jsonify({'success': False, 'error': '해당 요청 없음'})
-    i = idx[0]
-    for k in PURCHASE_FIELDS:
-        if k in request.json:
-            df.at[i, k] = request.json[k]
-    df.at[i, 'total_price'] = float(df.at[i, 'purchase_qty']) * float(df.at[i, 'unit_price'])
-    csv_manager.write_csv(PURCHASE_CSV, df)
-    return safe_jsonify({'success': True})
+    try:
+        req = PurchaseRequest.query.filter_by(request_id=req_id).first()
+        if not req:
+            return safe_jsonify({'success': False, 'error': '해당 요청 없음'})
+        data = request.json if request.is_json else request.form
+        req.item_name = data.get('item', req.item_name)
+        req.quantity = float(data.get('purchase_qty', req.quantity))
+        req.unit_price = float(data.get('unit_price', req.unit_price))
+        req.total_price = req.quantity * req.unit_price
+        req.status = data.get('purchase_status', req.status)
+        req.notes = data.get('note', req.notes)
+        req.reason = data.get('reason', req.reason)
+        req.requester = data.get('requester', req.requester)
+        db.session.commit()
+        return safe_jsonify({'success': True})
+    except Exception as e:
+        db.session.rollback()
+        return safe_jsonify({'success': False, 'error': str(e)})
 
 @purchasing_bp.route('/requests/delete/<req_id>', methods=['POST'])
 def delete_purchase_request(req_id):
-    import pandas as pd
-    df = csv_manager.read_csv(PURCHASE_CSV)
-    df = df[df['id'] != req_id]
-    csv_manager.write_csv(PURCHASE_CSV, df)
-    return safe_jsonify({'success': True})
+    try:
+        req = PurchaseRequest.query.filter_by(request_id=req_id).first()
+        if req:
+            db.session.delete(req)
+            db.session.commit()
+        return safe_jsonify({'success': True})
+    except Exception as e:
+        db.session.rollback()
+        return safe_jsonify({'success': False, 'error': str(e)})
 
 @purchasing_bp.route('/requests/list', methods=['GET'])
 def list_purchase_requests():
-    df = csv_manager.read_csv(PURCHASE_CSV)
-    # 필터
+    query = PurchaseRequest.query
     item = request.args.get('item')
     spec = request.args.get('spec')
     requester = request.args.get('requester')
     project_type = request.args.get('project_type')
     if item:
-        df = df[df['item'].str.contains(item, na=False)]
-    if spec:
-        df = df[df['spec'].str.contains(spec, na=False)]
+        query = query.filter(PurchaseRequest.item_name.contains(item))
+    # spec, project_type 등은 모델에 필드가 있으면 추가
     if requester:
-        df = df[df['requester'].str.contains(requester, na=False)]
-    if project_type:
-        df = df[df['project_type'] == project_type]
-    return safe_jsonify(df.to_dict('records'))
+        query = query.filter(PurchaseRequest.requester.contains(requester))
+    # project_type 필드는 필요시 모델에 추가
+    results = query.all()
+    result_list = []
+    for r in results:
+        result_list.append({
+            'id': r.request_id,
+            'item': r.item_name,
+            'purchase_qty': r.quantity,
+            'unit_price': float(r.unit_price) if r.unit_price else 0,
+            'total_price': float(r.total_price) if r.total_price else 0,
+            'purchase_status': r.status,
+            'note': r.notes,
+            'reason': r.reason,
+            'requester': r.requester,
+            'request_date': r.request_date.strftime('%Y-%m-%d') if r.request_date else ''
+        })
+    return safe_jsonify(result_list)
 
 @purchasing_bp.route('/requests/summary', methods=['GET'])
 def purchase_summary():
-    df = csv_manager.read_csv(PURCHASE_CSV)
-    total_count = len(df)
-    total_price = df['total_price'].astype(float).sum() if not df.empty else 0
-    return safe_jsonify({'total_count': total_count, 'total_price': total_price})
+    total_count = PurchaseRequest.query.count()
+    total_price = db.session.query(db.func.sum(PurchaseRequest.total_price)).scalar() or 0
+    return safe_jsonify({'total_count': total_count, 'total_price': float(total_price)})
 
 # 국책과제 종류 관리
 @purchasing_bp.route('/project-types/list')
 def list_project_types():
-    df = csv_manager.read_csv(PROJECT_TYPE_CSV)
-    return safe_jsonify(df.to_dict('records'))
+    types = ProjectType.query.all()
+    result = []
+    for t in types:
+        result.append({'id': t.id, 'project_type': t.project_type})
+    return safe_jsonify(result)
 
 @purchasing_bp.route('/project-types/add', methods=['POST'])
 def add_project_type():
-    import pandas as pd
-    df = csv_manager.read_csv(PROJECT_TYPE_CSV)
     new_type = request.json.get('project_type')
-    if df['project_type'].eq(new_type).any():
+    if ProjectType.query.filter_by(project_type=new_type).first():
         return safe_jsonify({'success': False, 'error': '이미 존재하는 국책과제 종류입니다.'})
-    new_row = {'id': str(uuid.uuid4()), 'project_type': new_type}
-    df = pd.concat([df, pd.DataFrame([new_row])], ignore_index=True)
-    csv_manager.write_csv(PROJECT_TYPE_CSV, df)
-    return safe_jsonify({'success': True, 'data': new_row})
+    import uuid
+    t = ProjectType(id=str(uuid.uuid4()), project_type=new_type)
+    db.session.add(t)
+    db.session.commit()
+    return safe_jsonify({'success': True, 'data': {'id': t.id, 'project_type': t.project_type}})
 
 @purchasing_bp.route('/project-types/delete/<type_id>', methods=['POST'])
 def delete_project_type(type_id):
-    import pandas as pd
-    df = csv_manager.read_csv(PROJECT_TYPE_CSV)
-    df = df[df['id'] != type_id]
-    csv_manager.write_csv(PROJECT_TYPE_CSV, df)
+    t = ProjectType.query.filter_by(id=type_id).first()
+    if t:
+        db.session.delete(t)
+        db.session.commit()
     return safe_jsonify({'success': True})
 
 @purchasing_bp.route('/requests/toggle-status/<req_id>', methods=['POST'])

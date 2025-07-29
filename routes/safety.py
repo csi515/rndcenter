@@ -145,33 +145,32 @@ def accidents():
 
 @safety_bp.route('/api/accidents')
 def api_accidents():
-    """사고 목록 API (CSV 기반, NaN 안전 변환)"""
-    def safe_value(val):
-        if val is None:
-            return ''
-        if isinstance(val, float) and math.isnan(val):
-            return ''
-        return str(val)
+    """사고 목록 API (DB 기반)"""
     try:
-        df = csv_manager.read_csv('accidents.csv')
+        accidents = Accident.query.order_by(Accident.incident_date.desc()).all()
         accidents_list = []
-        if not df.empty:
-            for _, row in df.iterrows():
+        for accident in accidents:
                 accidents_list.append({
-                    'id': safe_value(row.get('id', '')),
-                    'incident_date': safe_value(row.get('incident_date', ''))[:10],
-                    'location': safe_value(row.get('location', '')),
-                    'involved_person': safe_value(row.get('involved_person', '')),
-                    'incident_type': safe_value(row.get('incident_type', '')),
-                    'severity': safe_value(row.get('severity', '')),
-                    'description': safe_value(row.get('description', '')),
-                    'immediate_action': safe_value(row.get('action_taken', '')),
-                    'follow_up': safe_value(row.get('cause', '')),
-                    'prevention': safe_value(row.get('prevention_measures', '')),
-                    'reporter': safe_value(row.get('reporter', '')),
-                    'status': safe_value(row.get('status', '')),
-                    'created_date': safe_value(row.get('created_date', '')),
-                    'documents': []
+                'id': accident.id,
+                'incident_date': accident.incident_date.strftime('%Y-%m-%d') if accident.incident_date else '',
+                'location': accident.location or '',
+                'involved_person': accident.involved_person or '',
+                'incident_type': accident.incident_type or '',
+                'severity': accident.severity or '',
+                'description': accident.description or '',
+                'immediate_action': accident.immediate_action or '',
+                'follow_up': accident.follow_up or '',
+                'prevention': accident.prevention or '',
+                'reporter': accident.reporter or '',
+                'status': accident.status or '',
+                'created_date': accident.created_date.strftime('%Y-%m-%d %H:%M:%S') if accident.created_date else '',
+                'documents': [
+                    {
+                        'id': doc.id,
+                        'title': doc.title,
+                        'url': doc.url
+                    } for doc in getattr(accident, 'documents', [])
+                ]
                 })
         return jsonify({
             'success': True,
@@ -319,26 +318,34 @@ def api_delete_accident_document(accident_id, document_id):
 
 @safety_bp.route('/accidents/add', methods=['POST'])
 def add_accident():
-    data = {
-        'id': datetime.now().strftime('%Y%m%d%H%M%S'),
-        'incident_date': request.form.get('incident_date'),
-        'location': request.form.get('location'),
-        'description': request.form.get('description'),
-        'severity': request.form.get('severity'),
-        'involved_person': request.form.get('involved_person'),
-        'cause': request.form.get('cause', ''),
-        'action_taken': request.form.get('action_taken', ''),
-        'prevention_measures': request.form.get('prevention_measures', ''),
-        'status': request.form.get('status', '조사중'),
-        'reporter': request.form.get('reporter'),
-        'created_date': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-    }
-    
-    if csv_manager.append_to_csv('accidents.csv', data):
+    try:
+        def parse_date(date_str):
+            if not date_str:
+                return None
+            try:
+                return datetime.strptime(date_str, '%Y-%m-%d').date()
+            except Exception:
+                return None
+        accident = Accident(
+            incident_date=parse_date(request.form.get('incident_date')),
+            location=request.form.get('location'),
+            involved_person=request.form.get('involved_person'),
+            incident_type=request.form.get('incident_type'),
+            severity=request.form.get('severity'),
+            description=request.form.get('description'),
+            immediate_action=request.form.get('immediate_action'),
+            follow_up=request.form.get('follow_up'),
+            prevention=request.form.get('prevention'),
+            reporter=request.form.get('reporter'),
+            status=request.form.get('status', '조사중'),
+            created_date=datetime.now()
+        )
+        db.session.add(accident)
+        db.session.commit()
         flash('사고 보고서가 성공적으로 등록되었습니다.', 'success')
-    else:
-        flash('사고 보고서 등록 중 오류가 발생했습니다.', 'error')
-    
+    except Exception as e:
+        db.session.rollback()
+        flash(f'사고 보고서 등록 중 오류가 발생했습니다: {str(e)}', 'error')
     return redirect(url_for('safety.accidents'))
 
 @safety_bp.route('/education')
@@ -449,3 +456,14 @@ def add_procedure():
         flash('작업절차서 추가 중 오류가 발생했습니다.', 'error')
     
     return redirect(url_for('safety.procedures'))
+
+@safety_bp.route('/procedures/delete/<int:procedure_id>', methods=['POST'])
+def delete_procedure(procedure_id):
+    try:
+        procedure = SafetyProcedure.query.get_or_404(procedure_id)
+        db.session.delete(procedure)
+        db.session.commit()
+        return jsonify({'success': True, 'message': '절차서가 삭제되었습니다.'})
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'message': f'삭제 중 오류: {str(e)}'})

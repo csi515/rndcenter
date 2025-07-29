@@ -160,10 +160,14 @@ function showEventDetails(event) {
     };
     
     const formatTime = (date) => {
-        return date.toLocaleTimeString('ko-KR', {
-            hour: '2-digit',
-            minute: '2-digit'
-        });
+        let hour = date.getHours();
+        let minute = date.getMinutes();
+        let period = hour < 12 ? '오전' : '오후';
+        let displayHour = hour % 12;
+        if (displayHour === 0) displayHour = 12;
+        let result = `${period} ${displayHour}시`;
+        if (minute !== 0) result += ` ${minute}분`;
+        return result;
     };
     
     const isAllDay = event.allDay || 

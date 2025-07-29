@@ -5,7 +5,14 @@ from werkzeug.middleware.proxy_fix import ProxyFix
 from database import db, init_db
 
 # Configure logging
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s %(levelname)s %(name)s %(message)s',
+    handlers=[
+        logging.FileHandler('app.log', encoding='utf-8'),
+        logging.StreamHandler()
+    ]
+)
 
 # Create the app
 app = Flask(__name__)
@@ -13,7 +20,10 @@ app.secret_key = os.environ.get("SESSION_SECRET", "dev-secret-key-for-rd-center"
 app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
 
 # Configure the database
-app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DATABASE_URL", "sqlite:///rd_center.db")
+app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get(
+    "DATABASE_URL",
+    "postgresql://username:password@172.28.12.47:5987/dbname"
+)
 app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
     "pool_recycle": 300,
     "pool_pre_ping": True,
@@ -34,6 +44,7 @@ from routes.purchasing import purchasing_bp
 from routes.communication import communication_bp
 from routes.external import external_bp
 from routes.chemical import chemical_bp
+from routes.coal_tar_pitch_log import coal_log_bp
 
 app.register_blueprint(dashboard_bp, url_prefix='/')
 app.register_blueprint(research_bp, url_prefix='/research')
@@ -45,6 +56,7 @@ app.register_blueprint(purchasing_bp, url_prefix='/purchasing')
 app.register_blueprint(communication_bp, url_prefix='/communication')
 app.register_blueprint(external_bp, url_prefix='/external')
 app.register_blueprint(chemical_bp, url_prefix='/chemical')
+app.register_blueprint(coal_log_bp, url_prefix='/')
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    app.run(host='172.28.12.68', port=8002, debug=False)

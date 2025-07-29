@@ -4,36 +4,68 @@
 
 {% block content %}
 <div class="container-fluid py-3">
-  <div class="d-flex justify-content-between align-items-center mb-3">
-    <h2 class="mb-0"><i class="fas fa-clipboard-list"></i> 구매 요청 내역</h2>
-    <div class="d-flex gap-2">
-      <button class="btn btn-primary" id="openRequestModalBtn"><i class="fas fa-plus"></i> 신규 구매 요청</button>
-    </div>
-  </div>
-  <div class="card shadow-sm">
-    <div class="card-header bg-secondary text-white d-flex flex-wrap justify-content-between align-items-center">
-      <div class="d-flex gap-2 flex-wrap">
-        <input type="text" class="form-control form-control-sm" placeholder="품목명" id="filterItem" style="width:130px;">
-        <input type="text" class="form-control form-control-sm" placeholder="요청자 이름" id="filterRequester" style="width:110px;">
-        <select class="form-select form-select-sm" id="filterProjectType" style="width:130px;">
-          <option value="">국책과제</option>
-        </select>
+  <div class="row">
+    <div class="col-md-4 mb-3">
+      <h5 class="fw-bold text-primary mb-2"><i class="fas fa-boxes"></i> 품목 관리</h5>
+      <div class="card shadow-sm h-100">
+        <div class="card-header bg-primary text-white d-flex flex-wrap justify-content-end align-items-center">
+          <div class="d-flex gap-2 align-items-center flex-wrap">
+            <input type="text" class="form-control form-control-sm" placeholder="품목명" id="inventoryFilterName" style="width:110px; min-width:80px;">
+            <input type="text" class="form-control form-control-sm" placeholder="사양" id="inventoryFilterSpec" style="width:110px; min-width:80px;">
+            <input type="text" class="form-control form-control-sm" placeholder="품목 번호" id="inventoryFilterId" style="width:110px; min-width:80px;">
+            <button class="btn btn-primary btn-sm d-flex align-items-center border border-white" id="addInventoryBtn" style="height:32px; border-width:2px !important;"><i class="fas fa-plus"></i></button>
+          </div>
+        </div>
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0" id="inventoryTable" style="border-radius: 0.5rem; overflow: hidden;">
+              <thead class="table-light">
+                <tr style="background:#007bff; color:#fff;">
+                  <th class="text-center" style="min-width:90px;">품목</th>
+                  <th class="text-center" style="min-width:90px;">사양</th>
+                  <th class="text-center" style="min-width:90px;">품목 번호</th>
+                  <th class="text-center" style="min-width:90px;">안전재고</th>
+                  <th class="text-center" style="width:60px;"></th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+        <div class="card-footer d-flex justify-content-between align-items-center">
+          <div><span id="inventoryCount">총 <span id="inventoryCountNum">0</span>건</span></div>
+        </div>
       </div>
     </div>
-    <div class="card-body p-0">
-      <div class="table-responsive">
-        <table class="table table-hover align-middle mb-0" id="requestTable">
-          <thead class="table-light">
-            <tr>
-              <th data-sort="item">품목</th><th data-sort="spec">사양</th><th data-sort="item_number">품목번호</th><th data-sort="unit">단위</th><th data-sort="project_type">국책과제</th><th data-sort="purchase_qty">구매수량</th><th data-sort="unit_price">단가</th><th data-sort="total_price">총가격</th><th data-sort="note">비고</th><th data-sort="reason">사유</th><th data-sort="requester">요청자</th><th data-sort="request_date">요청일</th><th data-sort="purchase_status">구매여부</th><th></th>
-            </tr>
-          </thead>
-          <tbody></tbody>
-        </table>
+    <div class="col-md-8">
+      <h5 class="fw-bold text-primary mb-2"><i class="fas fa-clipboard-list"></i> 구매 요청 내역</h5>
+      <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white d-flex flex-wrap justify-content-end align-items-center">
+          <div class="d-flex gap-2 align-items-center flex-wrap">
+            <input type="text" class="form-control form-control-sm" placeholder="품목명" id="filterItem" style="width:110px; min-width:80px;">
+            <input type="text" class="form-control form-control-sm" placeholder="요청자 이름" id="filterRequester" style="width:110px; min-width:80px;">
+            <select class="form-select form-select-sm" id="filterProjectType" style="width:110px; min-width:80px;">
+              <option value="">국책과제</option>
+            </select>
+            <button class="btn btn-primary btn-sm d-flex align-items-center border border-white" id="openRequestModalBtn" style="height:32px; border-width:2px !important;"><i class="fas fa-plus"></i></button>
+          </div>
+        </div>
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0" id="requestTable">
+              <thead class="table-light">
+                <tr>
+                  <th data-sort="item">품목</th><th data-sort="spec">사양</th><th data-sort="item_number">품목번호</th><th data-sort="unit">단위</th><th data-sort="project_type">국책과제</th><th data-sort="purchase_qty">구매수량</th><th data-sort="unit_price">단가</th><th data-sort="total_price">총가격</th><th data-sort="note">비고</th><th data-sort="reason">사유</th><th data-sort="requester">요청자</th><th data-sort="request_date">요청일</th><th data-sort="purchase_status">구매여부</th><th></th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+        <div class="card-footer d-flex justify-content-between align-items-center">
+          <div><span id="totalCount">총 0건</span></div>
+        </div>
       </div>
-    </div>
-    <div class="card-footer d-flex justify-content-between align-items-center">
-      <div><span id="totalCount">총 0건</span></div>
     </div>
   </div>
 </div>
@@ -134,6 +166,78 @@
           <input type="text" class="form-control" id="newProjectType" placeholder="새 국책과제 종류 입력">
           <button class="btn btn-outline-primary" id="addProjectTypeBtn"><span class="me-1">➕</span>추가</button>
         </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- 품목 추가 모달 -->
+<div class="modal fade" id="inventoryModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">품목 추가</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <form id="inventoryForm">
+          <div class="mb-3">
+            <label class="form-label">품목명 *</label>
+            <input type="text" class="form-control" name="name" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">사양</label>
+            <input type="text" class="form-control" name="spec">
+          </div>
+          <div class="mb-3">
+            <label class="form-label">품목 번호</label>
+            <input type="text" class="form-control" name="item_id">
+          </div>
+          <div class="mb-3">
+            <label class="form-label">안전재고</label>
+            <input type="number" class="form-control" name="min_quantity" min="0" value="0">
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+        <button type="submit" class="btn btn-primary" id="submitInventoryBtn">저장</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- 품목 상세/수정 모달 -->
+<div class="modal fade" id="inventoryEditModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">품목 상세/수정</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <form id="inventoryEditForm">
+          <input type="hidden" name="id">
+          <div class="mb-3">
+            <label class="form-label">품목명 *</label>
+            <input type="text" class="form-control" name="name" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">사양</label>
+            <input type="text" class="form-control" name="spec">
+          </div>
+          <div class="mb-3">
+            <label class="form-label">품목 번호</label>
+            <input type="text" class="form-control" name="item_id">
+          </div>
+          <div class="mb-3">
+            <label class="form-label">안전재고</label>
+            <input type="number" class="form-control" name="min_quantity" min="0" value="0">
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger" id="deleteInventoryBtn">삭제</button>
+        <button type="submit" class="btn btn-primary" id="saveInventoryBtn">저장</button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
       </div>
     </div>
   </div>

@@ -95,9 +95,6 @@
                             <button class="btn btn-sm btn-outline-primary" onclick="editProcedure({{ procedure.id }})" title="수정">
                                 <i class="fas fa-edit"></i>
                             </button>
-                            <button class="btn btn-sm btn-outline-info" onclick="viewProcedure({{ procedure|tojson }})" title="상세보기">
-                                <i class="fas fa-eye"></i>
-                            </button>
                         </td>
                     </tr>
                     {% endfor %}
@@ -262,6 +259,7 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
                     <button type="submit" class="btn btn-primary">수정 완료</button>
+                    <button type="button" class="btn btn-danger ms-auto" id="deleteProcedureBtn">삭제</button>
                 </div>
             </form>
         </div>
@@ -362,6 +360,44 @@ document.getElementById('categoryFilter').addEventListener('change', function() 
             row.style.display = 'none';
         }
     });
+});
+
+// 절차서 삭제 기능
+// 삭제 버튼 클릭 시 확인 후 삭제 요청
+
+document.addEventListener('DOMContentLoaded', function() {
+    const deleteBtn = document.getElementById('deleteProcedureBtn');
+    if (deleteBtn) {
+        deleteBtn.onclick = function() {
+            const procedureId = document.getElementById('editProcedureId').value;
+            if (!procedureId) {
+                alert('삭제할 절차서 ID를 찾을 수 없습니다.');
+                return;
+            }
+            if (confirm('정말로 이 절차서를 삭제하시겠습니까?')) {
+                fetch(`/safety/procedures/delete/${procedureId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: JSON.stringify({})
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('절차서가 삭제되었습니다.');
+                        location.reload();
+                    } else {
+                        alert('삭제 중 오류: ' + (data.message || '')); 
+                    }
+                })
+                .catch(err => {
+                    alert('삭제 요청 중 오류 발생: ' + err);
+                });
+            }
+        };
+    }
 });
 </script>
 {% endblock %}

@@ -38,10 +38,11 @@
                         <td>{{ researcher.position }}</td>
                         <td>
                             <button class="btn btn-sm btn-outline-primary" 
-                                    onclick="editResearcher({{ loop.index0 }}, '{{ researcher.name|e }}', '{{ researcher.email|e }}', '{{ researcher.position|e }}')">
+                                    onclick="editResearcher({{ researcher.id }}, '{{ researcher.name|e }}', '{{ researcher.email|e }}', '{{ researcher.position|e }}')">
                                 <i class="fas fa-edit"></i>
                             </button>
-                            <button class="btn btn-sm btn-outline-danger" onclick="deleteResearcher({{ loop.index0 }}, '{{ researcher.name|e }}')">
+                            <button class="btn btn-sm btn-outline-danger"
+                                    onclick="deleteResearcher({{ researcher.id }}, '{{ researcher.name|e }}')">
                                 <i class="fas fa-trash"></i>
                             </button>
                         </td>
@@ -124,8 +125,8 @@
 
 {% block extra_js %}
 <script>
-function editResearcher(index, name, email, position) {
-    document.getElementById('editResearcherForm').action = `/research/researchers/update/${index}`;
+function editResearcher(id, name, email, position) {
+    document.getElementById('editResearcherForm').action = `/research/researchers/update/${id}`;
     document.getElementById('editName').value = name || '';
     document.getElementById('editEmail').value = email || '';
     document.getElementById('editPosition').value = position || '';
@@ -133,9 +134,9 @@ function editResearcher(index, name, email, position) {
     new bootstrap.Modal(document.getElementById('editResearcherModal')).show();
 }
 
-function deleteResearcher(index, name) {
+function deleteResearcher(id, name) {
     if (confirm(`정말로 "${name}" 연구원을 삭제하시겠습니까?`)) {
-        fetch(`/research/researchers/delete/${index}`, {
+        fetch(`/research/researchers/delete/${id}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

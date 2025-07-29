@@ -30,15 +30,11 @@
                             <p class="card-text">{{ post.content[:100] }}{% if post.content|length > 100 %}...{% endif %}</p>
                             <small class="text-muted">
                                 <i class="fas fa-user"></i> {{ post.author }} 
-                                <i class="fas fa-clock ms-3"></i> {{ post.created_date }}
+                                <i class="fas fa-clock ms-3"></i> {{ post.created_date.strftime('%Y-%m-%d %H:%M') if post.created_date else '' }}
                                 <i class="fas fa-eye ms-3"></i> {{ post.views }}회
                             </small>
                         </div>
-                        <div class="ms-3">
-                            <button class="btn btn-sm btn-outline-primary" onclick="viewPost({{ post|tojson }})">
-                                <i class="fas fa-eye"></i> 보기
-                            </button>
-                        </div>
+                        {# '보기' 버튼 영역 완전 삭제 #}
                     </div>
                 </div>
             </div>

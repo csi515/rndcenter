@@ -7,11 +7,27 @@ class Base(DeclarativeBase):
 
 db = SQLAlchemy(model_class=Base)
 
+def ensure_project_participants_column():
+    """participants 컬럼이 없으면 자동으로 추가 (PostgreSQL, SQLite 지원)"""
+    from sqlalchemy import inspect, text
+    engine = db.get_engine()
+    insp = inspect(engine)
+    columns = [col['name'] for col in insp.get_columns('projects')]
+    if 'participants' not in columns:
+        with engine.connect() as conn:
+            # DB 종류에 따라 쿼리 분기
+            if engine.dialect.name == 'postgresql':
+                conn.execute(text('ALTER TABLE projects ADD COLUMN participants TEXT'))
+            elif engine.dialect.name == 'sqlite':
+                conn.execute(text('ALTER TABLE projects ADD COLUMN participants TEXT'))
+            # 필요시 다른 DBMS도 추가
+
 def init_db(app):
     """Initialize database with app context"""
     db.init_app(app)
     with app.app_context():
         db.create_all()
+        ensure_project_participants_column()
 
 class Project(db.Model):
     __tablename__ = 'projects'
@@ -27,6 +43,7 @@ class Project(db.Model):
     budget = db.Column(db.Numeric(15, 2))
     status = db.Column(db.String(50), default='진행중')
     progress = db.Column(db.Integer, default=0)
+    participants = db.Column(db.Text)  # 추가: 참여자 정보
     created_date = db.Column(db.DateTime, default=datetime.utcnow)
     updated_date = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
@@ -163,6 +180,7 @@ class UsageLog(db.Model):
     start_time = db.Column(db.Time)
     end_time = db.Column(db.Time)
     purpose = db.Column(db.String(500))
+    notes = db.Column(db.Text)
     condition_before = db.Column(db.String(200))
     condition_after = db.Column(db.String(200))
     issues = db.Column(db.Text)
@@ -181,6 +199,7 @@ class InventoryItem(db.Model):
     min_quantity = db.Column(db.Integer, default=0)
     supplier = db.Column(db.String(200))
     unit_price = db.Column(db.Numeric(10, 2))
+    purchase_date = db.Column(db.Date)  # 추가
     expiry_date = db.Column(db.Date)
     lot_number = db.Column(db.String(100))
     storage_condition = db.Column(db.String(200))
@@ -221,6 +240,7 @@ class Communication(db.Model):
     question_type = db.Column(db.String(100))
     urgency = db.Column(db.String(50))
     created_date = db.Column(db.DateTime, default=datetime.utcnow)
+    answer = db.Column(db.Text)
 
 class Contact(db.Model):
     __tablename__ = 'contacts'
@@ -380,5 +400,41 @@ class SafetyMaterial(db.Model):
     title = db.Column(db.String(500), nullable=False)
     content = db.Column(db.Text, nullable=False)
     link = db.Column(db.String(1000))
+    created_date = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_date = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+class ProjectType(db.Model):
+    __tablename__ = 'project_types'
+    id = db.Column(db.String(50), primary_key=True)
+    project_type = db.Column(db.String(200), unique=True, nullable=False)
+
+class InventoryTransaction(db.Model):
+    __tablename__ = 'inventory_transactions'
+    id = db.Column(db.String(50), primary_key=True)
+    item_id = db.Column(db.String(50), db.ForeignKey('inventory.item_id'), nullable=False)
+    item_name = db.Column(db.String(200), nullable=False)
+    transaction_type = db.Column(db.String(50))  # 입고/출고
+    quantity = db.Column(db.Integer)
+    before_quantity = db.Column(db.Integer)
+    after_quantity = db.Column(db.Integer)
+    user = db.Column(db.String(100))
+    notes = db.Column(db.Text)
+    transaction_date = db.Column(db.DateTime, default=datetime.utcnow)
+
+class CoalTarPitchLog(db.Model):
+    __tablename__ = 'coal_tar_pitch_logs'
+    id = db.Column(db.Integer, primary_key=True)
+    user = db.Column(db.String(100), nullable=False)  # 사용자(작업자 이름)
+    material = db.Column(db.String(100), default='콜타르피치 휘발물', nullable=False)  # 사용 물질
+    used_at = db.Column(db.DateTime, nullable=False)  # 사용 일시
+    location = db.Column(db.String(200))  # 작업 장소
+    work_content = db.Column(db.String(200))  # 작업 내용
+    amount = db.Column(db.String(100))  # 사용량(단위 포함)
+    ppe = db.Column(db.Boolean, default=False)  # 보호구 착용 여부
+    process_condition = db.Column(db.String(200))  # 공정 조건
+    exposure_reaction = db.Column(db.String(200))  # 유해 노출 반응
+    action_note = db.Column(db.String(200))  # 조치 및 비고
+    writer = db.Column(db.String(100))  # 작성자
+    manager_sign = db.Column(db.String(100))  # 관리자 서명
     created_date = db.Column(db.DateTime, default=datetime.utcnow)
     updated_date = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)

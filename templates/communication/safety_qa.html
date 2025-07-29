@@ -76,18 +76,24 @@
                                 </span>
                             </div>
                             <p class="card-text">{{ post.content[:100] }}{% if post.content|length > 100 %}...{% endif %}</p>
+                            {%- if post.answer is not none %}
+                            <div class="alert alert-success mt-2 mb-0 p-2">
+                                <strong>답변:</strong> <span id="answer-content-{{ post.id }}">{{ post.answer }}</span>
+                                <button class="btn btn-sm btn-outline-secondary ms-2" onclick="openEditAnswerModal({{ post.id }}, {{ post.answer|tojson }})">수정</button>
+                            </div>
+                            {%- endif %}
                             <small class="text-muted">
                                 <i class="fas fa-user"></i> {{ post.author }} 
-                                <i class="fas fa-clock ms-3"></i> {{ post.created_date }}
+                                <i class="fas fa-clock ms-3"></i> {{ post.created_date.strftime('%Y-%m-%d %H:%M') if post.created_date else '' }}
                                 <i class="fas fa-eye ms-3"></i> {{ post.views }}회
                             </small>
                         </div>
                         <div class="ms-3">
-                            <button class="btn btn-sm btn-outline-primary" onclick="viewQuestion({{ post|tojson }})">
+                            <button class="btn btn-sm btn-outline-primary" data-post='{{ posts_json[loop.index0]|tojson }}' onclick="viewQuestion(JSON.parse(this.dataset.post))">
                                 <i class="fas fa-eye"></i> 보기
                             </button>
                             {% if post.status == '답변대기' %}
-                            <button class="btn btn-sm btn-outline-success">
+                            <button class="btn btn-sm btn-outline-success" onclick="openAnswerModal({{ post.id }})">
                                 <i class="fas fa-reply"></i> 답변
                             </button>
                             {% endif %}
@@ -244,6 +250,48 @@
         </div>
     </div>
 </div>
+
+<!-- Answer Modal -->
+<div class="modal fade" id="answerModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form id="answerForm">
+        <div class="modal-header">
+          <h5 class="modal-title">답변 작성</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <textarea class="form-control" name="answer" id="answerText" rows="5" required placeholder="답변 내용을 입력하세요"></textarea>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+          <button type="submit" class="btn btn-success">답변 등록</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Answer Modal -->
+<div class="modal fade" id="editAnswerModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form id="editAnswerForm">
+        <div class="modal-header">
+          <h5 class="modal-title">답변 수정</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <textarea class="form-control" name="edit_answer" id="editAnswerText" rows="5" required></textarea>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+          <button type="submit" class="btn btn-primary">수정 저장</button>
+        </div>
+      </form>
+        </div>
+    </div>
+</div>
 {% endblock %}
 
 {% block extra_js %}
@@ -261,7 +309,7 @@ function viewQuestion(post) {
         <br><br>
         <small class="text-muted">
             <i class="fas fa-user"></i> ${post.author} 
-            <i class="fas fa-clock ms-3"></i> ${post.created_date}
+            <i class="fas fa-clock ms-3"></i> ${post.created_date ? post.created_date : ''}
             <i class="fas fa-eye ms-3"></i> ${post.views}회
         </small>
     `;
@@ -269,6 +317,68 @@ function viewQuestion(post) {
     
     new bootstrap.Modal(document.getElementById('viewQuestionModal')).show();
 }
+
+let currentAnswerPostId = null;
+function openAnswerModal(postId) {
+    currentAnswerPostId = postId;
+    document.getElementById('answerText').value = '';
+    new bootstrap.Modal(document.getElementById('answerModal')).show();
+}
+
+document.getElementById('answerForm').onsubmit = function(e) {
+    e.preventDefault();
+    const answer = document.getElementById('answerText').value;
+    if (!answer.trim()) {
+        alert('답변 내용을 입력하세요.');
+        return;
+    }
+    fetch(`/communication/safety_qa/answer/${currentAnswerPostId}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ answer })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            alert('답변이 등록되었습니다.');
+            location.reload();
+        } else {
+            alert('답변 등록 중 오류가 발생했습니다.');
+        }
+    })
+    .catch(() => alert('서버 오류가 발생했습니다.'));
+};
+
+let currentEditAnswerPostId = null;
+function openEditAnswerModal(postId, answer) {
+    currentEditAnswerPostId = postId;
+    document.getElementById('editAnswerText').value = answer;
+    new bootstrap.Modal(document.getElementById('editAnswerModal')).show();
+}
+
+document.getElementById('editAnswerForm').onsubmit = function(e) {
+    e.preventDefault();
+    const answer = document.getElementById('editAnswerText').value;
+    if (!answer.trim()) {
+        alert('답변 내용을 입력하세요.');
+        return;
+    }
+    fetch(`/communication/safety_qa/answer/${currentEditAnswerPostId}/edit`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ answer })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            alert('답변이 수정되었습니다.');
+            location.reload();
+        } else {
+            alert('답변 수정 중 오류가 발생했습니다.');
+        }
+    })
+    .catch(() => alert('서버 오류가 발생했습니다.'));
+};
 
 // Type filter
 document.querySelectorAll('input[name="typeFilter"]').forEach(radio => {

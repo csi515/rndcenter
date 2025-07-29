@@ -50,11 +50,19 @@
                     </div>
                     <div class="form-group mb-3">
                         <label class="form-label">시작 시간 *</label>
-                        <input type="time" class="form-control" id="reservationStartTime" required>
+                        <select class="form-control" id="reservationStartTime" required>
+                            {% for h in range(0,24) %}{% for m in (0,30) %}
+                                <option value="{{'%02d:%02d' % (h, m)}}">{{'%02d:%02d' % (h, m)}}</option>
+                            {% endfor %}{% endfor %}
+                        </select>
                     </div>
                     <div class="form-group mb-3">
                         <label class="form-label">종료 시간 *</label>
-                        <input type="time" class="form-control" id="reservationEndTime" required>
+                        <select class="form-control" id="reservationEndTime" required>
+                            {% for h in range(0,24) %}{% for m in (0,30) %}
+                                <option value="{{'%02d:%02d' % (h, m)}}">{{'%02d:%02d' % (h, m)}}</option>
+                            {% endfor %}{% endfor %}
+                        </select>
                     </div>
                     <div class="form-group mb-3">
                         <label class="form-label">사용 목적 *</label>
@@ -94,7 +102,7 @@ function loadReservationCalendar() {
     
     calendar = new FullCalendar.Calendar(calendarEl, {
         initialView: 'dayGridMonth',
-        locale: 'en',
+        locale: 'ko',
         headerToolbar: {
             left: 'prev,next today',
             center: 'title',
@@ -153,29 +161,35 @@ function openNewReservationModal(start, end) {
     document.getElementById('reservationForm').reset();
     document.getElementById('reservationId').value = '';
     document.getElementById('deleteReservationBtn').style.display = 'none';
-    
-    document.getElementById('reservationDate').value = start.toISOString().split('T')[0];
-    document.getElementById('reservationStartTime').value = start.toTimeString().slice(0, 5);
-    if (end) {
-        document.getElementById('reservationEndTime').value = end.toTimeString().slice(0, 5);
+
+    const localDate = new Date(start.getTime() - (start.getTimezoneOffset() * 60000));
+    document.getElementById('reservationDate').value = localDate.toISOString().split('T')[0];
+
+    // 30분 단위로 반올림
+    function roundTo30(date) {
+      let h = date.getHours();
+      let m = date.getMinutes();
+      m = m < 30 ? 0 : 30;
+      return ('0'+h).slice(-2) + ':' + ('0'+m).slice(-2);
     }
-    
+    document.getElementById('reservationStartTime').value = roundTo30(start);
+    if (end) {
+        document.getElementById('reservationEndTime').value = roundTo30(end);
+    }
     new bootstrap.Modal(document.getElementById('reservationModal')).show();
 }
 
 function openEditReservationModal(reservation) {
     document.getElementById('reservationModalTitle').textContent = '장비 예약 수정';
     document.getElementById('reservationId').value = reservation.id;
-    document.getElementById('reservationEquipment').value = reservation.equipment_name;
+    document.getElementById('reservationEquipment').value = reservation.equipment_id;
     document.getElementById('reservationReserver').value = reservation.reserver;
     document.getElementById('reservationDate').value = reservation.start_date;
     document.getElementById('reservationStartTime').value = reservation.start_time;
     document.getElementById('reservationEndTime').value = reservation.end_time;
     document.getElementById('reservationPurpose').value = reservation.purpose;
     document.getElementById('reservationNotes').value = reservation.notes || '';
-    
     document.getElementById('deleteReservationBtn').style.display = 'inline-block';
-    
     new bootstrap.Modal(document.getElementById('reservationModal')).show();
 }
 

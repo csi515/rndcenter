@@ -60,10 +60,10 @@
                         <td>{{ project.participants }}</td>
                         <td>
                             <button class="btn btn-sm btn-outline-primary" 
-                                    onclick="editProject({{ loop.index0 }}, '{{ project.name|e }}', '{{ project.description|e }}', '{{ project.start_date|e }}', '{{ project.end_date|e }}', '{{ project.status|e }}', '{{ project.participants|e }}')">
+                                    onclick="editProject({{ project.id }}, '{{ project.name|e }}', '{{ project.description|e }}', '{{ project.start_date|e }}', '{{ project.end_date|e }}', '{{ project.status|e }}', '{{ project.participants|e }}')">
                                 <i class="fas fa-edit"></i>
                             </button>
-                            <a href="{{ url_for('research.delete_project', index=loop.index0) }}" 
+                            <a href="{{ url_for('research.delete_project', project_id=project.id) }}" 
                                class="btn btn-sm btn-outline-danger" 
                                onclick="return confirm('정말 삭제하시겠습니까?')">
                                 <i class="fas fa-trash"></i>
@@ -184,8 +184,8 @@
 
 {% block extra_js %}
 <script>
-function editProject(index, name, description, startDate, endDate, status, participants) {
-    document.getElementById('editProjectForm').action = `/research/projects/update/${index}`;
+function editProject(id, name, description, startDate, endDate, status, participants) {
+    document.getElementById('editProjectForm').action = `/research/projects/update/${id}`;
     document.getElementById('editName').value = name || '';
     document.getElementById('editDescription').value = description || '';
     document.getElementById('editStartDate').value = startDate || '';

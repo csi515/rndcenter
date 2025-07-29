@@ -962,9 +962,12 @@ document.getElementById('simpleScheduleSaveBtn').onclick = function() {
     loadScheduleDataAndRender();
     bootstrap.Modal.getInstance(document.getElementById('simpleScheduleModal')).hide();
     document.activeElement.blur();
-    if (data.success) {
-      alert('저장되었습니다.');
-    } else {
+    // if (data.success) {
+    //   alert('저장되었습니다.');
+    // } else {
+    //   alert('저장 중 오류: ' + data.message);
+    // }
+    if (!data.success) {
       alert('저장 중 오류: ' + data.message);
     }
   });

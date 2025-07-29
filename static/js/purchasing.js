@@ -179,8 +179,8 @@ function renderTable() {
     const td = document.createElement('td');
     td.innerHTML = `
       <div class="action-btns">
-        <button class="btn btn-sm btn-outline-primary me-1" onclick="editRequest('${req.id}')">수정</button>
-        <button class="btn btn-sm btn-outline-danger" onclick="deleteRequest('${req.id}')">삭제</button>
+        <button class="btn btn-sm btn-outline-primary me-1" onclick="editRequest('${req.id}')" title="수정"><i class="fas fa-edit"></i></button>
+        <button class="btn btn-sm btn-outline-danger" onclick="deleteRequest('${req.id}')" title="삭제"><i class="fas fa-trash-alt"></i></button>
       </div>
     `;
     tr.appendChild(td);
@@ -195,10 +195,163 @@ function updateSummary() {
   document.getElementById('totalPrice').textContent = `총액: ${sum.toLocaleString()}원`;
 }
 
+// 품목 행 클릭 시 상세/수정 모달 오픈
+function bindInventoryRowClick() {
+  document.querySelectorAll('#inventoryTable tbody tr').forEach(tr => {
+    tr.onclick = function() {
+      const cells = tr.children;
+      const id = tr.getAttribute('data-id');
+      document.querySelector('#inventoryEditForm [name="id"]').value = id;
+      document.querySelector('#inventoryEditForm [name="name"]').value = cells[0].textContent.trim();
+      document.querySelector('#inventoryEditForm [name="spec"]').value = cells[1].textContent.trim();
+      document.querySelector('#inventoryEditForm [name="item_id"]').value = cells[2].textContent.trim();
+      document.querySelector('#inventoryEditForm [name="min_quantity"]').value = cells[3].textContent.trim();
+      const modalEl = document.getElementById('inventoryEditModal');
+      let modal = bootstrap.Modal.getInstance(modalEl);
+      if (!modal) modal = new bootstrap.Modal(modalEl);
+      modal.show();
+    };
+  });
+}
+
+function loadInventoryTable() {
+  fetch('/inventory/api/list')
+    .then(res => res.json())
+    .then(list => {
+      // 필터 적용
+      const nameFilter = document.getElementById('inventoryFilterName').value.trim().toLowerCase();
+      const specFilter = document.getElementById('inventoryFilterSpec').value.trim().toLowerCase();
+      const idFilter = document.getElementById('inventoryFilterId').value.trim().toLowerCase();
+      const filtered = list.filter(item => {
+        return (!nameFilter || (item.name||'').toLowerCase().includes(nameFilter)) &&
+               (!specFilter || (item.spec||'').toLowerCase().includes(specFilter)) &&
+               (!idFilter || (item.item_id||'').toLowerCase().includes(idFilter));
+      });
+      const tbody = document.querySelector('#inventoryTable tbody');
+      tbody.innerHTML = '';
+      filtered.forEach(item => {
+        const tr = document.createElement('tr');
+        tr.setAttribute('data-id', item.id);
+        tr.innerHTML = `
+          <td>${item.name || ''}</td>
+          <td>${item.spec || ''}</td>
+          <td>${item.item_id || ''}</td>
+          <td>${item.min_quantity || 0}</td>
+          <td class="text-center">
+            <button class="btn btn-sm btn-outline-primary edit-inv-btn" title="수정"><i class="fas fa-edit"></i></button>
+            <button class="btn btn-sm btn-outline-danger delete-inv-btn" title="삭제"><i class="fas fa-trash-alt"></i></button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+      bindInventoryRowClick();
+      document.getElementById('inventoryCountNum').textContent = filtered.length;
+      // 수정/삭제 버튼 이벤트 바인딩
+      document.querySelectorAll('.edit-inv-btn').forEach((btn, idx) => {
+        btn.onclick = function(e) {
+          e.stopPropagation();
+          const tr = btn.closest('tr');
+          tr.click(); // 기존 행 클릭(수정 모달 오픈)
+        };
+      });
+      document.querySelectorAll('.delete-inv-btn').forEach((btn, idx) => {
+        btn.onclick = function(e) {
+          e.stopPropagation();
+          const tr = btn.closest('tr');
+          const id = tr.getAttribute('data-id');
+          if(!confirm('정말 삭제하시겠습니까?')) return;
+          fetch('/inventory/api/delete', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({id})
+          }).then(res => res.json()).then(result => {
+            if(result.success) {
+              loadInventoryTable();
+              alert('삭제되었습니다.');
+            } else {
+              alert('삭제 실패: ' + (result.message || '오류'));
+            }
+          });
+        };
+      });
+    });
+}
+
+// 품목 수정
+  document.getElementById('saveInventoryBtn').onclick = function(e) {
+    e.preventDefault();
+    const form = document.getElementById('inventoryEditForm');
+    const fd = new FormData(form);
+    const data = Object.fromEntries(fd.entries());
+    fetch('/inventory/api/update', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify(data)
+    }).then(res => res.json()).then(result => {
+      if(result.success) {
+        bootstrap.Modal.getInstance(document.getElementById('inventoryEditModal')).hide();
+        loadInventoryTable();
+        alert('수정되었습니다.');
+      } else {
+        alert('수정 실패: ' + (result.message || '오류'));
+      }
+    });
+  };
+// 품목 삭제
+  document.getElementById('deleteInventoryBtn').onclick = function(e) {
+    e.preventDefault();
+    if(!confirm('정말 삭제하시겠습니까?')) return;
+    const id = document.querySelector('#inventoryEditForm [name="id"]').value;
+    fetch('/inventory/api/delete', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({id})
+    }).then(res => res.json()).then(result => {
+      if(result.success) {
+        bootstrap.Modal.getInstance(document.getElementById('inventoryEditModal')).hide();
+        loadInventoryTable();
+        alert('삭제되었습니다.');
+      } else {
+        alert('삭제 실패: ' + (result.message || '오류'));
+      }
+    });
+  };
+
 // 최초 로딩 및 이벤트 바인딩
 window.addEventListener('DOMContentLoaded',()=>{
   loadProjectTypes();
   loadRequests();
+  loadInventoryTable();
+
+  // 품목 추가 버튼 클릭 시(모달 오픈)
+  document.getElementById('addInventoryBtn').onclick = function() {
+    const modalEl = document.getElementById('inventoryModal');
+    let modal = bootstrap.Modal.getInstance(modalEl);
+    if (!modal) modal = new bootstrap.Modal(modalEl);
+    modal.show();
+  };
+
+  // 품목 추가 폼 제출
+  document.getElementById('submitInventoryBtn').onclick = function(e) {
+    e.preventDefault();
+    const form = document.getElementById('inventoryForm');
+    const fd = new FormData(form);
+    const data = Object.fromEntries(fd.entries());
+    fetch('/inventory/api/add', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify(data)
+    }).then(res => res.json()).then(result => {
+      if(result.success) {
+        bootstrap.Modal.getInstance(document.getElementById('inventoryModal')).hide();
+        form.reset();
+        loadInventoryTable();
+        alert('품목이 추가되었습니다.');
+      } else {
+        alert('추가 실패: ' + (result.message || '오류'));
+      }
+    });
+  };
 
   // 신규 구매 요청 모달 열기
   document.getElementById('openRequestModalBtn').onclick = ()=>{

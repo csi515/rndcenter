@@ -1,11 +1,1 @@
-﻿id,requester,item_name,quantity,unit_price,total_price,supplier,category,urgency,reason,budget_code,status,request_date,notes,created_date,item,spec,item_number,unit,project_type,required_qty,safety_stock,purchase_qty,note,purchase_status
-f31e5b0f-e7d2-4a45-92b9-0fe00a5a162c,최성일,,,3232.0,3232.0,,,,,,,2025-07-03,,,ㄹㅇ,ㄹㅇ,ㄹㅇㄴ,개,없음,0.0,0.0,1.0,,완료
-f4ca0b10-445c-4dce-a068-4b1851b4c67b,ㄷ,,,123.0,2829.0,,,,ㄷ,,,2025-07-03,,,ㄹㅇ,ㄷㅁ,123,개,없음,1.0,4.0,23.0,ㄷ,완료
-43d08678-16ad-4598-aea4-5d5044925bbc,ㄷㅁ,,,22.0,242.0,,,,ㄷㅁ,,,2025-07-03,,,ㄹㅇ,ㄹㅇ,123,개,없음,1.0,1.0,11.0,ㄷㅁ,대기
-2fd8de58-d4dc-4ea0-a1d6-201a48885b58,ㄷ,,,12.0,12.0,,,,ㄷ,,,2025-07-03,,,ㄹㅇ,ㄹㅇ,ㄹㅇ,ㄹ,없음,1.0,1.0,1.0,ㄷ,대기
-5b302698-06a9-4fb6-89de-5eb15a3128ba,2,,,232.0,232.0,,,,2,,,2025-07-03,,,ㄷㄷ,ㄷ,ㄷ,ㄷㄷ2,없음,1.0,0.0,1.0,2,대기
-9b22c78a-7120-443b-8b19-91a039bae811,2,,,12.0,1476.0,,,,1,,,2025-07-03,,,2,ㄹㅇ,ㄷㅈㅂ,ㄷㅁ,없음,1.0,1.0,123.0,2,대기
-409800b4-3cb9-4e88-a363-7abcfd3b5093,23,,,23.0,529.0,,,,23,,,2025-07-03,,,23,23,23,23,없음,0.0,0.0,23.0,23,대기
-dadbb93e-5669-472d-a462-1c7ba8f831fc,2,,,123.0,123.0,,,,2,,,2025-07-03,,,ㄹㅇ,ㄹㅇ,123,개,없음,0.0,0.0,1.0,21,대기
-3295c6f9-145b-44fb-9aa4-6eb5af97089b,3,,,1231.0,1231.0,,,,3,,,2025-07-03,,,ㄹㅇㄴ,ㄷㅈㅂ,ㄷㅈㅂ321,32,전극재,0.0,0.0,1.0,23,대기
-6cdbef2f-4583-4461-bfef-32a42bcf41d6,2,,,321.0,321.0,,,,2,,,2025-07-03,,,ㄹㅇ,ㄹㅇ,3213,개,등방흑연블록,0.0,0.0,1.0,2,대기
+﻿id,item,spec,item_number,unit,project_type,required_qty,safety_stock,purchase_qty,unit_price,total_price,purchase_status,note,reason,requester,request_date
