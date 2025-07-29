@@ -30,9 +30,6 @@ app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
 }
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
-# Initialize database
-init_db(app)
-
 # Import and register blueprints
 from routes.dashboard import dashboard_bp
 from routes.research import research_bp
@@ -57,6 +54,9 @@ app.register_blueprint(communication_bp, url_prefix='/communication')
 app.register_blueprint(external_bp, url_prefix='/external')
 app.register_blueprint(chemical_bp, url_prefix='/chemical')
 app.register_blueprint(coal_log_bp, url_prefix='/')
+
+# Initialize database after all blueprints are registered
+init_db(app)
 
 if __name__ == '__main__':
     app.run(host='172.28.12.68', port=8002, debug=False)

@@ -27,7 +27,10 @@ def init_db(app):
     db.init_app(app)
     with app.app_context():
         db.create_all()
-        ensure_project_participants_column()
+        try:
+            ensure_project_participants_column()
+        except Exception as e:
+            print(f"Warning: Could not ensure project_participants column: {e}")
 
 class Project(db.Model):
     __tablename__ = 'projects'
