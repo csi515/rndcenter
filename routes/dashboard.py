@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, jsonify
 from database import db
-from database import Project, Patent, Equipment, Reservation, InventoryItem
+from database import Project, Equipment, Reservation, InventoryItem, Patent
 from datetime import datetime, timedelta
 from sqlalchemy import func
 

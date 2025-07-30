@@ -204,12 +204,12 @@
                     
                     <div class="row time-inputs" id="timeInputs">
                         <div class="col-md-6 mb-3">
-                            <label class="form-label">시작 시간</label>
-                            <input type="time" class="form-control" id="startTime" name="start_time">
+                            <label class="form-label">시작 시간 (07:00~19:00)</label>
+                            <input type="time" class="form-control" id="startTime" name="start_time" min="07:00" max="19:00" step="1800">
                         </div>
                         <div class="col-md-6 mb-3">
-                            <label class="form-label">종료 시간</label>
-                            <input type="time" class="form-control" id="endTime" name="end_time">
+                            <label class="form-label">종료 시간 (07:00~19:00)</label>
+                            <input type="time" class="form-control" id="endTime" name="end_time" min="07:00" max="19:00" step="1800">
                         </div>
                     </div>
                     
@@ -279,7 +279,44 @@ document.addEventListener('DOMContentLoaded', function() {
             endDate.value = this.value;
         }
     });
+    
+    // 시간 범위 실시간 검증
+    document.getElementById('startTime').addEventListener('change', function() {
+        validateTimeRange();
+    });
+    
+    document.getElementById('endTime').addEventListener('change', function() {
+        validateTimeRange();
+    });
 });
+
+function validateTimeRange() {
+    const startTime = document.getElementById('startTime');
+    const endTime = document.getElementById('endTime');
+    const startTimeValue = startTime.value;
+    const endTimeValue = endTime.value;
+    
+    if (startTimeValue && endTimeValue) {
+        const startHour = parseInt(startTimeValue.split(':')[0]);
+        const endHour = parseInt(endTimeValue.split(':')[0]);
+        
+        // 시작 시간 검증
+        if (startHour < 7 || startHour >= 19) {
+            startTime.setCustomValidity('시작 시간은 07:00~19:00 사이여야 합니다.');
+        } else {
+            startTime.setCustomValidity('');
+        }
+        
+        // 종료 시간 검증
+        if (endHour < 7 || endHour >= 19) {
+            endTime.setCustomValidity('종료 시간은 07:00~19:00 사이여야 합니다.');
+        } else if (startTimeValue >= endTimeValue) {
+            endTime.setCustomValidity('종료 시간은 시작 시간보다 늦어야 합니다.');
+        } else {
+            endTime.setCustomValidity('');
+        }
+    }
+}
 
 let currentReservationId = null;
 
@@ -339,6 +376,32 @@ function saveReservation() {
         return;
     }
     
+    // 시간 범위 검증 (7시~19시)
+    if (!document.getElementById('allDay').checked) {
+        const startTime = document.getElementById('startTime').value;
+        const endTime = document.getElementById('endTime').value;
+        
+        if (startTime && endTime) {
+            const startHour = parseInt(startTime.split(':')[0]);
+            const endHour = parseInt(endTime.split(':')[0]);
+            
+            if (startHour < 7 || startHour >= 19) {
+                showNotification('시작 시간은 07:00~19:00 사이여야 합니다.', 'error');
+                return;
+            }
+            
+            if (endHour < 7 || endHour >= 19) {
+                showNotification('종료 시간은 07:00~19:00 사이여야 합니다.', 'error');
+                return;
+            }
+            
+            if (startTime >= endTime) {
+                showNotification('종료 시간은 시작 시간보다 늦어야 합니다.', 'error');
+                return;
+            }
+        }
+    }
+    
     const formData = new FormData(form);
     const data = Object.fromEntries(formData);
     
@@ -350,7 +413,7 @@ function saveReservation() {
         endDateTime = data.end_date + 'T23:59:59';
     } else {
         startDateTime = data.start_date + 'T' + (data.start_time || '09:00:00');
-        endDateTime = data.end_date + 'T' + (data.end_time || '18:00:00');
+        endDateTime = data.end_date + 'T' + (data.end_time || '17:00:00');
     }
     
     const payload = {

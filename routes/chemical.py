@@ -78,8 +78,8 @@ def update_msds(id):
     try:
         chem = Chemical.query.filter_by(chem_id=id).first()
         if not chem:
-        flash('수정할 데이터를 찾을 수 없습니다.', 'error')
-        return redirect(url_for('chemical.msds_list'))
+            flash('수정할 데이터를 찾을 수 없습니다.', 'error')
+            return redirect(url_for('chemical.msds_list'))
         chem.chemical_name = request.form.get('chemical_name')
         chem.cas_number = request.form.get('cas_number')
         chem.manufacturer = request.form.get('manufacturer')
@@ -105,7 +105,7 @@ def delete_msds(id):
     try:
         chem = Chemical.query.filter_by(chem_id=id).first()
         if not chem:
-        return {'success': False, 'message': '삭제할 데이터를 찾을 수 없습니다.'}
+            return {'success': False, 'message': '삭제할 데이터를 찾을 수 없습니다.'}
         db.session.delete(chem)
         db.session.commit()
         return {'success': True}

@@ -1,5 +1,4 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify
-from csv_manager import csv_manager
 from datetime import datetime
 from database import db, SafetyMaterial, Accident, AccidentDocument, SafetyProcedure
 import math
@@ -140,28 +139,28 @@ def api_delete_material(material_id):
 @safety_bp.route('/accidents')
 def accidents():
     """사고관리 페이지"""
-    accidents = Accident.query.order_by(Accident.incident_date.desc()).all()
+    accidents = Accident.query.order_by(Accident.date.desc()).all()
     return render_template('safety/accidents.html', accidents=accidents)
 
 @safety_bp.route('/api/accidents')
 def api_accidents():
     """사고 목록 API (DB 기반)"""
     try:
-        accidents = Accident.query.order_by(Accident.incident_date.desc()).all()
+        accidents = Accident.query.order_by(Accident.date.desc()).all()
         accidents_list = []
         for accident in accidents:
                 accidents_list.append({
                 'id': accident.id,
-                'incident_date': accident.incident_date.strftime('%Y-%m-%d') if accident.incident_date else '',
+                'incident_date': accident.date.strftime('%Y-%m-%d') if accident.date else '',
                 'location': accident.location or '',
-                'involved_person': accident.involved_person or '',
-                'incident_type': accident.incident_type or '',
+                'involved_person': accident.injured_person or '',
+                'incident_type': accident.severity or '',
                 'severity': accident.severity or '',
                 'description': accident.description or '',
-                'immediate_action': accident.immediate_action or '',
-                'follow_up': accident.follow_up or '',
-                'prevention': accident.prevention or '',
-                'reporter': accident.reporter or '',
+                'immediate_action': accident.action_taken or '',
+                'follow_up': '',
+                'prevention': '',
+                'reporter': '',
                 'status': accident.status or '',
                 'created_date': accident.created_date.strftime('%Y-%m-%d %H:%M:%S') if accident.created_date else '',
                 'documents': [
@@ -191,25 +190,17 @@ def api_update_accident(accident_id):
         
         # 폼 데이터로부터 값 가져오기
         if request.form.get('incident_date'):
-            accident.incident_date = datetime.strptime(request.form.get('incident_date'), '%Y-%m-%d').date()
+            accident.date = datetime.strptime(request.form.get('incident_date'), '%Y-%m-%d').date()
         if request.form.get('location'):
             accident.location = request.form.get('location')
         if request.form.get('involved_person'):
-            accident.involved_person = request.form.get('involved_person')
-        if request.form.get('incident_type'):
-            accident.incident_type = request.form.get('incident_type')
+            accident.injured_person = request.form.get('involved_person')
         if request.form.get('severity'):
             accident.severity = request.form.get('severity')
         if request.form.get('description'):
             accident.description = request.form.get('description')
         if request.form.get('immediate_action'):
-            accident.immediate_action = request.form.get('immediate_action')
-        if request.form.get('follow_up'):
-            accident.follow_up = request.form.get('follow_up')
-        if request.form.get('prevention'):
-            accident.prevention = request.form.get('prevention')
-        if request.form.get('reporter'):
-            accident.reporter = request.form.get('reporter')
+            accident.action_taken = request.form.get('immediate_action')
         if request.form.get('status'):
             accident.status = request.form.get('status')
         
@@ -350,31 +341,33 @@ def add_accident():
 
 @safety_bp.route('/education')
 def education():
-    education_data = csv_manager.read_csv('education.csv')
-    education_list = education_data.to_dict('records') if not education_data.empty else []
+    # education_data = csv_manager.read_csv('education.csv')
+    # education_list = education_data.to_dict('records') if not education_data.empty else []
+    education_list = []
     return render_template('safety/education.html', education=education_list)
 
 @safety_bp.route('/education/add', methods=['POST'])
 def add_education():
-    data = {
-        'id': datetime.now().strftime('%Y%m%d%H%M%S'),
-        'trainee_name': request.form.get('trainee_name'),
-        'course_name': request.form.get('course_name'),
-        'course_date': request.form.get('course_date'),
-        'duration': request.form.get('duration'),
-        'instructor': request.form.get('instructor'),
-        'completion_status': request.form.get('completion_status', '완료'),
-        'score': request.form.get('score', ''),
-        'certificate_issued': request.form.get('certificate_issued', 'N'),
-        'notes': request.form.get('notes', ''),
-        'created_date': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-    }
+    # data = {
+    #     'id': datetime.now().strftime('%Y%m%d%H%M%S'),
+    #     'trainee_name': request.form.get('trainee_name'),
+    #     'course_name': request.form.get('course_name'),
+    #     'course_date': request.form.get('course_date'),
+    #     'duration': request.form.get('duration'),
+    #     'instructor': request.form.get('instructor'),
+    #     'completion_status': request.form.get('completion_status', '완료'),
+    #     'score': request.form.get('score', ''),
+    #     'certificate_issued': request.form.get('certificate_issued', 'N'),
+    #     'notes': request.form.get('notes', ''),
+    #     'created_date': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    # }
     
-    if csv_manager.append_to_csv('education.csv', data):
-        flash('교육 이력이 성공적으로 추가되었습니다.', 'success')
-    else:
-        flash('교육 이력 추가 중 오류가 발생했습니다.', 'error')
+    # if csv_manager.append_to_csv('education.csv', data):
+    #     flash('교육 이력이 성공적으로 추가되었습니다.', 'success')
+    # else:
+    #     flash('교육 이력 추가 중 오류가 발생했습니다.', 'error')
     
+    flash('교육 이력 기능은 현재 개발 중입니다.', 'info')
     return redirect(url_for('safety.education'))
 
 @safety_bp.route('/procedures')

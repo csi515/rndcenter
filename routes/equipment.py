@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify
 from datetime import datetime, date
-from app import db, Equipment, Reservation, UsageLog
+from database import db, Equipment, Reservation, UsageLog
 import csv
 
 equipment_bp = Blueprint('equipment', __name__)
@@ -55,6 +55,51 @@ def add_equipment():
     except Exception as e:
         db.session.rollback()
         flash(f'장비 추가 중 오류가 발생했습니다: {str(e)}', 'error')
+    return redirect(url_for('equipment.equipment_list'))
+
+@equipment_bp.route('/update/<int:equipment_id>', methods=['POST'])
+def update_equipment(equipment_id):
+    try:
+        equipment = Equipment.query.get_or_404(equipment_id)
+        
+        # 필수 필드 검증
+        if not request.form.get('name'):
+            flash('장비명은 필수 입력 항목입니다.', 'error')
+            return redirect(url_for('equipment.equipment_list'))
+
+        equipment.name = request.form.get('name')
+        equipment.model = request.form.get('model')
+        equipment.manufacturer = request.form.get('manufacturer')
+        equipment.location = request.form.get('location')
+        equipment.status = request.form.get('status', '사용 가능')
+        equipment.purchase_date = parse_date(request.form.get('purchase_date'))
+        equipment.maintenance_date = parse_date(request.form.get('maintenance_date'))
+        equipment.notes = request.form.get('notes', '')
+        
+        db.session.commit()
+        flash('장비 정보가 성공적으로 수정되었습니다.', 'success')
+    except Exception as e:
+        db.session.rollback()
+        flash(f'장비 정보 수정 중 오류가 발생했습니다: {str(e)}', 'error')
+    return redirect(url_for('equipment.equipment_list'))
+
+@equipment_bp.route('/delete/<int:equipment_id>', methods=['POST'])
+def delete_equipment(equipment_id):
+    try:
+        equipment = Equipment.query.get_or_404(equipment_id)
+        
+        # 관련 예약이 있는지 확인
+        active_reservations = Reservation.query.filter_by(equipment_name=equipment.name, status='예약').count()
+        if active_reservations > 0:
+            flash('활성 예약이 있는 장비는 삭제할 수 없습니다.', 'error')
+            return redirect(url_for('equipment.equipment_list'))
+        
+        db.session.delete(equipment)
+        db.session.commit()
+        flash('장비가 성공적으로 삭제되었습니다.', 'success')
+    except Exception as e:
+        db.session.rollback()
+        flash(f'장비 삭제 중 오류가 발생했습니다: {str(e)}', 'error')
     return redirect(url_for('equipment.equipment_list'))
 
 @equipment_bp.route('/list')

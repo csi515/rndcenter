@@ -1,39 +1,7 @@
-from flask import Blueprint, render_template, request, redirect, url_for, jsonify
-from app import db, Project, Researcher
+from flask import Blueprint, render_template, request, redirect, url_for, jsonify, flash
+from database import db, Project, Researcher, Week, WeeklyScheduleNew
 import uuid
 from datetime import datetime
-
-# Define additional models for this blueprint
-class Week(db.Model):
-    __tablename__ = 'weeks'
-    
-    id = db.Column(db.Integer, primary_key=True)
-    month = db.Column(db.Integer, nullable=False)
-    year = db.Column(db.Integer, nullable=False)
-    week_number = db.Column(db.Integer, nullable=False)
-    start_date = db.Column(db.Date)
-    end_date = db.Column(db.Date)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-
-class WeeklyScheduleNew(db.Model):
-    __tablename__ = 'weekly_schedule_new'
-    
-    id = db.Column(db.Integer, primary_key=True)
-    project_name = db.Column(db.String(200), nullable=False)
-    researcher_name = db.Column(db.String(100))
-    week_id = db.Column(db.Integer, db.ForeignKey('weeks.id'), nullable=False)
-    title = db.Column(db.String(500), nullable=False)
-    description = db.Column(db.Text)
-    start_week_id = db.Column(db.Integer, db.ForeignKey('weeks.id'), nullable=False)
-    end_week_id = db.Column(db.Integer, db.ForeignKey('weeks.id'), nullable=False)
-    status = db.Column(db.String(50), default='계획')
-    priority = db.Column(db.String(50), default='보통')
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
-    
-    week = db.relationship('Week', foreign_keys=[week_id], backref='schedules')
-    start_week = db.relationship('Week', foreign_keys=[start_week_id])
-    end_week = db.relationship('Week', foreign_keys=[end_week_id])
 
 research_bp = Blueprint('research', __name__)
 
@@ -63,20 +31,37 @@ def add_researcher():
     hire_date = request.form.get('hire_date')
     status = request.form.get('status', '재직')
 
-    researcher = Researcher(
-        employee_id=employee_id,
-        name=name,
-        position=position,
-        department=department,
-        specialization=specialization,
-        email=email,
-        phone=phone,
-        hire_date=datetime.strptime(hire_date, '%Y-%m-%d') if hire_date else None,
-        status=status,
-        created_date=datetime.now()
-    )
-    db.session.add(researcher)
-    db.session.commit()
+    # 필수 필드 검증
+    if not name or not email:
+        flash('이름과 이메일은 필수 입력 항목입니다.', 'error')
+        return redirect(url_for('research.researchers'))
+
+    # 중복 이메일 검증
+    existing_researcher = Researcher.query.filter_by(email=email).first()
+    if existing_researcher:
+        flash('이미 존재하는 이메일입니다.', 'error')
+        return redirect(url_for('research.researchers'))
+
+    try:
+        researcher = Researcher(
+            employee_id=employee_id if employee_id else None,
+            name=name,
+            position=position,
+            department=department,
+            specialization=specialization,
+            email=email,
+            phone=phone,
+            hire_date=datetime.strptime(hire_date, '%Y-%m-%d') if hire_date else None,
+            status=status,
+            created_date=datetime.now()
+        )
+        db.session.add(researcher)
+        db.session.commit()
+        flash('연구원이 성공적으로 추가되었습니다.', 'success')
+    except Exception as e:
+        db.session.rollback()
+        flash(f'연구원 추가 중 오류가 발생했습니다: {str(e)}', 'error')
+    
     return redirect(url_for('research.researchers'))
 
 @research_bp.route('/projects/add', methods=['POST'])
@@ -88,18 +73,29 @@ def add_project():
     end_date = request.form.get('end_date')
     participants = request.form.get('participants')
 
-    project = Project(
-        project_id=str(uuid.uuid4()),
-        name=name,
-        description=description,
-        status=status,
-        start_date=datetime.strptime(start_date, '%Y-%m-%d') if start_date else None,
-        end_date=datetime.strptime(end_date, '%Y-%m-%d') if end_date else None,
-        participants=participants,
-        created_date=datetime.now()
-    )
-    db.session.add(project)
-    db.session.commit()
+    # 필수 필드 검증
+    if not name:
+        flash('프로젝트명은 필수 입력 항목입니다.', 'error')
+        return redirect(url_for('research.projects'))
+
+    try:
+        project = Project(
+            project_id=str(uuid.uuid4()),
+            name=name,
+            description=description,
+            status=status,
+            start_date=datetime.strptime(start_date, '%Y-%m-%d') if start_date else None,
+            end_date=datetime.strptime(end_date, '%Y-%m-%d') if end_date else None,
+            participants=participants,
+            created_date=datetime.now()
+        )
+        db.session.add(project)
+        db.session.commit()
+        flash('프로젝트가 성공적으로 추가되었습니다.', 'success')
+    except Exception as e:
+        db.session.rollback()
+        flash(f'프로젝트 추가 중 오류가 발생했습니다: {str(e)}', 'error')
+    
     return redirect(url_for('research.projects'))
 
 # ---- 임시 API 엔드포인트 ----

@@ -86,12 +86,58 @@
                             <input type="date" class="form-control" name="usage_date" required>
                         </div>
                         <div class="col-md-4 mb-3">
-                            <label class="form-label">시작 시간 *</label>
-                            <input type="time" class="form-control" name="start_time" required>
+                            <label class="form-label">시작 시간 * (07:00~17:00, 30분 간격)</label>
+                            <select class="form-select" name="start_time" required>
+                                <option value="">시작 시간 선택</option>
+                                <option value="07:00">07:00</option>
+                                <option value="07:30">07:30</option>
+                                <option value="08:00">08:00</option>
+                                <option value="08:30">08:30</option>
+                                <option value="09:00">09:00</option>
+                                <option value="09:30">09:30</option>
+                                <option value="10:00">10:00</option>
+                                <option value="10:30">10:30</option>
+                                <option value="11:00">11:00</option>
+                                <option value="11:30">11:30</option>
+                                <option value="12:00">12:00</option>
+                                <option value="12:30">12:30</option>
+                                <option value="13:00">13:00</option>
+                                <option value="13:30">13:30</option>
+                                <option value="14:00">14:00</option>
+                                <option value="14:30">14:30</option>
+                                <option value="15:00">15:00</option>
+                                <option value="15:30">15:30</option>
+                                <option value="16:00">16:00</option>
+                                <option value="16:30">16:30</option>
+                                <option value="17:00">17:00</option>
+                            </select>
                         </div>
                         <div class="col-md-4 mb-3">
-                            <label class="form-label">종료 시간 *</label>
-                            <input type="time" class="form-control" name="end_time" required>
+                            <label class="form-label">종료 시간 * (07:00~17:00, 30분 간격)</label>
+                            <select class="form-select" name="end_time" required>
+                                <option value="">종료 시간 선택</option>
+                                <option value="07:00">07:00</option>
+                                <option value="07:30">07:30</option>
+                                <option value="08:00">08:00</option>
+                                <option value="08:30">08:30</option>
+                                <option value="09:00">09:00</option>
+                                <option value="09:30">09:30</option>
+                                <option value="10:00">10:00</option>
+                                <option value="10:30">10:30</option>
+                                <option value="11:00">11:00</option>
+                                <option value="11:30">11:30</option>
+                                <option value="12:00">12:00</option>
+                                <option value="12:30">12:30</option>
+                                <option value="13:00">13:00</option>
+                                <option value="13:30">13:30</option>
+                                <option value="14:00">14:00</option>
+                                <option value="14:30">14:30</option>
+                                <option value="15:00">15:00</option>
+                                <option value="15:30">15:30</option>
+                                <option value="16:00">16:00</option>
+                                <option value="16:30">16:30</option>
+                                <option value="17:00">17:00</option>
+                            </select>
                         </div>
                     </div>
                     <div class="mb-3">
@@ -115,4 +161,47 @@
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // 드롭다운 시간 선택 필드에 검증 추가
+    const startTimeSelect = document.querySelector('select[name="start_time"]');
+    const endTimeSelect = document.querySelector('select[name="end_time"]');
+    
+    function validateTimeRange() {
+        const startTime = startTimeSelect.value;
+        const endTime = endTimeSelect.value;
+        
+        if (startTime && endTime) {
+            if (startTime >= endTime) {
+                endTimeSelect.setCustomValidity('종료 시간은 시작 시간보다 늦어야 합니다.');
+            } else {
+                endTimeSelect.setCustomValidity('');
+            }
+        }
+    }
+    
+    // 시작 시간 변경 시 검증
+    startTimeSelect.addEventListener('change', function() {
+        validateTimeRange();
+    });
+    
+    // 종료 시간 변경 시 검증
+    endTimeSelect.addEventListener('change', function() {
+        validateTimeRange();
+    });
+    
+    // 폼 제출 시 최종 검증
+    document.querySelector('form').addEventListener('submit', function(e) {
+        validateTimeRange();
+        
+        if (!this.checkValidity()) {
+            e.preventDefault();
+            this.reportValidity();
+        }
+    });
+});
+</script>
 {% endblock %}

@@ -17,7 +17,7 @@
 <!-- Patents Table -->
 <div class="card">
     <div class="card-header">
-        <h5 class="mb-0">등록된 특허</h5>
+        <h5 class="mb-0">특허 목록</h5>
     </div>
     <div class="card-body">
         <div class="table-responsive">
@@ -25,12 +25,9 @@
                 <thead>
                     <tr>
                         <th>특허명</th>
-                        <th>출원번호</th>
-                        <th>등록번호</th>
                         <th>출원일</th>
                         <th>상태</th>
                         <th>발명자</th>
-                        <th>특허청</th>
                         <th>액션</th>
                     </tr>
                 </thead>
@@ -38,8 +35,6 @@
                     {% for patent in patents %}
                     <tr>
                         <td>{{ patent.title }}</td>
-                        <td>{{ patent.application_number }}</td>
-                        <td>{{ patent.registration_number or '-' }}</td>
                         <td>{{ patent.application_date }}</td>
                         <td>
                             <span class="badge {% if patent.status == '등록' %}bg-success{% elif patent.status == '출원 준비 중' %}bg-secondary{% elif patent.status == '출원' %}bg-warning{% else %}bg-info{% endif %}">
@@ -47,7 +42,6 @@
                             </span>
                         </td>
                         <td>{{ patent.inventors }}</td>
-                        <td>{{ patent.patent_office }}</td>
                         <td>
                             <!-- 상세보기 버튼 제거 -->
                             <button class="btn btn-sm btn-outline-primary edit-patent-btn" data-id="{{ patent.id }}" data-patent='{{ patent|tojson|escape }}' title="수정">
@@ -152,9 +146,60 @@
                         <label class="form-label">설명</label>
                         <textarea class="form-control" name="description" rows="3"></textarea>
                     </div>
+
+                    
+                    <!-- 특허 관련 문서 링크들 -->
                     <div class="mb-3">
-                        <label class="form-label">관련 링크</label>
-                        <input type="url" class="form-control" name="link" placeholder="http://">
+                        <h6 class="form-label">특허 관련 문서 링크</h6>
+                        <div class="row">
+                            <div class="col-md-6 mb-2">
+                                <label class="form-label small">출원서 초안</label>
+                                <input type="url" class="form-control form-control-sm" name="application_draft_link" placeholder="http://">
+                            </div>
+                            <div class="col-md-6 mb-2">
+                                <label class="form-label small">선행기술조사 보고서</label>
+                                <input type="url" class="form-control form-control-sm" name="prior_art_report_link" placeholder="http://">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-2">
+                                <label class="form-label small">출원서</label>
+                                <input type="url" class="form-control form-control-sm" name="application_form_link" placeholder="http://">
+                            </div>
+                            <div class="col-md-6 mb-2">
+                                <label class="form-label small">출원 심의 자료</label>
+                                <input type="url" class="form-control form-control-sm" name="application_review_link" placeholder="http://">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-2">
+                                <label class="form-label small">의견제출통지서</label>
+                                <input type="url" class="form-control form-control-sm" name="office_action_link" placeholder="http://">
+                            </div>
+                            <div class="col-md-6 mb-2">
+                                <label class="form-label small">의견서</label>
+                                <input type="url" class="form-control form-control-sm" name="response_link" placeholder="http://">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-2">
+                                <label class="form-label small">보정서</label>
+                                <input type="url" class="form-control form-control-sm" name="amendment_link" placeholder="http://">
+                            </div>
+                            <div class="col-md-6 mb-2">
+                                <label class="form-label small">특허등록 공보</label>
+                                <input type="url" class="form-control form-control-sm" name="publication_link" placeholder="http://">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-2">
+                                <label class="form-label small">등록 심의 자료</label>
+                                <input type="url" class="form-control form-control-sm" name="registration_review_link" placeholder="http://">
+                            </div>
+                            <div class="col-md-6 mb-2">
+                                <!-- 빈 공간 -->
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -251,9 +296,60 @@
                         <label class="form-label">설명</label>
                         <textarea class="form-control" name="description" id="editDescription" rows="3"></textarea>
                     </div>
+
+                    
+                    <!-- 특허 관련 문서 링크들 -->
                     <div class="mb-3">
-                        <label class="form-label">관련 링크</label>
-                        <input type="url" class="form-control" name="link" id="editLink" placeholder="http://">
+                        <h6 class="form-label">특허 관련 문서 링크</h6>
+                        <div class="row">
+                            <div class="col-md-6 mb-2">
+                                <label class="form-label small">출원서 초안</label>
+                                <input type="url" class="form-control form-control-sm" name="application_draft_link" id="editApplicationDraftLink" placeholder="http://">
+                            </div>
+                            <div class="col-md-6 mb-2">
+                                <label class="form-label small">선행기술조사 보고서</label>
+                                <input type="url" class="form-control form-control-sm" name="prior_art_report_link" id="editPriorArtReportLink" placeholder="http://">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-2">
+                                <label class="form-label small">출원서</label>
+                                <input type="url" class="form-control form-control-sm" name="application_form_link" id="editApplicationFormLink" placeholder="http://">
+                            </div>
+                            <div class="col-md-6 mb-2">
+                                <label class="form-label small">출원 심의 자료</label>
+                                <input type="url" class="form-control form-control-sm" name="application_review_link" id="editApplicationReviewLink" placeholder="http://">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-2">
+                                <label class="form-label small">의견제출통지서</label>
+                                <input type="url" class="form-control form-control-sm" name="office_action_link" id="editOfficeActionLink" placeholder="http://">
+                            </div>
+                            <div class="col-md-6 mb-2">
+                                <label class="form-label small">의견서</label>
+                                <input type="url" class="form-control form-control-sm" name="response_link" id="editResponseLink" placeholder="http://">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-2">
+                                <label class="form-label small">보정서</label>
+                                <input type="url" class="form-control form-control-sm" name="amendment_link" id="editAmendmentLink" placeholder="http://">
+                            </div>
+                            <div class="col-md-6 mb-2">
+                                <label class="form-label small">특허등록 공보</label>
+                                <input type="url" class="form-control form-control-sm" name="publication_link" id="editPublicationLink" placeholder="http://">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-2">
+                                <label class="form-label small">등록 심의 자료</label>
+                                <input type="url" class="form-control form-control-sm" name="registration_review_link" id="editRegistrationReviewLink" placeholder="http://">
+                            </div>
+                            <div class="col-md-6 mb-2">
+                                <!-- 빈 공간 -->
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -296,7 +392,15 @@ function editPatent(id, patent) {
       editCoContainer.appendChild(row);
     });
     document.getElementById('editDescription').value = patent.description || '';
-    document.getElementById('editLink').value = patent.link || '';
+    document.getElementById('editApplicationDraftLink').value = patent.application_draft_link || '';
+    document.getElementById('editPriorArtReportLink').value = patent.prior_art_report_link || '';
+    document.getElementById('editApplicationFormLink').value = patent.application_form_link || '';
+    document.getElementById('editApplicationReviewLink').value = patent.application_review_link || '';
+    document.getElementById('editOfficeActionLink').value = patent.office_action_link || '';
+    document.getElementById('editResponseLink').value = patent.response_link || '';
+    document.getElementById('editAmendmentLink').value = patent.amendment_link || '';
+    document.getElementById('editPublicationLink').value = patent.publication_link || '';
+    document.getElementById('editRegistrationReviewLink').value = patent.registration_review_link || '';
     const updateRemoveBtnVisibility = (container) => {
       const rows = container.querySelectorAll('.co-inventor-row');
       rows.forEach((row, idx) => {

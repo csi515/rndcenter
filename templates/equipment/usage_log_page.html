@@ -113,11 +113,57 @@
               <div class="row">
                 <div class="col-md-4 mb-3">
                   <label class="form-label">시작 시간 *</label>
-                  <input type="time" class="form-control" id="usageStartTime" required step="1800">
+                  <select class="form-select" id="usageStartTime" required>
+                    <option value="">시작 시간 선택</option>
+                    <option value="07:00">07:00</option>
+                    <option value="07:30">07:30</option>
+                    <option value="08:00">08:00</option>
+                    <option value="08:30">08:30</option>
+                    <option value="09:00">09:00</option>
+                    <option value="09:30">09:30</option>
+                    <option value="10:00">10:00</option>
+                    <option value="10:30">10:30</option>
+                    <option value="11:00">11:00</option>
+                    <option value="11:30">11:30</option>
+                    <option value="12:00">12:00</option>
+                    <option value="12:30">12:30</option>
+                    <option value="13:00">13:00</option>
+                    <option value="13:30">13:30</option>
+                    <option value="14:00">14:00</option>
+                    <option value="14:30">14:30</option>
+                    <option value="15:00">15:00</option>
+                    <option value="15:30">15:30</option>
+                    <option value="16:00">16:00</option>
+                    <option value="16:30">16:30</option>
+                    <option value="17:00">17:00</option>
+                  </select>
                 </div>
                 <div class="col-md-4 mb-3">
                   <label class="form-label">종료 시간</label>
-                  <input type="time" class="form-control" id="usageEndTime" step="1800">
+                  <select class="form-select" id="usageEndTime">
+                    <option value="">종료 시간 선택</option>
+                    <option value="07:00">07:00</option>
+                    <option value="07:30">07:30</option>
+                    <option value="08:00">08:00</option>
+                    <option value="08:30">08:30</option>
+                    <option value="09:00">09:00</option>
+                    <option value="09:30">09:30</option>
+                    <option value="10:00">10:00</option>
+                    <option value="10:30">10:30</option>
+                    <option value="11:00">11:00</option>
+                    <option value="11:30">11:30</option>
+                    <option value="12:00">12:00</option>
+                    <option value="12:30">12:30</option>
+                    <option value="13:00">13:00</option>
+                    <option value="13:30">13:30</option>
+                    <option value="14:00">14:00</option>
+                    <option value="14:30">14:30</option>
+                    <option value="15:00">15:00</option>
+                    <option value="15:30">15:30</option>
+                    <option value="16:00">16:00</option>
+                    <option value="16:30">16:30</option>
+                    <option value="17:00">17:00</option>
+                  </select>
                 </div>
                 <div class="col-md-4 mb-3">
                   <label class="form-label">사용 목적 *</label>
@@ -252,6 +298,28 @@ document.addEventListener('DOMContentLoaded', function() {
             modal.show();
         };
     }
+    
+    // 시간 검증 이벤트 리스너 추가
+    const startTimeSelect = document.getElementById('usageStartTime');
+    const endTimeSelect = document.getElementById('usageEndTime');
+    
+    if (startTimeSelect && endTimeSelect) {
+        startTimeSelect.addEventListener('change', validateTimeRange);
+        endTimeSelect.addEventListener('change', validateTimeRange);
+    }
+    
+    function validateTimeRange() {
+        const startTime = startTimeSelect.value;
+        const endTime = endTimeSelect.value;
+        
+        if (startTime && endTime) {
+            if (startTime >= endTime) {
+                endTimeSelect.setCustomValidity('종료 시간은 시작 시간보다 늦어야 합니다.');
+            } else {
+                endTimeSelect.setCustomValidity('');
+            }
+        }
+    }
 });
 
 // 새로운 사용일지 함수들
@@ -308,7 +376,25 @@ async function loadEquipmentForUsage() {
 function setCurrentDateTime() {
     const now = new Date();
     const today = now.toISOString().split('T')[0];
-    const currentTime = now.toTimeString().slice(0, 5);
+    const currentHour = now.getHours();
+    const currentMinute = now.getMinutes();
+    
+    // 현재 시간을 30분 간격으로 반올림
+    let roundedHour = currentHour;
+    let roundedMinute = currentMinute >= 30 ? 30 : 0;
+    
+    // 17시를 넘으면 17:00으로 설정
+    if (roundedHour >= 17) {
+        roundedHour = 17;
+        roundedMinute = 0;
+    }
+    // 7시 이전이면 09:00으로 설정
+    else if (roundedHour < 7) {
+        roundedHour = 9;
+        roundedMinute = 0;
+    }
+    
+    const currentTime = `${roundedHour.toString().padStart(2, '0')}:${roundedMinute.toString().padStart(2, '0')}`;
     
     document.getElementById('usageDate').value = today;
     document.getElementById('usageStartTime').value = currentTime;
@@ -346,6 +432,24 @@ async function saveNewUsageLog() {
             document.getElementById('usageLogForm').reset();
             setCurrentDateTime();
             loadUsageLogsData();
+            // 모달 닫기 - 여러 방법으로 시도
+            const modalElement = document.getElementById('usageLogModal');
+            const modal = bootstrap.Modal.getInstance(modalElement) || new bootstrap.Modal(modalElement);
+            modal.hide();
+            
+            // 추가로 jQuery 방식도 시도
+            if (typeof $ !== 'undefined') {
+                $('#usageLogModal').modal('hide');
+            }
+            
+            // 강제로 모달 닫기
+            modalElement.classList.remove('show');
+            modalElement.style.display = 'none';
+            document.body.classList.remove('modal-open');
+            const backdrop = document.querySelector('.modal-backdrop');
+            if (backdrop) {
+                backdrop.remove();
+            }
         } else {
             alert('오류: ' + (result.error || '저장에 실패했습니다.'));
         }
@@ -468,7 +572,24 @@ function editUsageLog(logId) {
                     alert('수정되었습니다.');
                     document.getElementById('usageLogForm').reset();
                     loadUsageLogsData();
-                    bootstrap.Modal.getOrCreateInstance(document.getElementById('usageLogModal')).hide();
+                    // 모달 닫기 - 여러 방법으로 시도
+                    const modalElement = document.getElementById('usageLogModal');
+                    const modal = bootstrap.Modal.getInstance(modalElement) || new bootstrap.Modal(modalElement);
+                    modal.hide();
+                    
+                    // 추가로 jQuery 방식도 시도
+                    if (typeof $ !== 'undefined') {
+                        $('#usageLogModal').modal('hide');
+                    }
+                    
+                    // 강제로 모달 닫기
+                    modalElement.classList.remove('show');
+                    modalElement.style.display = 'none';
+                    document.body.classList.remove('modal-open');
+                    const backdrop = document.querySelector('.modal-backdrop');
+                    if (backdrop) {
+                        backdrop.remove();
+                    }
                 } else {
                     alert('수정 실패: ' + (result.error || '오류'));
                 }

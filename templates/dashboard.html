@@ -12,7 +12,7 @@
 <!-- Statistics Cards -->
 <div class="row mb-4">
     <div class="col-lg-3 col-md-6 mb-3">
-        <div class="card bg-primary text-white">
+        <div class="card dashboard-card bg-primary text-white">
             <div class="card-body">
                 <div class="d-flex justify-content-between">
                     <div>
@@ -27,7 +27,7 @@
         </div>
     </div>
     <div class="col-lg-3 col-md-6 mb-3">
-        <div class="card bg-success text-white">
+        <div class="card dashboard-card bg-success text-white">
             <div class="card-body">
                 <div class="d-flex justify-content-between">
                     <div>
@@ -42,7 +42,7 @@
         </div>
     </div>
     <div class="col-lg-3 col-md-6 mb-3">
-        <div class="card bg-info text-white">
+        <div class="card dashboard-card bg-info text-white">
             <div class="card-body">
                 <div class="d-flex justify-content-between">
                     <div>
@@ -57,7 +57,7 @@
         </div>
     </div>
     <div class="col-lg-3 col-md-6 mb-3">
-        <div class="card bg-warning text-white">
+        <div class="card dashboard-card bg-warning text-white">
             <div class="card-body">
                 <div class="d-flex justify-content-between">
                     <div>
@@ -76,22 +76,26 @@
 <!-- Charts Row -->
 <div class="row mb-4">
     <div class="col-lg-6 mb-3">
-        <div class="card">
+        <div class="card recent-activity-card">
             <div class="card-header">
                 <h5 class="card-title mb-0"><i class="fas fa-chart-pie"></i> 프로젝트 상태 분포</h5>
             </div>
             <div class="card-body">
-                <canvas id="projectStatusChart" width="400" height="200"></canvas>
+                <div class="chart-container">
+                    <canvas id="projectStatusChart" width="400" height="200"></canvas>
+                </div>
             </div>
         </div>
     </div>
     <div class="col-lg-6 mb-3">
-        <div class="card">
+        <div class="card recent-activity-card">
             <div class="card-header">
                 <h5 class="card-title mb-0"><i class="fas fa-chart-bar"></i> 장비 상태 현황</h5>
             </div>
             <div class="card-body">
-                <canvas id="equipmentStatusChart" width="400" height="200"></canvas>
+                <div class="chart-container">
+                    <canvas id="equipmentStatusChart" width="400" height="200"></canvas>
+                </div>
             </div>
         </div>
     </div>
@@ -100,7 +104,7 @@
 <!-- Recent Activities -->
 <div class="row">
     <div class="col-lg-6 mb-3">
-        <div class="card">
+        <div class="card recent-activity-card">
             <div class="card-header">
                 <h5 class="card-title mb-0"><i class="fas fa-clock"></i> 최근 프로젝트</h5>
             </div>
@@ -126,7 +130,7 @@
         </div>
     </div>
     <div class="col-lg-6 mb-3">
-        <div class="card">
+        <div class="card recent-activity-card">
             <div class="card-header">
                 <h5 class="card-title mb-0"><i class="fas fa-calendar-check"></i> 최근 예약</h5>
             </div>

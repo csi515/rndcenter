@@ -49,10 +49,10 @@
                         <td>{{ equip.purchase_date }}</td>
                         <td>{{ equip.maintenance_date }}</td>
                         <td>
-                            <button class="btn btn-sm btn-outline-primary">
+                            <button class="btn btn-sm btn-outline-primary edit-equipment-btn" data-id="{{ equip.id }}" data-equipment='{{ equip|tojson|escape }}' title="수정">
                                 <i class="fas fa-edit"></i>
                             </button>
-                            <button class="btn btn-sm btn-outline-danger">
+                            <button class="btn btn-sm btn-outline-danger delete-equipment-btn" data-id="{{ equip.id }}" data-name="{{ equip.name }}" title="삭제">
                                 <i class="fas fa-trash"></i>
                             </button>
                         </td>
@@ -126,4 +126,130 @@
         </div>
     </div>
 </div>
+
+<!-- Edit Equipment Modal -->
+<div class="modal fade" id="editEquipmentModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <form method="POST" id="editEquipmentForm">
+                <div class="modal-header">
+                    <h5 class="modal-title">장비 수정</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">장비명 *</label>
+                            <input type="text" class="form-control" name="name" id="editName" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">모델</label>
+                            <input type="text" class="form-control" name="model" id="editModel">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">제조사</label>
+                            <input type="text" class="form-control" name="manufacturer" id="editManufacturer">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">위치</label>
+                            <input type="text" class="form-control" name="location" id="editLocation">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">상태</label>
+                            <select class="form-select" name="status" id="editStatus">
+                                <option value="사용 가능">사용 가능</option>
+                                <option value="점검 중">점검 중</option>
+                                <option value="수리 중">수리 중</option>
+                                <option value="사용 불가">사용 불가</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">구매일</label>
+                            <input type="date" class="form-control" name="purchase_date" id="editPurchaseDate">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">최근 점검일</label>
+                        <input type="date" class="form-control" name="maintenance_date" id="editMaintenanceDate">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">비고</label>
+                        <textarea class="form-control" name="notes" id="editNotes" rows="3"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+                    <button type="submit" class="btn btn-primary">수정</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// 장비 수정 모달 열기
+function editEquipment(id, equipment) {
+    document.getElementById('editEquipmentForm').action = `/equipment/update/${id}`;
+    document.getElementById('editName').value = equipment.name || '';
+    document.getElementById('editModel').value = equipment.model || '';
+    document.getElementById('editManufacturer').value = equipment.manufacturer || '';
+    document.getElementById('editLocation').value = equipment.location || '';
+    document.getElementById('editStatus').value = equipment.status || '사용 가능';
+    document.getElementById('editPurchaseDate').value = equipment.purchase_date || '';
+    document.getElementById('editMaintenanceDate').value = equipment.maintenance_date || '';
+    document.getElementById('editNotes').value = equipment.notes || '';
+    
+    new bootstrap.Modal(document.getElementById('editEquipmentModal')).show();
+}
+
+// 장비 삭제 확인
+function deleteEquipment(id, name) {
+    if (confirm(`정말로 "${name}" 장비를 삭제하시겠습니까?`)) {
+        fetch(`/equipment/delete/${id}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+        .then(response => {
+            if (response.ok) {
+                location.reload();
+            } else {
+                alert('장비 삭제 중 오류가 발생했습니다.');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('장비 삭제 중 오류가 발생했습니다.');
+        });
+    }
+}
+
+// 이벤트 리스너 등록
+document.addEventListener('DOMContentLoaded', function() {
+    // 수정 버튼 이벤트
+    document.querySelectorAll('.edit-equipment-btn').forEach(btn => {
+        btn.onclick = function() {
+            const id = btn.getAttribute('data-id');
+            const equipment = JSON.parse(btn.getAttribute('data-equipment'));
+            editEquipment(id, equipment);
+        };
+    });
+
+    // 삭제 버튼 이벤트
+    document.querySelectorAll('.delete-equipment-btn').forEach(btn => {
+        btn.onclick = function() {
+            const id = btn.getAttribute('data-id');
+            const name = btn.getAttribute('data-name');
+            deleteEquipment(id, name);
+        };
+    });
+});
+</script>
 {% endblock %}
