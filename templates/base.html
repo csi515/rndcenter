@@ -12,7 +12,7 @@
     <!-- FullCalendar CSS -->
     {# <link href='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css' rel='stylesheet'> #}
     <!-- Custom CSS -->
-    <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/style.css', v='1.2') }}" rel="stylesheet">
     
     {% block extra_css %}{% endblock %}
 </head>
@@ -21,68 +21,68 @@
         <!-- Sidebar -->
         <div class="bg-light border-end" id="sidebar-wrapper">
             <div class="sidebar-heading border-bottom bg-primary text-white p-3">
-                <h5 class="mb-0"><i class="fas fa-flask"></i> R&D 센터</h5>
+                <h5 class="mb-0"><i class="fas fa-lightbulb"></i> R&D 센터</h5>
             </div>
             <div class="list-group list-group-flush">
                 <a class="list-group-item list-group-item-action bg-light text-dark" href="{{ url_for('dashboard.dashboard') }}">
-                    <i class="fas fa-tachometer-alt me-2"></i>대시보드
+                    <i class="fas fa-home me-2"></i>대시보드
                 </a>
                 
                 <!-- 연구 관리 -->
                 <div class="list-group-item list-group-item-action bg-light text-dark dropdown-toggle" data-bs-toggle="collapse" data-bs-target="#researchMenu">
-                    <i class="fas fa-microscope me-2"></i>연구 관리
+                    <i class="fas fa-graduation-cap me-2"></i>연구 관리
                 </div>
                 <div class="collapse" id="researchMenu">
                     <a class="list-group-item list-group-item-action bg-white text-dark ps-4" href="{{ url_for('research.projects') }}">
-                        <i class="fas fa-project-diagram me-2"></i>연구 프로젝트
+                        <i class="fas fa-rocket me-2"></i>연구 프로젝트
                     </a>
                     <a class="list-group-item list-group-item-action bg-white text-dark ps-4" href="{{ url_for('research.researchers') }}">
-                        <i class="fas fa-users me-2"></i>연구원 관리
+                        <i class="fas fa-user-friends me-2"></i>연구원 관리
                     </a>
                     <a class="list-group-item list-group-item-action bg-white text-dark ps-4" href="{{ url_for('research.schedule') }}">
-                        <i class="fas fa-calendar-week me-2"></i>주간 일정
+                        <i class="fas fa-calendar-alt me-2"></i>주간 일정
                     </a>
                 </div>
                 
                 <!-- 지식재산 관리 -->
                 <a class="list-group-item list-group-item-action bg-light text-dark" href="{{ url_for('patents.patent_list') }}">
-                    <i class="fas fa-certificate me-2"></i>지식재산 관리
+                    <i class="fas fa-star me-2"></i>지식재산 관리
                 </a>
                 
                 <!-- 장비 관리 -->
                 <div class="list-group-item list-group-item-action bg-light text-dark dropdown-toggle" data-bs-toggle="collapse" data-bs-target="#equipmentMenu" style="cursor: pointer;">
-                    <i class="fas fa-tools me-2"></i>장비 관리
+                    <i class="fas fa-cogs me-2"></i>장비 관리
                 </div>
                 <div class="collapse" id="equipmentMenu">
-                    <a class="list-group-item list-group-item-action bg-white text-dark ps-4" href="{{ url_for('equipment.equipment_list_page') }}">
-                        <i class="fas fa-list me-2"></i>장비 목록
+                    <a class="list-group-item list-group-item-action bg-white text-dark ps-4" href="{{ url_for('equipment_pages.equipment_list_page') }}">
+                        <i class="fas fa-th-list me-2"></i>장비 목록
                     </a>
-                    <a class="list-group-item list-group-item-action bg-white text-dark ps-4" href="{{ url_for('equipment.reservations_page') }}">
-                        <i class="fas fa-calendar-alt me-2"></i>장비 예약
+                    <a class="list-group-item list-group-item-action bg-white text-dark ps-4" href="{{ url_for('equipment_pages.reservations_page') }}">
+                        <i class="fas fa-clock me-2"></i>장비 예약
                     </a>
-                    <a class="list-group-item list-group-item-action bg-white text-dark ps-4" href="{{ url_for('equipment.usage_log_page') }}">
-                        <i class="fas fa-clipboard-list me-2"></i>사용일지
+                    <a class="list-group-item list-group-item-action bg-white text-dark ps-4" href="{{ url_for('equipment_pages.usage_log_page') }}">
+                        <i class="fas fa-clipboard-check me-2"></i>사용일지
+                    </a>
+                    <a class="list-group-item list-group-item-action bg-white text-dark ps-4" href="{{ url_for('equipment_inspection.inspection_list') }}">
+                        <i class="fas fa-clipboard-list me-2"></i>점검 기록
                     </a>
                 </div>
                 
-                <!-- 재고 관리 -->
-                <a class="list-group-item list-group-item-action bg-light text-dark" href="{{ url_for('inventory.current_inventory') }}">
-                    <i class="fas fa-boxes me-2"></i>재고 현황
-                </a>
+
                 
                 <!-- 안전 & 교육 관리 -->
                 <div class="list-group-item list-group-item-action bg-light text-dark dropdown-toggle" data-bs-toggle="collapse" data-bs-target="#safetyMenu">
-                    <i class="fas fa-shield-alt me-2"></i>안전 & 교육
+                    <i class="fas fa-heart me-2"></i>안전 & 교육
                 </div>
                 <div class="collapse" id="safetyMenu">
                     <a class="list-group-item list-group-item-action bg-white text-dark ps-4" href="{{ url_for('safety.materials') }}">
-                        <i class="fas fa-book me-2"></i>교육자료
+                        <i class="fas fa-graduation-cap me-2"></i>교육자료
                     </a>
                     <a class="list-group-item list-group-item-action bg-white text-dark ps-4" href="{{ url_for('safety.accidents') }}">
-                        <i class="fas fa-exclamation-triangle me-2"></i>사고관리
+                        <i class="fas fa-ambulance me-2"></i>사고관리
                     </a>
                     <a class="list-group-item list-group-item-action bg-white text-dark ps-4" href="{{ url_for('safety.procedures') }}">
-                        <i class="fas fa-file-alt me-2"></i>작업절차서 및 위험성평가
+                        <i class="fas fa-tasks me-2"></i>작업 목록
                     </a>
                 </div>
                 
@@ -94,26 +94,23 @@
                 </div>
                 <div class="collapse" id="commMenu">
                     <a class="list-group-item list-group-item-action bg-white text-dark ps-4" href="{{ url_for('communication.free_communication') }}">
-                        <i class="fas fa-comment-dots me-2"></i>자유소통
+                        <i class="fas fa-comments me-2"></i>자유소통
                     </a>
                     <a class="list-group-item list-group-item-action bg-white text-dark ps-4" href="{{ url_for('communication.safety_qa') }}">
-                        <i class="fas fa-question-circle me-2"></i>안전 Q&A
+                        <i class="fas fa-lightbulb me-2"></i>안전 Q&A
                     </a>
                 </div>
                 
                 <!-- 외부 정보 관리 -->
                 <a class="list-group-item list-group-item-action bg-light text-dark" href="{{ url_for('external.contacts') }}">
-                    <i class="fas fa-address-card me-2"></i>명함 관리
+                    <i class="fas fa-id-card me-2"></i>명함 관리
                 </a>
                 
                 <!-- 화학 제품 관리 -->
                 <a class="list-group-item list-group-item-action bg-light text-dark" href="{{ url_for('chemical.msds_list') }}">
-                    <i class="fas fa-flask me-2"></i>MSDS 관리
+                    <i class="fas fa-vial me-2"></i>MSDS 관리
                 </a>
-                <!-- 콜타르피치 휘발물 사용일지 -->
-                <a class="list-group-item list-group-item-action bg-light text-dark" href="{{ url_for('coal_log.coal_log_page') }}">
-                    <i class="fas fa-vial me-2"></i>콜타르피치 휘발물 사용일지
-                </a>
+
             </div>
         </div>
 

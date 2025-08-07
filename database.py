@@ -1,13 +1,9 @@
 import os
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy.orm import DeclarativeBase
 from datetime import datetime
 
 # Create database instance
-class Base(DeclarativeBase):
-    pass
-
-db = SQLAlchemy(model_class=Base)
+db = SQLAlchemy()
 
 # Define all models
 class Project(db.Model):
@@ -21,10 +17,15 @@ class Project(db.Model):
     department = db.Column(db.String(100))
     start_date = db.Column(db.Date)
     end_date = db.Column(db.Date)
-    budget = db.Column(db.Numeric(15, 2))
+    budget = db.Column(db.Float)
     status = db.Column(db.String(50), default='진행중')
     progress = db.Column(db.Integer, default=0)
     participants = db.Column(db.Text)
+    # 분기별 보고서 링크
+    q1_report_link = db.Column(db.String(500))
+    q2_report_link = db.Column(db.String(500))
+    q3_report_link = db.Column(db.String(500))
+    q4_report_link = db.Column(db.String(500))
     created_date = db.Column(db.DateTime, default=datetime.utcnow)
     updated_date = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
@@ -55,14 +56,39 @@ class Equipment(db.Model):
     serial_number = db.Column(db.String(200))
     location = db.Column(db.String(200))
     purchase_date = db.Column(db.Date)
-    purchase_price = db.Column(db.Numeric(15, 2))
+    purchase_price = db.Column(db.Float)
     status = db.Column(db.String(50), default='사용가능')
     manager = db.Column(db.String(100))
     maintenance_date = db.Column(db.Date)
     warranty_expiry = db.Column(db.Date)
+    # 점검 주기 관련 필드 추가
+    inspection_cycle_days = db.Column(db.Integer, default=365)  # 점검 주기 (일)
+    last_inspection_date = db.Column(db.Date)  # 마지막 점검일
+    next_inspection_date = db.Column(db.Date)  # 다음 점검 예정일
+    inspection_status = db.Column(db.String(50), default='정상')  # 점검 상태 (정상, 점검필요, 점검지연)
     specifications = db.Column(db.Text)
     notes = db.Column(db.Text)
     created_date = db.Column(db.DateTime, default=datetime.utcnow)
+
+class EquipmentInspection(db.Model):
+    __tablename__ = 'equipment_inspections'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    equipment_id = db.Column(db.Integer, db.ForeignKey('equipment.id'), nullable=False)
+    inspection_date = db.Column(db.Date, nullable=False)
+    inspector = db.Column(db.String(100), nullable=False)
+    inspection_type = db.Column(db.String(50), default='정기점검')  # 정기점검, 수리후점검, 특별점검
+    result = db.Column(db.String(50), default='정상')  # 정상, 이상발견, 수리필요
+    condition_before = db.Column(db.String(200))  # 점검 전 상태
+    condition_after = db.Column(db.String(200))   # 점검 후 상태
+    findings = db.Column(db.Text)  # 발견사항
+    actions_taken = db.Column(db.Text)  # 조치사항
+    next_inspection_date = db.Column(db.Date)  # 다음 점검 예정일
+    notes = db.Column(db.Text)  # 기타 메모
+    created_date = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    # 관계 설정
+    equipment = db.relationship('Equipment', backref='inspections')
 
 class Reservation(db.Model):
     __tablename__ = 'reservations'
@@ -98,25 +124,9 @@ class UsageLog(db.Model):
 class ProjectType(db.Model):
     __tablename__ = 'project_types'
     id = db.Column(db.String(50), primary_key=True)
-    project_type = db.Column(db.String(200), unique=True, nullable=False)
+    project_type = db.Column(db.String(200), nullable=False)
 
-class CoalTarPitchLog(db.Model):
-    __tablename__ = 'coal_tar_pitch_logs'
-    id = db.Column(db.Integer, primary_key=True)
-    user = db.Column(db.String(100), nullable=False)
-    material = db.Column(db.String(100), default='콜타르피치 휘발물', nullable=False)
-    used_at = db.Column(db.DateTime, nullable=False)
-    location = db.Column(db.String(200))
-    work_content = db.Column(db.String(200))
-    amount = db.Column(db.String(100))
-    ppe = db.Column(db.Boolean, default=False)
-    process_condition = db.Column(db.String(200))
-    exposure_reaction = db.Column(db.String(200))
-    action_note = db.Column(db.String(200))
-    writer = db.Column(db.String(100))
-    manager_sign = db.Column(db.String(100))
-    created_date = db.Column(db.DateTime, default=datetime.utcnow)
-    updated_date = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
 
 # Additional models from routes
 class Week(db.Model):
@@ -178,37 +188,11 @@ class Patent(db.Model):
     amendment_link = db.Column(db.String(500))          # 보정서
     publication_link = db.Column(db.String(500))        # 특허등록 공보
     registration_review_link = db.Column(db.String(500)) # 등록 심의 자료
+    notes = db.Column(db.Text)  # 비고
     created_date = db.Column(db.DateTime, default=datetime.utcnow)
     updated_date = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
-class InventoryItem(db.Model):
-    __tablename__ = 'inventory_items'
-    
-    id = db.Column(db.Integer, primary_key=True)
-    item_id = db.Column(db.String(50), unique=True, nullable=False)
-    name = db.Column(db.String(200), nullable=False)
-    category = db.Column(db.String(100))
-    quantity = db.Column(db.Integer, default=0)
-    unit = db.Column(db.String(50))
-    location = db.Column(db.String(200))
-    supplier = db.Column(db.String(200))
-    unit_price = db.Column(db.Numeric(10, 2))
-    reorder_level = db.Column(db.Integer, default=10)
-    notes = db.Column(db.Text)
-    created_date = db.Column(db.DateTime, default=datetime.utcnow)
-    updated_date = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
-class InventoryTransaction(db.Model):
-    __tablename__ = 'inventory_transactions'
-    
-    id = db.Column(db.Integer, primary_key=True)
-    item_id = db.Column(db.String(50), nullable=False)
-    transaction_type = db.Column(db.String(50), nullable=False)  # 'in', 'out'
-    quantity = db.Column(db.Integer, nullable=False)
-    date = db.Column(db.Date, nullable=False)
-    user = db.Column(db.String(100))
-    notes = db.Column(db.Text)
-    created_date = db.Column(db.DateTime, default=datetime.utcnow)
 
 class SafetyMaterial(db.Model):
     __tablename__ = 'safety_materials'
@@ -252,10 +236,14 @@ class SafetyProcedure(db.Model):
     
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(200), nullable=False)
-    content = db.Column(db.Text, nullable=False)
+    description = db.Column(db.Text, nullable=False)
     category = db.Column(db.String(100))
     version = db.Column(db.String(20))
-    effective_date = db.Column(db.Date)
+    responsible_person = db.Column(db.String(100))
+    review_date = db.Column(db.Date)
+    status = db.Column(db.String(50), default='유효')
+    procedure_link = db.Column(db.String(500))
+    risk_assessment_link = db.Column(db.String(500))
     created_date = db.Column(db.DateTime, default=datetime.utcnow)
     updated_date = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 

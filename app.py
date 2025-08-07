@@ -3,21 +3,23 @@ import logging
 from flask import Flask, redirect, request
 from werkzeug.middleware.proxy_fix import ProxyFix
 from datetime import datetime
+from dotenv import load_dotenv
 
-# Configure logging
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s %(levelname)s %(name)s %(message)s',
-    handlers=[
-        logging.FileHandler('app.log', encoding='utf-8'),
-        logging.StreamHandler()
-    ]
-)
+# 환경 변수 로드
+load_dotenv()
 
 # Create the app
 app = Flask(__name__)
-app.secret_key = os.environ.get("SESSION_SECRET", "dev-secret-key-for-rd-center")
+
+# 환경 설정
+app.secret_key = os.environ.get("SECRET_KEY", "dev-secret-key-for-rd-center")
 app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
+
+# 로깅 설정
+from utils.logger import setup_logger, log_request_info, log_error_info
+setup_logger(app)
+log_request_info(app)
+log_error_info(app)
 
 # Security and performance headers
 @app.after_request
@@ -47,50 +49,70 @@ def https_redirect():
         url = request.url.replace('http://', 'https://', 1)
         return redirect(url, code=301)
 
-# Import database and models
-from database import db, Project, Researcher, Equipment, Reservation, UsageLog, CoalTarPitchLog, Week, WeeklyScheduleNew, Patent, InventoryItem, InventoryTransaction, SafetyMaterial, Accident, AccidentDocument, SafetyProcedure, Contact, Communication, Chemical
-
 # Configure the database
 app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get(
     "DATABASE_URL",
     "sqlite:///app.db"  # Use SQLite as fallback
 )
-app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
-    "pool_recycle": 300,
-    "pool_pre_ping": True,
-}
+
+# PostgreSQL인 경우에만 연결 풀 설정 적용
+if app.config["SQLALCHEMY_DATABASE_URI"].startswith('postgresql'):
+    app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
+        "pool_recycle": 300,
+        "pool_pre_ping": True,
+        "pool_size": 10,
+        "max_overflow": 20,
+    }
+else:
+    # SQLite인 경우 기본 설정만 적용
+    app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
+        "pool_pre_ping": True,
+    }
+
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+
+# Import database and models
+from database import db, Project, Researcher, Equipment, Reservation, UsageLog, Week, WeeklyScheduleNew, Patent, SafetyMaterial, Accident, AccidentDocument, SafetyProcedure, Contact, Communication, Chemical
 
 db.init_app(app)
 
-
-
 # Create tables
 with app.app_context():
-    db.create_all()
+    try:
+        db.create_all()
+        app.logger.info("데이터베이스 테이블이 성공적으로 생성되었습니다.")
+    except Exception as e:
+        app.logger.error(f"데이터베이스 테이블 생성 중 오류: {str(e)}")
 
 # Import and register blueprints
 from routes.dashboard import dashboard_bp
 from routes.research import research_bp
 from routes.patents import patents_bp
+from routes.equipment_pages import equipment_pages_bp
+from routes.equipment_api import equipment_api_bp
 from routes.equipment import equipment_bp
-from routes.inventory import inventory_bp
+from routes.equipment_inspection import equipment_inspection_bp
 from routes.safety import safety_bp
 from routes.communication import communication_bp
 from routes.external import external_bp
 from routes.chemical import chemical_bp
-from routes.coal_tar_pitch_log import coal_log_bp
 
 app.register_blueprint(dashboard_bp, url_prefix='/')
 app.register_blueprint(research_bp, url_prefix='/research')
 app.register_blueprint(patents_bp, url_prefix='/patents')
+app.register_blueprint(equipment_pages_bp, url_prefix='/equipment')
+app.register_blueprint(equipment_api_bp, url_prefix='/equipment')
 app.register_blueprint(equipment_bp, url_prefix='/equipment')
-app.register_blueprint(inventory_bp, url_prefix='/inventory')
+app.register_blueprint(equipment_inspection_bp, url_prefix='/equipment')
 app.register_blueprint(safety_bp, url_prefix='/safety')
 app.register_blueprint(communication_bp, url_prefix='/communication')
 app.register_blueprint(external_bp, url_prefix='/external')
 app.register_blueprint(chemical_bp, url_prefix='/chemical')
-app.register_blueprint(coal_log_bp, url_prefix='/')
 
 if __name__ == '__main__':
-    app.run(host='127.0.0.1', port=8002, debug=True)
+    host = os.environ.get('HOST', '127.0.0.1')
+    port = int(os.environ.get('PORT', 8002))
+    debug = os.environ.get('DEBUG', 'False').lower() == 'true'
+    
+    app.logger.info(f"애플리케이션이 시작됩니다. 호스트: {host}, 포트: {port}, 디버그: {debug}")
+    app.run(host=host, port=port, debug=debug)

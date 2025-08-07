@@ -1,795 +1,470 @@
-2025-07-30 13:32:47,809 INFO werkzeug [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+2025-08-07 11:57:43 INFO app 로거가 설정되었습니다. 로그 레벨: INFO, 로그 파일: app.log
+2025-08-07 11:58:01 INFO app 로거가 설정되었습니다. 로그 레벨: INFO, 로그 파일: app.log
+2025-08-07 11:58:01 INFO app 데이터베이스 테이블이 성공적으로 생성되었습니다.
+2025-08-07 11:58:01 INFO app 애플리케이션이 시작됩니다. 호스트: 127.0.0.1, 포트: 8002, 디버그: False
+2025-08-07 11:58:01 INFO werkzeug [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
  * Running on http://127.0.0.1:8002
-2025-07-30 13:32:47,809 INFO werkzeug [33mPress CTRL+C to quit[0m
-2025-07-30 13:32:47,842 INFO werkzeug  * Restarting with watchdog (windowsapi)
-2025-07-30 13:32:48,409 WARNING werkzeug  * Debugger is active!
-2025-07-30 13:32:48,417 INFO werkzeug  * Debugger PIN: 124-020-770
-2025-07-30 13:32:48,721 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 13:32:48] "[35m[1mGET / HTTP/1.1[0m" 500 -
-2025-07-30 13:32:48,874 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 13:32:48] "GET /?__debugger__=yes&cmd=resource&f=debugger.js HTTP/1.1" 200 -
-2025-07-30 13:32:48,880 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 13:32:48] "GET /?__debugger__=yes&cmd=resource&f=style.css HTTP/1.1" 200 -
-2025-07-30 13:32:48,934 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 13:32:48] "GET /?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1" 200 -
-2025-07-30 13:32:48,949 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 13:32:48] "[36mGET /?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
-2025-07-30 13:32:53,388 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\routes\\dashboard.py', reloading
-2025-07-30 13:32:53,389 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\routes\\dashboard.py', reloading
-2025-07-30 13:32:53,454 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\routes\\dashboard.py', reloading
-2025-07-30 13:32:53,456 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\routes\\dashboard.py', reloading
-2025-07-30 13:32:53,753 INFO werkzeug  * Restarting with watchdog (windowsapi)
-2025-07-30 13:32:54,308 WARNING werkzeug  * Debugger is active!
-2025-07-30 13:32:54,315 INFO werkzeug  * Debugger PIN: 124-020-770
-2025-07-30 13:32:57,445 INFO werkzeug  * Detected change in 'C:\\Program Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\\Lib\\encodings\\unicode_escape.py', reloading
-2025-07-30 13:32:57,450 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 13:32:57] "GET / HTTP/1.1" 200 -
-2025-07-30 13:32:57,558 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 13:32:57] "GET /static/js/main.js HTTP/1.1" 200 -
-2025-07-30 13:32:57,563 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 13:32:57] "GET /static/css/style.css HTTP/1.1" 200 -
-2025-07-30 13:32:57,616 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 13:32:57] "GET /api/stats HTTP/1.1" 200 -
-2025-07-30 13:32:57,620 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 13:32:57] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
-2025-07-30 13:32:58,661 INFO werkzeug  * Restarting with watchdog (windowsapi)
-2025-07-30 13:32:59,193 WARNING werkzeug  * Debugger is active!
-2025-07-30 13:32:59,200 INFO werkzeug  * Debugger PIN: 124-020-770
-2025-07-30 13:33:05,046 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 13:33:05] "GET / HTTP/1.1" 200 -
-2025-07-30 13:33:05,056 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 13:33:05] "GET /api/stats HTTP/1.1" 200 -
-2025-07-30 13:33:06,302 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 13:33:06] "GET / HTTP/1.1" 200 -
-2025-07-30 13:33:06,311 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 13:33:06] "GET /api/stats HTTP/1.1" 200 -
-2025-07-30 13:33:08,298 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 13:33:08] "GET / HTTP/1.1" 200 -
-2025-07-30 13:33:08,308 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 13:33:08] "GET /api/stats HTTP/1.1" 200 -
-2025-07-30 13:33:09,414 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 13:33:09] "GET / HTTP/1.1" 200 -
-2025-07-30 13:33:09,424 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 13:33:09] "GET /api/stats HTTP/1.1" 200 -
-2025-07-30 13:33:09,955 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 13:33:09] "GET / HTTP/1.1" 200 -
-2025-07-30 13:33:09,965 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 13:33:09] "GET /api/stats HTTP/1.1" 200 -
-2025-07-30 13:33:13,858 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\routes\\chemical.py', reloading
-2025-07-30 13:33:13,859 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\app.py', reloading
-2025-07-30 13:33:13,859 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\routes\\chemical.py', reloading
-2025-07-30 13:33:13,860 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\app.py', reloading
-2025-07-30 13:33:14,784 INFO werkzeug  * Restarting with watchdog (windowsapi)
-2025-07-30 13:33:15,302 WARNING werkzeug  * Debugger is active!
-2025-07-30 13:33:15,310 INFO werkzeug  * Debugger PIN: 124-020-770
-2025-07-30 13:53:38,164 INFO werkzeug [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
- * Running on http://127.0.0.1:8002
-2025-07-30 13:53:38,165 INFO werkzeug [33mPress CTRL+C to quit[0m
-2025-07-30 13:53:38,175 INFO werkzeug  * Restarting with watchdog (windowsapi)
-2025-07-30 13:53:38,718 WARNING werkzeug  * Debugger is active!
-2025-07-30 13:53:38,725 INFO werkzeug  * Debugger PIN: 124-020-770
-2025-07-30 13:53:41,420 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 13:53:41] "GET / HTTP/1.1" 200 -
-2025-07-30 13:53:41,451 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 13:53:41] "GET /api/stats HTTP/1.1" 200 -
-2025-07-30 13:53:41,490 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 13:53:41] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
-2025-07-30 13:53:46,628 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\app.py', reloading
-2025-07-30 13:53:46,628 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\app.py', reloading
-2025-07-30 13:53:46,763 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\app.py', reloading
-2025-07-30 13:53:46,764 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\app.py', reloading
-2025-07-30 13:53:47,107 INFO werkzeug  * Restarting with watchdog (windowsapi)
-2025-07-30 13:53:47,673 WARNING werkzeug  * Debugger is active!
-2025-07-30 13:53:47,679 INFO werkzeug  * Debugger PIN: 124-020-770
-2025-07-30 13:53:55,397 INFO werkzeug [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
- * Running on http://127.0.0.1:8002
-2025-07-30 13:53:55,397 INFO werkzeug [33mPress CTRL+C to quit[0m
-2025-07-30 13:53:55,408 INFO werkzeug  * Restarting with watchdog (windowsapi)
-2025-07-30 13:53:55,965 WARNING werkzeug  * Debugger is active!
-2025-07-30 13:53:55,972 INFO werkzeug  * Debugger PIN: 124-020-770
-2025-07-30 13:53:58,716 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 13:53:58] "GET / HTTP/1.1" 200 -
-2025-07-30 13:53:58,789 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 13:53:58] "GET /api/stats HTTP/1.1" 200 -
-2025-07-30 13:54:58,310 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 13:54:58] "GET / HTTP/1.1" 200 -
-2025-07-30 13:54:58,344 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 13:54:58] "GET /api/stats HTTP/1.1" 200 -
-2025-07-30 13:55:25,633 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 13:55:25] "GET / HTTP/1.1" 200 -
-2025-07-30 13:55:25,669 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 13:55:25] "GET /api/stats HTTP/1.1" 200 -
-2025-07-30 13:55:28,272 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 13:55:28] "GET /research/projects HTTP/1.1" 200 -
-2025-07-30 13:55:39,888 INFO werkzeug  * Detected change in 'C:\\Program Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\\Lib\\_strptime.py', reloading
-2025-07-30 13:55:39,890 INFO werkzeug  * Detected change in 'C:\\Program Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\\Lib\\_strptime.py', reloading
-2025-07-30 13:55:39,895 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 13:55:39] "[32mPOST /research/projects/add HTTP/1.1[0m" 302 -
-2025-07-30 13:55:39,901 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 13:55:39] "GET /research/projects HTTP/1.1" 200 -
-2025-07-30 13:55:40,985 INFO werkzeug  * Restarting with watchdog (windowsapi)
-2025-07-30 13:55:41,089 INFO werkzeug  * Restarting with watchdog (windowsapi)
-2025-07-30 13:55:41,570 WARNING werkzeug  * Debugger is active!
-2025-07-30 13:55:41,577 INFO werkzeug  * Debugger PIN: 124-020-770
-2025-07-30 13:55:41,672 WARNING werkzeug  * Debugger is active!
-2025-07-30 13:55:41,679 INFO werkzeug  * Debugger PIN: 124-020-770
-2025-07-30 13:55:42,207 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 13:55:42] "GET /research/researchers HTTP/1.1" 200 -
-2025-07-30 13:55:49,880 INFO werkzeug  * Detected change in 'C:\\Users\\POSCOMCMATERIALS\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python311\\site-packages\\sqlalchemy\\orm\\state_changes.py', reloading
-2025-07-30 13:55:49,880 INFO werkzeug  * Detected change in 'C:\\Users\\POSCOMCMATERIALS\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python311\\site-packages\\sqlalchemy\\orm\\state_changes.py', reloading
-2025-07-30 13:55:49,882 INFO werkzeug  * Detected change in 'C:\\Users\\POSCOMCMATERIALS\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python311\\site-packages\\sqlalchemy\\orm\\unitofwork.py', reloading
-2025-07-30 13:55:49,882 INFO werkzeug  * Detected change in 'C:\\Users\\POSCOMCMATERIALS\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python311\\site-packages\\sqlalchemy\\orm\\unitofwork.py', reloading
-2025-07-30 13:55:49,884 INFO werkzeug  * Detected change in 'C:\\Users\\POSCOMCMATERIALS\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python311\\site-packages\\sqlalchemy\\orm\\persistence.py', reloading
-2025-07-30 13:55:49,886 INFO werkzeug  * Detected change in 'C:\\Users\\POSCOMCMATERIALS\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python311\\site-packages\\sqlalchemy\\engine\\base.py', reloading
-2025-07-30 13:55:49,886 INFO werkzeug  * Detected change in 'C:\\Users\\POSCOMCMATERIALS\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python311\\site-packages\\sqlalchemy\\engine\\base.py', reloading
-2025-07-30 13:55:49,889 INFO werkzeug  * Detected change in 'C:\\Users\\POSCOMCMATERIALS\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python311\\site-packages\\sqlalchemy\\engine\\default.py', reloading
-2025-07-30 13:55:49,890 INFO werkzeug  * Detected change in 'C:\\Users\\POSCOMCMATERIALS\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python311\\site-packages\\sqlalchemy\\engine\\default.py', reloading
-2025-07-30 13:55:50,020 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 13:55:50] "[35m[1mPOST /research/researchers/add HTTP/1.1[0m" 500 -
-2025-07-30 13:55:50,166 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 13:55:50] "GET /research/researchers/add?__debugger__=yes&cmd=resource&f=style.css HTTP/1.1" 200 -
-2025-07-30 13:55:50,181 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 13:55:50] "GET /research/researchers/add?__debugger__=yes&cmd=resource&f=debugger.js HTTP/1.1" 200 -
-2025-07-30 13:55:50,213 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 13:55:50] "GET /research/researchers/add?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1" 200 -
-2025-07-30 13:55:50,242 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 13:55:50] "[36mGET /research/researchers/add?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
-2025-07-30 13:55:50,972 INFO werkzeug  * Restarting with watchdog (windowsapi)
-2025-07-30 13:55:51,062 INFO werkzeug  * Restarting with watchdog (windowsapi)
-2025-07-30 13:55:51,516 WARNING werkzeug  * Debugger is active!
-2025-07-30 13:55:51,524 INFO werkzeug  * Debugger PIN: 124-020-770
-2025-07-30 13:55:51,611 WARNING werkzeug  * Debugger is active!
-2025-07-30 13:55:51,618 INFO werkzeug  * Debugger PIN: 124-020-770
-2025-07-30 13:56:23,710 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\routes\\research.py', reloading
-2025-07-30 13:56:23,711 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\routes\\research.py', reloading
-2025-07-30 13:56:23,711 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\routes\\research.py', reloading
-2025-07-30 13:56:23,712 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\routes\\research.py', reloading
-2025-07-30 13:56:23,761 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\routes\\research.py', reloading
-2025-07-30 13:56:23,761 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\routes\\research.py', reloading
-2025-07-30 13:56:23,762 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\routes\\research.py', reloading
-2025-07-30 13:56:23,762 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\routes\\research.py', reloading
-2025-07-30 13:56:24,342 INFO werkzeug  * Restarting with watchdog (windowsapi)
-2025-07-30 13:56:24,449 INFO werkzeug  * Restarting with watchdog (windowsapi)
-2025-07-30 13:56:24,914 WARNING werkzeug  * Debugger is active!
-2025-07-30 13:56:24,922 INFO werkzeug  * Debugger PIN: 124-020-770
-2025-07-30 13:56:25,005 WARNING werkzeug  * Debugger is active!
-2025-07-30 13:56:25,012 INFO werkzeug  * Debugger PIN: 124-020-770
-2025-07-30 13:56:33,841 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\routes\\research.py', reloading
-2025-07-30 13:56:33,842 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\routes\\research.py', reloading
-2025-07-30 13:56:33,852 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\routes\\research.py', reloading
-2025-07-30 13:56:33,852 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\routes\\research.py', reloading
-2025-07-30 13:56:33,852 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\routes\\research.py', reloading
-2025-07-30 13:56:33,853 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\routes\\research.py', reloading
-2025-07-30 13:56:33,931 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\routes\\research.py', reloading
-2025-07-30 13:56:33,931 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\routes\\research.py', reloading
-2025-07-30 13:56:33,933 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\routes\\research.py', reloading
-2025-07-30 13:56:34,337 INFO werkzeug  * Restarting with watchdog (windowsapi)
-2025-07-30 13:56:34,429 INFO werkzeug  * Restarting with watchdog (windowsapi)
-2025-07-30 13:56:34,898 WARNING werkzeug  * Debugger is active!
-2025-07-30 13:56:34,908 INFO werkzeug  * Debugger PIN: 124-020-770
-2025-07-30 13:56:34,980 WARNING werkzeug  * Debugger is active!
-2025-07-30 13:56:34,986 INFO werkzeug  * Debugger PIN: 124-020-770
-2025-07-30 13:56:42,215 INFO werkzeug [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
- * Running on http://127.0.0.1:8002
-2025-07-30 13:56:42,216 INFO werkzeug [33mPress CTRL+C to quit[0m
-2025-07-30 13:56:42,227 INFO werkzeug  * Restarting with watchdog (windowsapi)
-2025-07-30 13:56:42,798 WARNING werkzeug  * Debugger is active!
-2025-07-30 13:56:42,805 INFO werkzeug  * Debugger PIN: 124-020-770
-2025-07-30 13:56:45,722 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 13:56:45] "GET / HTTP/1.1" 200 -
-2025-07-30 13:56:45,759 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 13:56:45] "GET /api/stats HTTP/1.1" 200 -
-2025-07-30 13:56:53,286 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 13:56:53] "GET /research/researchers HTTP/1.1" 200 -
-2025-07-30 13:57:51,537 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 13:57:51] "[35m[1mPOST /research/researchers/add HTTP/1.1[0m" 500 -
-2025-07-30 13:57:51,652 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 13:57:51] "[36mGET /research/researchers/add?__debugger__=yes&cmd=resource&f=style.css HTTP/1.1[0m" 304 -
-2025-07-30 13:57:51,663 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 13:57:51] "[36mGET /research/researchers/add?__debugger__=yes&cmd=resource&f=debugger.js HTTP/1.1[0m" 304 -
-2025-07-30 13:57:51,676 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 13:57:51] "[36mGET /research/researchers/add?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
-2025-07-30 13:57:58,486 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\routes\\research.py', reloading
-2025-07-30 13:57:58,486 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\routes\\research.py', reloading
-2025-07-30 13:57:58,486 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\routes\\research.py', reloading
-2025-07-30 13:57:58,487 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\routes\\research.py', reloading
-2025-07-30 13:57:58,487 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\routes\\research.py', reloading
-2025-07-30 13:57:58,562 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\routes\\research.py', reloading
-2025-07-30 13:57:58,562 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\routes\\research.py', reloading
-2025-07-30 13:57:58,562 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\routes\\research.py', reloading
-2025-07-30 13:57:58,563 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\routes\\research.py', reloading
-2025-07-30 13:57:58,563 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\routes\\research.py', reloading
-2025-07-30 13:57:58,563 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\routes\\research.py', reloading
-2025-07-30 13:57:58,564 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\routes\\research.py', reloading
-2025-07-30 13:57:59,358 INFO werkzeug  * Restarting with watchdog (windowsapi)
-2025-07-30 13:57:59,671 INFO werkzeug  * Restarting with watchdog (windowsapi)
-2025-07-30 13:57:59,687 INFO werkzeug  * Restarting with watchdog (windowsapi)
-2025-07-30 13:57:59,923 WARNING werkzeug  * Debugger is active!
-2025-07-30 13:57:59,932 INFO werkzeug  * Debugger PIN: 124-020-770
-2025-07-30 13:58:00,229 WARNING werkzeug  * Debugger is active!
-2025-07-30 13:58:00,237 INFO werkzeug  * Debugger PIN: 124-020-770
-2025-07-30 13:58:00,247 WARNING werkzeug  * Debugger is active!
-2025-07-30 13:58:00,257 INFO werkzeug  * Debugger PIN: 124-020-770
-2025-07-30 13:58:06,481 INFO werkzeug [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
- * Running on http://127.0.0.1:8002
-2025-07-30 13:58:06,481 INFO werkzeug [33mPress CTRL+C to quit[0m
-2025-07-30 13:58:06,490 INFO werkzeug  * Restarting with watchdog (windowsapi)
-2025-07-30 13:58:07,021 WARNING werkzeug  * Debugger is active!
-2025-07-30 13:58:07,033 INFO werkzeug  * Debugger PIN: 124-020-770
-2025-07-30 13:58:09,734 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 13:58:09] "GET / HTTP/1.1" 200 -
-2025-07-30 13:58:09,754 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 13:58:09] "GET /api/stats HTTP/1.1" 200 -
-2025-07-30 13:58:12,556 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 13:58:12] "GET /research/researchers HTTP/1.1" 200 -
-2025-07-30 13:58:28,849 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 13:58:28] "[32mPOST /research/researchers/add HTTP/1.1[0m" 302 -
-2025-07-30 13:58:28,854 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 13:58:28] "GET /research/researchers HTTP/1.1" 200 -
-2025-07-30 13:58:32,861 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 13:58:32] "[33mGET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1[0m" 404 -
-2025-07-30 13:59:24,319 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\routes\\research.py', reloading
-2025-07-30 13:59:24,319 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\routes\\research.py', reloading
-2025-07-30 13:59:24,319 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\routes\\research.py', reloading
-2025-07-30 13:59:24,329 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\routes\\research.py', reloading
-2025-07-30 13:59:24,329 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\routes\\research.py', reloading
-2025-07-30 13:59:24,329 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\routes\\research.py', reloading
-2025-07-30 13:59:24,353 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\routes\\research.py', reloading
-2025-07-30 13:59:24,353 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\routes\\research.py', reloading
-2025-07-30 13:59:24,353 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\routes\\research.py', reloading
-2025-07-30 13:59:24,353 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\routes\\research.py', reloading
-2025-07-30 13:59:24,353 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\routes\\research.py', reloading
-2025-07-30 13:59:24,353 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\routes\\research.py', reloading
-2025-07-30 13:59:24,353 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\routes\\research.py', reloading
-2025-07-30 13:59:24,354 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\routes\\research.py', reloading
-2025-07-30 13:59:24,354 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\routes\\research.py', reloading
-2025-07-30 13:59:24,354 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\routes\\research.py', reloading
-2025-07-30 13:59:24,808 INFO werkzeug  * Restarting with watchdog (windowsapi)
-2025-07-30 13:59:24,808 INFO werkzeug  * Restarting with watchdog (windowsapi)
-2025-07-30 13:59:25,077 INFO werkzeug  * Restarting with watchdog (windowsapi)
-2025-07-30 13:59:25,107 INFO werkzeug  * Restarting with watchdog (windowsapi)
-2025-07-30 13:59:25,416 WARNING werkzeug  * Debugger is active!
-2025-07-30 13:59:25,416 WARNING werkzeug  * Debugger is active!
-2025-07-30 13:59:25,426 INFO werkzeug  * Debugger PIN: 124-020-770
-2025-07-30 13:59:25,427 INFO werkzeug  * Debugger PIN: 124-020-770
-2025-07-30 13:59:25,683 WARNING werkzeug  * Debugger is active!
-2025-07-30 13:59:25,689 INFO werkzeug  * Debugger PIN: 124-020-770
-2025-07-30 13:59:25,710 WARNING werkzeug  * Debugger is active!
-2025-07-30 13:59:25,718 INFO werkzeug  * Debugger PIN: 124-020-770
-2025-07-30 13:59:41,236 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\database.py', reloading
-2025-07-30 13:59:41,236 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\database.py', reloading
-2025-07-30 13:59:41,236 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\database.py', reloading
-2025-07-30 13:59:41,236 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\database.py', reloading
-2025-07-30 13:59:41,247 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\database.py', reloading
-2025-07-30 13:59:41,247 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\database.py', reloading
-2025-07-30 13:59:41,247 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\database.py', reloading
-2025-07-30 13:59:41,247 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\database.py', reloading
-2025-07-30 13:59:41,796 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\database.py', reloading
-2025-07-30 13:59:41,796 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\database.py', reloading
-2025-07-30 13:59:41,796 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\database.py', reloading
-2025-07-30 13:59:41,797 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\database.py', reloading
-2025-07-30 13:59:41,797 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\database.py', reloading
-2025-07-30 13:59:41,798 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\database.py', reloading
-2025-07-30 13:59:41,799 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\database.py', reloading
-2025-07-30 13:59:42,070 INFO werkzeug  * Restarting with watchdog (windowsapi)
-2025-07-30 13:59:42,248 INFO werkzeug  * Restarting with watchdog (windowsapi)
-2025-07-30 13:59:42,685 WARNING werkzeug  * Debugger is active!
-2025-07-30 13:59:42,685 WARNING werkzeug  * Debugger is active!
-2025-07-30 13:59:42,693 INFO werkzeug  * Debugger PIN: 124-020-770
-2025-07-30 13:59:42,694 INFO werkzeug  * Debugger PIN: 124-020-770
-2025-07-30 13:59:42,843 WARNING werkzeug  * Debugger is active!
-2025-07-30 13:59:42,845 WARNING werkzeug  * Debugger is active!
-2025-07-30 13:59:42,851 INFO werkzeug  * Debugger PIN: 124-020-770
-2025-07-30 13:59:42,852 INFO werkzeug  * Debugger PIN: 124-020-770
-2025-07-30 13:59:49,602 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\routes\\research.py', reloading
-2025-07-30 13:59:49,602 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\routes\\research.py', reloading
-2025-07-30 13:59:49,602 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\routes\\research.py', reloading
-2025-07-30 13:59:49,602 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\routes\\research.py', reloading
-2025-07-30 13:59:49,613 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\routes\\research.py', reloading
-2025-07-30 13:59:49,613 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\routes\\research.py', reloading
-2025-07-30 13:59:49,613 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\routes\\research.py', reloading
-2025-07-30 13:59:49,614 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\routes\\research.py', reloading
-2025-07-30 13:59:49,614 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\routes\\research.py', reloading
-2025-07-30 13:59:49,614 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\routes\\research.py', reloading
-2025-07-30 13:59:49,658 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\routes\\research.py', reloading
-2025-07-30 13:59:49,658 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\routes\\research.py', reloading
-2025-07-30 13:59:49,658 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\routes\\research.py', reloading
-2025-07-30 13:59:49,658 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\routes\\research.py', reloading
-2025-07-30 13:59:49,658 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\routes\\research.py', reloading
-2025-07-30 13:59:49,659 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\routes\\research.py', reloading
-2025-07-30 13:59:49,659 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\routes\\research.py', reloading
-2025-07-30 13:59:49,659 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\routes\\research.py', reloading
-2025-07-30 13:59:50,101 INFO werkzeug  * Restarting with watchdog (windowsapi)
-2025-07-30 13:59:50,204 INFO werkzeug  * Restarting with watchdog (windowsapi)
-2025-07-30 13:59:50,234 INFO werkzeug  * Restarting with watchdog (windowsapi)
-2025-07-30 13:59:50,699 WARNING werkzeug  * Debugger is active!
-2025-07-30 13:59:50,703 WARNING werkzeug  * Debugger is active!
-2025-07-30 13:59:50,710 INFO werkzeug  * Debugger PIN: 124-020-770
-2025-07-30 13:59:50,713 INFO werkzeug  * Debugger PIN: 124-020-770
-2025-07-30 13:59:50,792 WARNING werkzeug  * Debugger is active!
-2025-07-30 13:59:50,799 INFO werkzeug  * Debugger PIN: 124-020-770
-2025-07-30 13:59:50,820 WARNING werkzeug  * Debugger is active!
-2025-07-30 13:59:50,829 INFO werkzeug  * Debugger PIN: 124-020-770
-2025-07-30 13:59:57,690 INFO werkzeug [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
- * Running on http://127.0.0.1:8002
-2025-07-30 13:59:57,690 INFO werkzeug [33mPress CTRL+C to quit[0m
-2025-07-30 13:59:57,700 INFO werkzeug  * Restarting with watchdog (windowsapi)
-2025-07-30 13:59:58,242 WARNING werkzeug  * Debugger is active!
-2025-07-30 13:59:58,249 INFO werkzeug  * Debugger PIN: 124-020-770
-2025-07-30 14:00:01,440 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 14:00:01] "GET /research/researchers HTTP/1.1" 200 -
-2025-07-30 14:00:19,920 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 14:00:19] "[32mPOST /research/researchers/add HTTP/1.1[0m" 302 -
-2025-07-30 14:00:19,923 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 14:00:19] "GET /research/researchers HTTP/1.1" 200 -
-2025-07-30 14:00:37,755 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\init_db.py', reloading
-2025-07-30 14:00:37,755 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\init_db.py', reloading
-2025-07-30 14:00:37,755 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\init_db.py', reloading
-2025-07-30 14:00:37,766 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\init_db.py', reloading
-2025-07-30 14:00:37,766 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\init_db.py', reloading
-2025-07-30 14:00:37,766 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\init_db.py', reloading
-2025-07-30 14:00:37,767 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\init_db.py', reloading
-2025-07-30 14:00:37,767 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\init_db.py', reloading
-2025-07-30 14:00:37,767 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\init_db.py', reloading
-2025-07-30 14:00:37,767 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\init_db.py', reloading
-2025-07-30 14:00:37,767 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\init_db.py', reloading
-2025-07-30 14:00:37,767 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\init_db.py', reloading
-2025-07-30 14:00:37,768 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\init_db.py', reloading
-2025-07-30 14:00:37,768 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\init_db.py', reloading
-2025-07-30 14:00:38,184 INFO werkzeug  * Restarting with watchdog (windowsapi)
-2025-07-30 14:00:38,845 WARNING werkzeug  * Debugger is active!
-2025-07-30 14:00:38,860 INFO werkzeug  * Debugger PIN: 124-020-770
-2025-07-30 14:00:38,933 INFO werkzeug  * Restarting with watchdog (windowsapi)
-2025-07-30 14:00:38,977 INFO werkzeug  * Restarting with watchdog (windowsapi)
-2025-07-30 14:00:38,993 INFO werkzeug  * Restarting with watchdog (windowsapi)
-2025-07-30 14:00:38,993 INFO werkzeug  * Restarting with watchdog (windowsapi)
-2025-07-30 14:00:39,570 WARNING werkzeug  * Debugger is active!
-2025-07-30 14:00:39,578 INFO werkzeug  * Debugger PIN: 124-020-770
-2025-07-30 14:00:39,618 WARNING werkzeug  * Debugger is active!
-2025-07-30 14:00:39,627 INFO werkzeug  * Debugger PIN: 124-020-770
-2025-07-30 14:00:39,634 WARNING werkzeug  * Debugger is active!
-2025-07-30 14:00:39,638 WARNING werkzeug  * Debugger is active!
-2025-07-30 14:00:39,645 INFO werkzeug  * Debugger PIN: 124-020-770
-2025-07-30 14:00:39,649 INFO werkzeug  * Debugger PIN: 124-020-770
-2025-07-30 14:00:39,673 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\init_db.py', reloading
-2025-07-30 14:00:39,673 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\init_db.py', reloading
-2025-07-30 14:00:39,674 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\init_db.py', reloading
-2025-07-30 14:00:39,685 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\init_db.py', reloading
-2025-07-30 14:00:39,685 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\init_db.py', reloading
-2025-07-30 14:00:40,101 INFO werkzeug  * Restarting with watchdog (windowsapi)
-2025-07-30 14:00:40,636 WARNING werkzeug  * Debugger is active!
-2025-07-30 14:00:40,642 INFO werkzeug  * Debugger PIN: 124-020-770
-2025-07-30 14:00:40,839 INFO werkzeug  * Restarting with watchdog (windowsapi)
-2025-07-30 14:00:40,900 INFO werkzeug  * Restarting with watchdog (windowsapi)
-2025-07-30 14:00:41,396 WARNING werkzeug  * Debugger is active!
-2025-07-30 14:00:41,406 INFO werkzeug  * Debugger PIN: 124-020-770
-2025-07-30 14:00:41,451 WARNING werkzeug  * Debugger is active!
-2025-07-30 14:00:41,461 INFO werkzeug  * Debugger PIN: 124-020-770
-2025-07-30 14:00:49,749 INFO werkzeug [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
- * Running on http://127.0.0.1:8002
-2025-07-30 14:00:49,750 INFO werkzeug [33mPress CTRL+C to quit[0m
-2025-07-30 14:00:49,759 INFO werkzeug  * Restarting with watchdog (windowsapi)
-2025-07-30 14:00:50,302 WARNING werkzeug  * Debugger is active!
-2025-07-30 14:00:50,319 INFO werkzeug  * Debugger PIN: 124-020-770
-2025-07-30 14:00:53,335 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 14:00:53] "GET /research/researchers HTTP/1.1" 200 -
-2025-07-30 14:01:11,505 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 14:01:11] "[32mPOST /research/researchers/add HTTP/1.1[0m" 302 -
-2025-07-30 14:01:11,508 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 14:01:11] "GET /research/researchers HTTP/1.1" 200 -
-2025-07-30 14:01:40,669 INFO werkzeug [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
- * Running on http://127.0.0.1:8002
-2025-07-30 14:01:40,669 INFO werkzeug [33mPress CTRL+C to quit[0m
-2025-07-30 14:01:40,680 INFO werkzeug  * Restarting with watchdog (windowsapi)
-2025-07-30 14:01:41,203 WARNING werkzeug  * Debugger is active!
-2025-07-30 14:01:41,210 INFO werkzeug  * Debugger PIN: 124-020-770
-2025-07-30 14:01:44,190 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 14:01:44] "GET /research/researchers HTTP/1.1" 200 -
-2025-07-30 14:02:01,706 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 14:02:01] "[32mPOST /research/researchers/add HTTP/1.1[0m" 302 -
-2025-07-30 14:02:01,709 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 14:02:01] "GET /research/researchers HTTP/1.1" 200 -
-2025-07-30 14:02:07,290 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 14:02:07] "GET /research/schedule HTTP/1.1" 200 -
-2025-07-30 14:02:07,312 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 14:02:07] "GET /research/api/schedule HTTP/1.1" 200 -
-2025-07-30 14:02:07,325 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 14:02:07] "GET /research/projects/api HTTP/1.1" 200 -
-2025-07-30 14:02:12,992 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 14:02:12] "POST /research/projects/manage HTTP/1.1" 200 -
-2025-07-30 14:02:12,998 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 14:02:12] "GET /research/projects/api HTTP/1.1" 200 -
-2025-07-30 14:02:17,536 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 14:02:17] "POST /research/projects/manage HTTP/1.1" 200 -
-2025-07-30 14:02:17,541 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 14:02:17] "GET /research/projects/api HTTP/1.1" 200 -
-2025-07-30 14:02:27,220 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 14:02:27] "GET /patents/list HTTP/1.1" 200 -
-2025-07-30 14:03:10,882 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 14:03:10] "[32mPOST /patents/add HTTP/1.1[0m" 302 -
-2025-07-30 14:03:10,887 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 14:03:10] "GET /patents/list HTTP/1.1" 200 -
-2025-07-30 14:03:15,764 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 14:03:15] "[33mGET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1[0m" 404 -
-2025-07-30 14:04:00,294 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\database.py', reloading
-2025-07-30 14:04:00,295 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\database.py', reloading
-2025-07-30 14:04:00,596 INFO werkzeug  * Restarting with watchdog (windowsapi)
-2025-07-30 14:04:01,156 WARNING werkzeug  * Debugger is active!
-2025-07-30 14:04:01,164 INFO werkzeug  * Debugger PIN: 124-020-770
-2025-07-30 14:04:19,309 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\routes\\patents.py', reloading
-2025-07-30 14:04:19,314 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\routes\\patents.py', reloading
-2025-07-30 14:04:19,315 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\routes\\patents.py', reloading
-2025-07-30 14:04:19,368 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\routes\\patents.py', reloading
-2025-07-30 14:04:19,369 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\routes\\patents.py', reloading
-2025-07-30 14:04:19,743 INFO werkzeug  * Restarting with watchdog (windowsapi)
-2025-07-30 14:04:20,273 WARNING werkzeug  * Debugger is active!
-2025-07-30 14:04:20,280 INFO werkzeug  * Debugger PIN: 124-020-770
-2025-07-30 14:05:17,161 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\routes\\patents.py', reloading
-2025-07-30 14:05:17,172 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\routes\\patents.py', reloading
-2025-07-30 14:05:17,223 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\routes\\patents.py', reloading
-2025-07-30 14:05:17,225 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\routes\\patents.py', reloading
-2025-07-30 14:05:17,486 INFO werkzeug  * Restarting with watchdog (windowsapi)
-2025-07-30 14:05:18,014 WARNING werkzeug  * Debugger is active!
-2025-07-30 14:05:18,021 INFO werkzeug  * Debugger PIN: 124-020-770
-2025-07-30 14:05:25,955 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\routes\\patents.py', reloading
-2025-07-30 14:05:25,955 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\routes\\patents.py', reloading
-2025-07-30 14:05:25,956 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\routes\\patents.py', reloading
-2025-07-30 14:05:26,001 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\routes\\patents.py', reloading
-2025-07-30 14:05:26,002 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\routes\\patents.py', reloading
-2025-07-30 14:05:26,397 INFO werkzeug  * Restarting with watchdog (windowsapi)
-2025-07-30 14:05:26,909 WARNING werkzeug  * Debugger is active!
-2025-07-30 14:05:26,915 INFO werkzeug  * Debugger PIN: 124-020-770
-2025-07-30 14:05:39,815 INFO werkzeug [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
- * Running on http://127.0.0.1:8002
-2025-07-30 14:05:39,815 INFO werkzeug [33mPress CTRL+C to quit[0m
-2025-07-30 14:05:39,827 INFO werkzeug  * Restarting with watchdog (windowsapi)
-2025-07-30 14:05:40,400 WARNING werkzeug  * Debugger is active!
-2025-07-30 14:05:40,408 INFO werkzeug  * Debugger PIN: 124-020-770
-2025-07-30 14:05:42,913 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 14:05:42] "GET /patents/list HTTP/1.1" 200 -
-2025-07-30 14:05:42,934 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 14:05:42] "[33mGET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1[0m" 404 -
-2025-07-30 14:06:02,789 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 14:06:02] "[32mPOST /patents/add HTTP/1.1[0m" 302 -
-2025-07-30 14:06:02,794 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 14:06:02] "GET /patents/list HTTP/1.1" 200 -
-2025-07-30 14:06:02,815 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 14:06:02] "[33mGET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1[0m" 404 -
-2025-07-30 14:11:18,211 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\database.py', reloading
-2025-07-30 14:11:18,212 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\database.py', reloading
-2025-07-30 14:11:18,690 INFO werkzeug  * Restarting with watchdog (windowsapi)
-2025-07-30 14:11:19,257 WARNING werkzeug  * Debugger is active!
-2025-07-30 14:11:19,265 INFO werkzeug  * Debugger PIN: 124-020-770
-2025-07-30 14:11:56,092 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\routes\\patents.py', reloading
-2025-07-30 14:11:56,093 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\routes\\patents.py', reloading
-2025-07-30 14:11:56,145 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\routes\\patents.py', reloading
-2025-07-30 14:11:56,146 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\routes\\patents.py', reloading
-2025-07-30 14:11:57,172 INFO werkzeug  * Restarting with watchdog (windowsapi)
-2025-07-30 14:11:57,711 WARNING werkzeug  * Debugger is active!
-2025-07-30 14:11:57,717 INFO werkzeug  * Debugger PIN: 124-020-770
-2025-07-30 14:12:01,763 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\routes\\patents.py', reloading
-2025-07-30 14:12:01,764 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\routes\\patents.py', reloading
-2025-07-30 14:12:01,808 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\routes\\patents.py', reloading
-2025-07-30 14:12:01,809 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\routes\\patents.py', reloading
-2025-07-30 14:12:02,051 INFO werkzeug  * Restarting with watchdog (windowsapi)
-2025-07-30 14:12:02,595 WARNING werkzeug  * Debugger is active!
-2025-07-30 14:12:02,602 INFO werkzeug  * Debugger PIN: 124-020-770
-2025-07-30 14:12:09,054 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\routes\\patents.py', reloading
-2025-07-30 14:12:09,066 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\routes\\patents.py', reloading
-2025-07-30 14:12:09,114 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\routes\\patents.py', reloading
-2025-07-30 14:12:09,115 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\routes\\patents.py', reloading
-2025-07-30 14:12:09,950 INFO werkzeug  * Restarting with watchdog (windowsapi)
-2025-07-30 14:12:10,494 WARNING werkzeug  * Debugger is active!
-2025-07-30 14:12:10,513 INFO werkzeug  * Debugger PIN: 124-020-770
-2025-07-30 14:12:24,552 INFO werkzeug [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
- * Running on http://127.0.0.1:8002
-2025-07-30 14:12:24,552 INFO werkzeug [33mPress CTRL+C to quit[0m
-2025-07-30 14:12:24,562 INFO werkzeug  * Restarting with watchdog (windowsapi)
-2025-07-30 14:12:25,134 WARNING werkzeug  * Debugger is active!
-2025-07-30 14:12:25,142 INFO werkzeug  * Debugger PIN: 124-020-770
-2025-07-30 14:12:27,840 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 14:12:27] "GET /patents/list HTTP/1.1" 200 -
-2025-07-30 14:12:27,862 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 14:12:27] "[33mGET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1[0m" 404 -
-2025-07-30 14:12:59,776 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 14:12:59] "[32mPOST /patents/add HTTP/1.1[0m" 302 -
-2025-07-30 14:12:59,784 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 14:12:59] "GET /patents/list HTTP/1.1" 200 -
-2025-07-30 14:12:59,807 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 14:12:59] "[33mGET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1[0m" 404 -
-2025-07-30 14:16:44,665 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\routes\\patents.py', reloading
-2025-07-30 14:16:44,677 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\routes\\patents.py', reloading
-2025-07-30 14:16:44,677 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\routes\\patents.py', reloading
-2025-07-30 14:16:44,758 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\routes\\patents.py', reloading
-2025-07-30 14:16:44,758 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\routes\\patents.py', reloading
-2025-07-30 14:16:45,474 INFO werkzeug  * Restarting with watchdog (windowsapi)
-2025-07-30 14:16:46,008 WARNING werkzeug  * Debugger is active!
-2025-07-30 14:16:46,016 INFO werkzeug  * Debugger PIN: 124-020-770
-2025-07-30 14:16:49,588 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\routes\\patents.py', reloading
-2025-07-30 14:16:49,600 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\routes\\patents.py', reloading
-2025-07-30 14:16:49,601 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\routes\\patents.py', reloading
-2025-07-30 14:16:49,707 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\routes\\patents.py', reloading
-2025-07-30 14:16:49,707 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\routes\\patents.py', reloading
-2025-07-30 14:16:49,708 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\routes\\patents.py', reloading
-2025-07-30 14:16:50,276 INFO werkzeug  * Restarting with watchdog (windowsapi)
-2025-07-30 14:16:50,811 WARNING werkzeug  * Debugger is active!
-2025-07-30 14:16:50,818 INFO werkzeug  * Debugger PIN: 124-020-770
-2025-07-30 14:16:54,335 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\routes\\patents.py', reloading
-2025-07-30 14:16:54,346 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\routes\\patents.py', reloading
-2025-07-30 14:16:54,347 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\routes\\patents.py', reloading
-2025-07-30 14:16:54,424 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\routes\\patents.py', reloading
-2025-07-30 14:16:54,424 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\routes\\patents.py', reloading
-2025-07-30 14:16:55,111 INFO werkzeug  * Restarting with watchdog (windowsapi)
-2025-07-30 14:16:55,651 WARNING werkzeug  * Debugger is active!
-2025-07-30 14:16:55,658 INFO werkzeug  * Debugger PIN: 124-020-770
-2025-07-30 14:17:03,736 INFO werkzeug [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
- * Running on http://127.0.0.1:8002
-2025-07-30 14:17:03,736 INFO werkzeug [33mPress CTRL+C to quit[0m
-2025-07-30 14:17:03,746 INFO werkzeug  * Restarting with watchdog (windowsapi)
-2025-07-30 14:17:04,294 WARNING werkzeug  * Debugger is active!
-2025-07-30 14:17:04,300 INFO werkzeug  * Debugger PIN: 124-020-770
-2025-07-30 14:17:07,649 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 14:17:07] "GET /patents/list HTTP/1.1" 200 -
-2025-07-30 14:17:43,624 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 14:17:43] "GET /equipment/list HTTP/1.1" 200 -
-2025-07-30 14:17:56,808 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 14:17:56] "[32mPOST /equipment/add HTTP/1.1[0m" 302 -
-2025-07-30 14:17:56,814 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 14:17:56] "GET /equipment/list HTTP/1.1" 200 -
-2025-07-30 14:18:03,478 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 14:18:03] "[33mGET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1[0m" 404 -
-2025-07-30 14:19:20,060 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\routes\\equipment.py', reloading
-2025-07-30 14:19:20,070 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\routes\\equipment.py', reloading
-2025-07-30 14:19:20,072 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\routes\\equipment.py', reloading
-2025-07-30 14:19:20,338 INFO werkzeug  * Restarting with watchdog (windowsapi)
-2025-07-30 14:19:20,907 WARNING werkzeug  * Debugger is active!
-2025-07-30 14:19:20,915 INFO werkzeug  * Debugger PIN: 124-020-770
-2025-07-30 14:19:29,275 INFO werkzeug [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
- * Running on http://127.0.0.1:8002
-2025-07-30 14:19:29,276 INFO werkzeug [33mPress CTRL+C to quit[0m
-2025-07-30 14:19:29,285 INFO werkzeug  * Restarting with watchdog (windowsapi)
-2025-07-30 14:19:29,835 WARNING werkzeug  * Debugger is active!
-2025-07-30 14:19:29,854 INFO werkzeug  * Debugger PIN: 124-020-770
-2025-07-30 14:19:32,795 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 14:19:32] "GET /equipment/list HTTP/1.1" 200 -
-2025-07-30 14:21:04,387 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 14:21:04] "GET /equipment/reservations HTTP/1.1" 200 -
-2025-07-30 14:21:04,413 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 14:21:04] "GET /equipment/api/reservations HTTP/1.1" 200 -
-2025-07-30 14:21:04,452 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 14:21:04] "GET /equipment/api/equipment HTTP/1.1" 200 -
-2025-07-30 14:21:04,456 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 14:21:04] "GET /equipment/api/reservations HTTP/1.1" 200 -
-2025-07-30 14:21:04,463 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 14:21:04] "GET /equipment/api/equipment HTTP/1.1" 200 -
-2025-07-30 14:21:32,696 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 14:21:32] "GET /equipment/api/equipment HTTP/1.1" 200 -
-2025-07-30 14:21:35,763 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 14:21:35] "GET /equipment/api/equipment HTTP/1.1" 200 -
-2025-07-30 14:21:48,139 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 14:21:48] "GET /equipment/api/equipment HTTP/1.1" 200 -
-2025-07-30 14:21:55,580 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 14:21:55] "POST /equipment/api/reservations/add HTTP/1.1" 200 -
-2025-07-30 14:21:56,632 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 14:21:56] "GET /equipment/api/reservations HTTP/1.1" 200 -
-2025-07-30 14:21:56,634 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 14:21:56] "GET /equipment/api/equipment HTTP/1.1" 200 -
-2025-07-30 14:22:18,683 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 14:22:18] "GET /equipment/api/equipment HTTP/1.1" 200 -
-2025-07-30 14:23:20,229 INFO werkzeug [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
- * Running on http://127.0.0.1:8002
-2025-07-30 14:23:20,229 INFO werkzeug [33mPress CTRL+C to quit[0m
-2025-07-30 14:23:20,241 INFO werkzeug  * Restarting with watchdog (windowsapi)
-2025-07-30 14:23:20,814 WARNING werkzeug  * Debugger is active!
-2025-07-30 14:23:20,821 INFO werkzeug  * Debugger PIN: 124-020-770
-2025-07-30 14:23:22,982 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 14:23:22] "GET /equipment/reservations HTTP/1.1" 200 -
-2025-07-30 14:23:23,006 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 14:23:23] "GET /equipment/api/reservations HTTP/1.1" 200 -
-2025-07-30 14:23:23,027 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 14:23:23] "GET /equipment/api/equipment HTTP/1.1" 200 -
-2025-07-30 14:23:23,031 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 14:23:23] "GET /equipment/api/reservations HTTP/1.1" 200 -
-2025-07-30 14:23:23,033 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 14:23:23] "GET /equipment/api/equipment HTTP/1.1" 200 -
-2025-07-30 14:23:35,384 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 14:23:35] "GET /equipment/api/equipment HTTP/1.1" 200 -
-2025-07-30 14:23:42,197 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 14:23:42] "GET /equipment/api/equipment HTTP/1.1" 200 -
-2025-07-30 14:23:42,200 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 14:23:42] "GET /equipment/api/equipment HTTP/1.1" 200 -
-2025-07-30 14:24:03,409 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 14:24:03] "GET /equipment/usage-log HTTP/1.1" 200 -
-2025-07-30 14:24:03,427 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 14:24:03] "GET /equipment/api/usage-logs HTTP/1.1" 200 -
-2025-07-30 14:24:03,431 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 14:24:03] "GET /equipment/api/equipment HTTP/1.1" 200 -
-2025-07-30 14:24:03,438 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 14:24:03] "GET /equipment/api/equipment HTTP/1.1" 200 -
-2025-07-30 14:26:00,102 INFO werkzeug [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
- * Running on http://127.0.0.1:8002
-2025-07-30 14:26:00,102 INFO werkzeug [33mPress CTRL+C to quit[0m
-2025-07-30 14:26:00,112 INFO werkzeug  * Restarting with watchdog (windowsapi)
-2025-07-30 14:26:00,650 WARNING werkzeug  * Debugger is active!
-2025-07-30 14:26:00,656 INFO werkzeug  * Debugger PIN: 124-020-770
-2025-07-30 14:26:03,467 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 14:26:03] "GET /equipment/usage-log HTTP/1.1" 200 -
-2025-07-30 14:26:03,496 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 14:26:03] "GET /equipment/api/usage-logs HTTP/1.1" 200 -
-2025-07-30 14:26:03,499 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 14:26:03] "GET /equipment/api/equipment HTTP/1.1" 200 -
-2025-07-30 14:26:03,503 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 14:26:03] "GET /equipment/api/equipment HTTP/1.1" 200 -
-2025-07-30 14:27:12,100 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 14:27:12] "POST /equipment/api/usage-logs/add HTTP/1.1" 200 -
-2025-07-30 14:27:13,285 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 14:27:13] "GET /equipment/api/usage-logs HTTP/1.1" 200 -
-2025-07-30 14:28:24,825 INFO werkzeug [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
- * Running on http://127.0.0.1:8002
-2025-07-30 14:28:24,826 INFO werkzeug [33mPress CTRL+C to quit[0m
-2025-07-30 14:28:24,835 INFO werkzeug  * Restarting with watchdog (windowsapi)
-2025-07-30 14:28:25,369 WARNING werkzeug  * Debugger is active!
-2025-07-30 14:28:25,375 INFO werkzeug  * Debugger PIN: 124-020-770
-2025-07-30 14:28:28,278 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 14:28:28] "GET /equipment/usage-log HTTP/1.1" 200 -
-2025-07-30 14:28:28,313 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 14:28:28] "GET /equipment/api/usage-logs HTTP/1.1" 200 -
-2025-07-30 14:28:28,318 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 14:28:28] "GET /equipment/api/equipment HTTP/1.1" 200 -
-2025-07-30 14:28:28,324 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 14:28:28] "GET /equipment/api/equipment HTTP/1.1" 200 -
-2025-07-30 14:29:07,032 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\app.py', reloading
-2025-07-30 14:29:07,033 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\app.py', reloading
-2025-07-30 14:29:07,384 INFO werkzeug  * Restarting with watchdog (windowsapi)
-2025-07-30 14:29:07,927 WARNING werkzeug  * Debugger is active!
-2025-07-30 14:29:07,933 INFO werkzeug  * Debugger PIN: 124-020-770
-2025-07-30 14:29:24,442 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 14:29:24] "POST /equipment/api/usage-logs/1/delete HTTP/1.1" 200 -
-2025-07-30 14:29:25,669 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 14:29:25] "GET /equipment/api/usage-logs HTTP/1.1" 200 -
-2025-07-30 14:30:53,167 INFO werkzeug [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
- * Running on http://127.0.0.1:8002
-2025-07-30 14:30:53,167 INFO werkzeug [33mPress CTRL+C to quit[0m
-2025-07-30 14:30:53,176 INFO werkzeug  * Restarting with watchdog (windowsapi)
-2025-07-30 14:30:53,714 WARNING werkzeug  * Debugger is active!
-2025-07-30 14:30:53,720 INFO werkzeug  * Debugger PIN: 124-020-770
-2025-07-30 14:30:57,654 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 14:30:57] "GET /equipment/usage-log HTTP/1.1" 200 -
-2025-07-30 14:30:57,693 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 14:30:57] "GET /equipment/api/usage-logs HTTP/1.1" 200 -
-2025-07-30 14:30:57,696 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 14:30:57] "GET /equipment/api/equipment HTTP/1.1" 200 -
-2025-07-30 14:30:57,702 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 14:30:57] "GET /equipment/api/equipment HTTP/1.1" 200 -
-2025-07-30 14:33:05,335 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\routes\\dashboard.py', reloading
-2025-07-30 14:33:06,189 INFO werkzeug  * Restarting with watchdog (windowsapi)
-2025-07-30 14:33:06,755 WARNING werkzeug  * Debugger is active!
-2025-07-30 14:33:06,763 INFO werkzeug  * Debugger PIN: 124-020-770
-2025-07-30 14:33:22,358 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\main.py', reloading
-2025-07-30 14:33:22,360 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\tools\\migrate_csv_to_postgres.py', reloading
-2025-07-30 14:33:22,360 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\tools\\csv_to_json_schedule.py', reloading
-2025-07-30 14:33:22,361 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\add_answer_column.py', reloading
-2025-07-30 14:33:22,363 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\routes\\safety.py', reloading
-2025-07-30 14:33:22,363 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\routes\\purchasing.py', reloading
-2025-07-30 14:33:22,364 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\routes\\inventory.py', reloading
-2025-07-30 14:33:22,365 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\routes\\external.py', reloading
-2025-07-30 14:33:22,365 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\routes\\communication.py', reloading
-2025-07-30 14:33:22,365 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\routes\\coal_tar_pitch_log.py', reloading
-2025-07-30 14:33:22,366 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\routes\\chemical.py', reloading
-2025-07-30 14:33:23,341 INFO werkzeug  * Restarting with watchdog (windowsapi)
-2025-07-30 14:33:23,887 WARNING werkzeug  * Debugger is active!
-2025-07-30 14:33:23,893 INFO werkzeug  * Debugger PIN: 124-020-770
-2025-07-30 14:34:53,696 INFO werkzeug  * Detected change in 'C:\\Program Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\\Lib\\encodings\\unicode_escape.py', reloading
-2025-07-30 14:34:53,701 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 14:34:53] "GET /equipment/usage-log HTTP/1.1" 200 -
-2025-07-30 14:34:53,739 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 14:34:53] "GET /equipment/api/usage-logs HTTP/1.1" 200 -
-2025-07-30 14:34:53,741 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 14:34:53] "GET /equipment/api/equipment HTTP/1.1" 200 -
-2025-07-30 14:34:53,747 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 14:34:53] "GET /equipment/api/equipment HTTP/1.1" 200 -
-2025-07-30 14:34:54,709 INFO werkzeug  * Restarting with watchdog (windowsapi)
-2025-07-30 14:34:55,257 WARNING werkzeug  * Debugger is active!
-2025-07-30 14:34:55,266 INFO werkzeug  * Debugger PIN: 124-020-770
-2025-07-30 14:35:04,423 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 14:35:04] "POST /equipment/api/usage-logs/add HTTP/1.1" 200 -
-2025-07-30 14:35:05,334 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 14:35:05] "GET /equipment/api/usage-logs HTTP/1.1" 200 -
-2025-07-30 14:35:27,190 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 14:35:27] "GET /equipment/api/usage-logs HTTP/1.1" 200 -
-2025-07-30 14:35:29,971 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 14:35:29] "POST /equipment/api/usage-logs/1/update HTTP/1.1" 200 -
-2025-07-30 14:35:30,934 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 14:35:30] "GET /equipment/api/usage-logs HTTP/1.1" 200 -
-2025-07-30 14:36:35,133 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 14:36:35] "POST /equipment/api/usage-logs/add HTTP/1.1" 200 -
-2025-07-30 14:36:36,088 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 14:36:36] "GET /equipment/api/usage-logs HTTP/1.1" 200 -
-2025-07-30 14:36:57,479 INFO werkzeug  * Detected change in 'C:\\Users\\POSCOMCMATERIALS\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python311\\site-packages\\sqlalchemy\\sql\\expression.py', reloading
-2025-07-30 14:36:57,483 INFO werkzeug  * Detected change in 'C:\\Users\\POSCOMCMATERIALS\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python311\\site-packages\\sqlalchemy\\sql\\functions.py', reloading
-2025-07-30 14:36:57,843 INFO werkzeug  * Restarting with watchdog (windowsapi)
-2025-07-30 14:36:58,386 WARNING werkzeug  * Debugger is active!
-2025-07-30 14:36:58,395 INFO werkzeug  * Debugger PIN: 124-020-770
-2025-07-30 14:37:40,539 INFO werkzeug [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
- * Running on http://127.0.0.1:8002
-2025-07-30 14:37:40,539 INFO werkzeug [33mPress CTRL+C to quit[0m
-2025-07-30 14:37:40,550 INFO werkzeug  * Restarting with watchdog (windowsapi)
-2025-07-30 14:37:41,122 WARNING werkzeug  * Debugger is active!
-2025-07-30 14:37:41,129 INFO werkzeug  * Debugger PIN: 124-020-770
-2025-07-30 14:37:44,448 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 14:37:44] "GET /equipment/usage-log HTTP/1.1" 200 -
-2025-07-30 14:37:44,485 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 14:37:44] "GET /equipment/api/usage-logs HTTP/1.1" 200 -
-2025-07-30 14:37:44,488 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 14:37:44] "GET /equipment/api/equipment HTTP/1.1" 200 -
-2025-07-30 14:37:44,492 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 14:37:44] "GET /equipment/api/equipment HTTP/1.1" 200 -
-2025-07-30 14:38:15,322 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 14:38:15] "POST /equipment/api/usage-logs/add HTTP/1.1" 200 -
-2025-07-30 14:38:17,509 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 14:38:17] "GET /equipment/api/usage-logs HTTP/1.1" 200 -
-2025-07-30 14:38:35,933 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 14:38:35] "POST /equipment/api/usage-logs/add HTTP/1.1" 200 -
-2025-07-30 14:38:36,948 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 14:38:36] "GET /equipment/api/usage-logs HTTP/1.1" 200 -
-2025-07-30 14:38:45,086 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 14:38:45] "GET /inventory/current HTTP/1.1" 200 -
-2025-07-30 14:39:12,411 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 14:39:12] "GET /safety/materials HTTP/1.1" 200 -
-2025-07-30 14:39:12,427 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 14:39:12] "GET /safety/api/materials HTTP/1.1" 200 -
-2025-07-30 14:39:15,308 INFO werkzeug  * Detected change in 'C:\\Users\\POSCOMCMATERIALS\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python311\\site-packages\\flask\\app.py', reloading
-2025-07-30 14:39:15,309 INFO werkzeug  * Detected change in 'C:\\Users\\POSCOMCMATERIALS\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python311\\site-packages\\werkzeug\\middleware\\proxy_fix.py', reloading
-2025-07-30 14:39:15,327 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 14:39:15] "[35m[1mGET /safety/accidents HTTP/1.1[0m" 500 -
-2025-07-30 14:39:15,437 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 14:39:15] "GET /safety/accidents?__debugger__=yes&cmd=resource&f=style.css HTTP/1.1" 200 -
-2025-07-30 14:39:15,442 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 14:39:15] "GET /safety/accidents?__debugger__=yes&cmd=resource&f=debugger.js HTTP/1.1" 200 -
-2025-07-30 14:39:15,454 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 14:39:15] "GET /safety/accidents?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1" 200 -
-2025-07-30 14:39:15,464 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 14:39:15] "[36mGET /safety/accidents?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
-2025-07-30 14:39:16,247 INFO werkzeug  * Restarting with watchdog (windowsapi)
-2025-07-30 14:39:16,801 WARNING werkzeug  * Debugger is active!
-2025-07-30 14:39:16,808 INFO werkzeug  * Debugger PIN: 124-020-770
-2025-07-30 14:39:17,049 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 14:39:17] "GET /safety/materials HTTP/1.1" 200 -
-2025-07-30 14:39:17,068 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 14:39:17] "GET /safety/api/materials HTTP/1.1" 200 -
-2025-07-30 14:39:18,555 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 14:39:18] "[35m[1mGET /safety/accidents HTTP/1.1[0m" 500 -
-2025-07-30 14:39:18,668 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 14:39:18] "[36mGET /safety/accidents?__debugger__=yes&cmd=resource&f=style.css HTTP/1.1[0m" 304 -
-2025-07-30 14:39:18,676 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 14:39:18] "[36mGET /safety/accidents?__debugger__=yes&cmd=resource&f=debugger.js HTTP/1.1[0m" 304 -
-2025-07-30 14:39:18,686 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 14:39:18] "[36mGET /safety/accidents?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
-2025-07-30 14:39:22,315 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 14:39:22] "[36mGET /safety/accidents?__debugger__=yes&cmd=resource&f=style.css HTTP/1.1[0m" 304 -
-2025-07-30 14:39:22,322 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 14:39:22] "[33mGET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1[0m" 404 -
-2025-07-30 14:39:42,340 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\routes\\safety.py', reloading
-2025-07-30 14:39:42,603 INFO werkzeug  * Restarting with watchdog (windowsapi)
-2025-07-30 14:39:43,164 WARNING werkzeug  * Debugger is active!
-2025-07-30 14:39:43,171 INFO werkzeug  * Debugger PIN: 124-020-770
-2025-07-30 14:39:54,584 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\routes\\safety.py', reloading
-2025-07-30 14:39:54,594 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\routes\\safety.py', reloading
-2025-07-30 14:39:54,595 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\routes\\safety.py', reloading
-2025-07-30 14:39:54,654 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\routes\\safety.py', reloading
-2025-07-30 14:39:54,655 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\routes\\safety.py', reloading
-2025-07-30 14:39:55,612 INFO werkzeug  * Restarting with watchdog (windowsapi)
-2025-07-30 14:39:56,150 WARNING werkzeug  * Debugger is active!
-2025-07-30 14:39:56,156 INFO werkzeug  * Debugger PIN: 124-020-770
-2025-07-30 14:40:06,570 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\routes\\safety.py', reloading
-2025-07-30 14:40:06,571 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\routes\\safety.py', reloading
-2025-07-30 14:40:06,622 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\routes\\safety.py', reloading
-2025-07-30 14:40:06,624 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\routes\\safety.py', reloading
-2025-07-30 14:40:07,607 INFO werkzeug  * Restarting with watchdog (windowsapi)
-2025-07-30 14:40:08,130 WARNING werkzeug  * Debugger is active!
-2025-07-30 14:40:08,137 INFO werkzeug  * Debugger PIN: 124-020-770
-2025-07-30 14:40:19,759 INFO werkzeug [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
- * Running on http://127.0.0.1:8002
-2025-07-30 14:40:19,759 INFO werkzeug [33mPress CTRL+C to quit[0m
-2025-07-30 14:40:19,770 INFO werkzeug  * Restarting with watchdog (windowsapi)
-2025-07-30 14:40:20,308 WARNING werkzeug  * Debugger is active!
-2025-07-30 14:40:20,315 INFO werkzeug  * Debugger PIN: 124-020-770
-2025-07-30 14:40:24,854 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 14:40:24] "GET /safety/accidents HTTP/1.1" 200 -
-2025-07-30 14:40:24,874 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 14:40:24] "[33mGET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1[0m" 404 -
-2025-07-30 14:40:24,920 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 14:40:24] "GET /safety/api/accidents HTTP/1.1" 200 -
-2025-07-30 14:41:13,379 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 14:41:13] "GET /safety/procedures HTTP/1.1" 200 -
-2025-07-30 14:41:13,399 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 14:41:13] "[33mGET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1[0m" 404 -
-2025-07-30 14:41:22,776 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 14:41:22] "GET /purchasing/requests HTTP/1.1" 200 -
-2025-07-30 14:41:22,793 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 14:41:22] "[33mGET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1[0m" 404 -
-2025-07-30 14:41:22,915 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 14:41:22] "GET /static/js/purchasing.js HTTP/1.1" 200 -
-2025-07-30 14:41:22,923 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 14:41:22] "GET /purchasing/project-types/list HTTP/1.1" 200 -
-2025-07-30 14:41:22,932 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 14:41:22] "GET /purchasing/requests/list HTTP/1.1" 200 -
-2025-07-30 14:41:22,938 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 14:41:22] "GET /inventory/api/list HTTP/1.1" 200 -
-2025-07-30 14:41:33,297 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 14:41:33] "GET /purchasing/requests HTTP/1.1" 200 -
-2025-07-30 14:41:33,325 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 14:41:33] "GET /purchasing/project-types/list HTTP/1.1" 200 -
-2025-07-30 14:41:33,327 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 14:41:33] "GET /purchasing/requests/list HTTP/1.1" 200 -
-2025-07-30 14:41:33,330 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 14:41:33] "GET /inventory/api/list HTTP/1.1" 200 -
-2025-07-30 14:41:50,464 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\routes\\purchasing.py', reloading
-2025-07-30 14:41:50,465 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\routes\\purchasing.py', reloading
-2025-07-30 14:41:50,466 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\routes\\purchasing.py', reloading
-2025-07-30 14:41:50,470 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\routes\\purchasing.py', reloading
-2025-07-30 14:41:50,953 INFO werkzeug  * Detected change in 'C:\\Users\\POSCOMCMATERIALS\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python311\\site-packages\\flask\\__init__.py', reloading
-2025-07-30 14:41:50,955 INFO werkzeug  * Detected change in 'C:\\Users\\POSCOMCMATERIALS\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python311\\site-packages\\flask\\json\\__init__.py', reloading
-2025-07-30 14:41:50,956 INFO werkzeug  * Detected change in 'C:\\Users\\POSCOMCMATERIALS\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python311\\site-packages\\flask\\blueprints.py', reloading
-2025-07-30 14:41:50,956 INFO werkzeug  * Detected change in 'C:\\Users\\POSCOMCMATERIALS\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python311\\site-packages\\flask\\config.py', reloading
-2025-07-30 14:41:50,957 INFO werkzeug  * Detected change in 'C:\\Users\\POSCOMCMATERIALS\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python311\\site-packages\\flask\\ctx.py', reloading
-2025-07-30 14:41:50,957 INFO werkzeug  * Detected change in 'C:\\Users\\POSCOMCMATERIALS\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python311\\site-packages\\flask\\globals.py', reloading
-2025-07-30 14:41:50,958 INFO werkzeug  * Detected change in 'C:\\Users\\POSCOMCMATERIALS\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python311\\site-packages\\flask\\helpers.py', reloading
-2025-07-30 14:41:50,958 INFO werkzeug  * Detected change in 'C:\\Users\\POSCOMCMATERIALS\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python311\\site-packages\\flask\\templating.py', reloading
-2025-07-30 14:41:50,959 INFO werkzeug  * Detected change in 'C:\\Users\\POSCOMCMATERIALS\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python311\\site-packages\\werkzeug\\datastructures\\__init__.py', reloading
-2025-07-30 14:41:50,960 INFO werkzeug  * Detected change in 'C:\\Users\\POSCOMCMATERIALS\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python311\\site-packages\\werkzeug\\utils.py', reloading
-2025-07-30 14:41:50,960 INFO werkzeug  * Detected change in 'C:\\Users\\POSCOMCMATERIALS\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python311\\site-packages\\werkzeug\\wrappers\\__init__.py', reloading
-2025-07-30 14:41:50,961 INFO werkzeug  * Detected change in 'C:\\Users\\POSCOMCMATERIALS\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python311\\site-packages\\flask\\typing.py', reloading
-2025-07-30 14:41:50,961 INFO werkzeug  * Detected change in 'C:\\Users\\POSCOMCMATERIALS\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python311\\site-packages\\flask\\scaffold.py', reloading
-2025-07-30 14:41:50,962 INFO werkzeug  * Detected change in 'C:\\Users\\POSCOMCMATERIALS\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python311\\site-packages\\flask\\sessions.py', reloading
-2025-07-30 14:41:50,962 INFO werkzeug  * Detected change in 'C:\\Users\\POSCOMCMATERIALS\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python311\\site-packages\\flask\\wrappers.py', reloading
-2025-07-30 14:41:50,963 INFO werkzeug  * Detected change in 'C:\\Users\\POSCOMCMATERIALS\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python311\\site-packages\\jinja2\\__init__.py', reloading
-2025-07-30 14:41:50,963 INFO werkzeug  * Detected change in 'C:\\Users\\POSCOMCMATERIALS\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python311\\site-packages\\werkzeug\\wrappers\\request.py', reloading
-2025-07-30 14:41:50,964 INFO werkzeug  * Detected change in 'C:\\Users\\POSCOMCMATERIALS\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python311\\site-packages\\werkzeug\\wrappers\\response.py', reloading
-2025-07-30 14:41:50,965 INFO werkzeug  * Detected change in 'C:\\Users\\POSCOMCMATERIALS\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python311\\site-packages\\werkzeug\\sansio\\response.py', reloading
-2025-07-30 14:41:50,966 INFO werkzeug  * Detected change in 'C:\\Users\\POSCOMCMATERIALS\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python311\\site-packages\\werkzeug\\_internal.py', reloading
-2025-07-30 14:41:50,966 INFO werkzeug  * Detected change in 'C:\\Users\\POSCOMCMATERIALS\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python311\\site-packages\\werkzeug\\sansio\\request.py', reloading
-2025-07-30 14:41:50,967 INFO werkzeug  * Detected change in 'C:\\Users\\POSCOMCMATERIALS\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python311\\site-packages\\flask_sqlalchemy\\__init__.py', reloading
-2025-07-30 14:41:50,967 INFO werkzeug  * Detected change in 'C:\\Users\\POSCOMCMATERIALS\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python311\\site-packages\\sqlalchemy\\orm\\__init__.py', reloading
-2025-07-30 14:41:50,968 INFO werkzeug  * Detected change in 'C:\\Users\\POSCOMCMATERIALS\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python311\\site-packages\\flask_sqlalchemy\\extension.py', reloading
-2025-07-30 14:41:50,968 INFO werkzeug  * Detected change in 'C:\\Users\\POSCOMCMATERIALS\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python311\\site-packages\\sqlalchemy\\__init__.py', reloading
-2025-07-30 14:41:50,969 INFO werkzeug  * Detected change in 'C:\\Users\\POSCOMCMATERIALS\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python311\\site-packages\\sqlalchemy\\event\\__init__.py', reloading
-2025-07-30 14:41:50,969 INFO werkzeug  * Detected change in 'C:\\Users\\POSCOMCMATERIALS\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python311\\site-packages\\flask_sqlalchemy\\model.py', reloading
-2025-07-30 14:41:50,970 INFO werkzeug  * Detected change in 'C:\\Users\\POSCOMCMATERIALS\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python311\\site-packages\\flask_sqlalchemy\\query.py', reloading
-2025-07-30 14:41:50,970 INFO werkzeug  * Detected change in 'C:\\Users\\POSCOMCMATERIALS\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python311\\site-packages\\flask_sqlalchemy\\session.py', reloading
-2025-07-30 14:41:50,971 INFO werkzeug  * Detected change in 'C:\\Users\\POSCOMCMATERIALS\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python311\\site-packages\\flask_sqlalchemy\\table.py', reloading
-2025-07-30 14:41:50,971 INFO werkzeug  * Detected change in 'C:\\Users\\POSCOMCMATERIALS\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python311\\site-packages\\sqlalchemy\\util\\__init__.py', reloading
-2025-07-30 14:41:50,971 INFO werkzeug  * Detected change in 'C:\\Users\\POSCOMCMATERIALS\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python311\\site-packages\\sqlalchemy\\inspection.py', reloading
-2025-07-30 14:41:50,972 INFO werkzeug  * Detected change in 'C:\\Users\\POSCOMCMATERIALS\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python311\\site-packages\\sqlalchemy\\schema.py', reloading
-2025-07-30 14:41:50,972 INFO werkzeug  * Detected change in 'C:\\Users\\POSCOMCMATERIALS\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python311\\site-packages\\sqlalchemy\\sql\\__init__.py', reloading
-2025-07-30 14:41:50,973 INFO werkzeug  * Detected change in 'C:\\Users\\POSCOMCMATERIALS\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python311\\site-packages\\sqlalchemy\\sql\\base.py', reloading
-2025-07-30 14:41:50,973 INFO werkzeug  * Detected change in 'C:\\Users\\POSCOMCMATERIALS\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python311\\site-packages\\sqlalchemy\\sql\\schema.py', reloading
-2025-07-30 14:41:50,974 INFO werkzeug  * Detected change in 'C:\\Users\\POSCOMCMATERIALS\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python311\\site-packages\\sqlalchemy\\sql\\roles.py', reloading
-2025-07-30 14:41:50,974 INFO werkzeug  * Detected change in 'C:\\Users\\POSCOMCMATERIALS\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python311\\site-packages\\sqlalchemy\\sql\\visitors.py', reloading
-2025-07-30 14:41:50,975 INFO werkzeug  * Detected change in 'C:\\Users\\POSCOMCMATERIALS\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python311\\site-packages\\sqlalchemy\\sql\\elements.py', reloading
-2025-07-30 14:41:50,975 INFO werkzeug  * Detected change in 'C:\\Users\\POSCOMCMATERIALS\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python311\\site-packages\\sqlalchemy\\sql\\selectable.py', reloading
-2025-07-30 14:41:50,975 INFO werkzeug  * Detected change in 'C:\\Users\\POSCOMCMATERIALS\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python311\\site-packages\\sqlalchemy\\util\\typing.py', reloading
-2025-07-30 14:41:50,975 INFO werkzeug  * Detected change in 'C:\\Users\\POSCOMCMATERIALS\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python311\\site-packages\\sqlalchemy\\sql\\_typing.py', reloading
-2025-07-30 14:41:50,975 INFO werkzeug  * Detected change in 'C:\\Users\\POSCOMCMATERIALS\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python311\\site-packages\\sqlalchemy\\sql\\cache_key.py', reloading
-2025-07-30 14:41:50,976 INFO werkzeug  * Detected change in 'C:\\Users\\POSCOMCMATERIALS\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python311\\site-packages\\sqlalchemy\\sql\\traversals.py', reloading
-2025-07-30 14:41:50,976 INFO werkzeug  * Detected change in 'C:\\Users\\POSCOMCMATERIALS\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python311\\site-packages\\sqlalchemy\\event\\registry.py', reloading
-2025-07-30 14:41:50,977 INFO werkzeug  * Detected change in 'C:\\Users\\POSCOMCMATERIALS\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python311\\site-packages\\sqlalchemy\\util\\_collections.py', reloading
-2025-07-30 14:41:50,978 INFO werkzeug  * Detected change in 'C:\\Users\\POSCOMCMATERIALS\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python311\\site-packages\\sqlalchemy\\util\\deprecations.py', reloading
-2025-07-30 14:41:50,978 INFO werkzeug  * Detected change in 'C:\\Users\\POSCOMCMATERIALS\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python311\\site-packages\\sqlalchemy\\util\\langhelpers.py', reloading
-2025-07-30 14:41:50,979 INFO werkzeug  * Detected change in 'C:\\Users\\POSCOMCMATERIALS\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python311\\site-packages\\sqlalchemy\\util\\_py_collections.py', reloading
-2025-07-30 14:41:50,979 INFO werkzeug  * Detected change in 'C:\\Users\\POSCOMCMATERIALS\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python311\\site-packages\\sqlalchemy\\sql\\lambdas.py', reloading
-2025-07-30 14:41:50,980 INFO werkzeug  * Detected change in 'C:\\Users\\POSCOMCMATERIALS\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python311\\site-packages\\sqlalchemy\\sql\\annotation.py', reloading
-2025-07-30 14:41:50,980 INFO werkzeug  * Detected change in 'C:\\Users\\POSCOMCMATERIALS\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python311\\site-packages\\sqlalchemy\\orm\\mapper.py', reloading
-2025-07-30 14:41:50,981 INFO werkzeug  * Detected change in 'C:\\Users\\POSCOMCMATERIALS\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python311\\site-packages\\sqlalchemy\\orm\\base.py', reloading
-2025-07-30 14:41:50,981 INFO werkzeug  * Detected change in 'C:\\Users\\POSCOMCMATERIALS\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python311\\site-packages\\sqlalchemy\\orm\\decl_api.py', reloading
-2025-07-30 14:41:50,981 INFO werkzeug  * Detected change in 'C:\\Users\\POSCOMCMATERIALS\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python311\\site-packages\\sqlalchemy\\orm\\interfaces.py', reloading
-2025-07-30 14:41:50,982 INFO werkzeug  * Detected change in 'C:\\Users\\POSCOMCMATERIALS\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python311\\site-packages\\sqlalchemy\\orm\\query.py', reloading
-2025-07-30 14:41:50,982 INFO werkzeug  * Detected change in 'C:\\Users\\POSCOMCMATERIALS\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python311\\site-packages\\sqlalchemy\\orm\\relationships.py', reloading
-2025-07-30 14:41:50,983 INFO werkzeug  * Detected change in 'C:\\Users\\POSCOMCMATERIALS\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python311\\site-packages\\sqlalchemy\\orm\\scoping.py', reloading
-2025-07-30 14:41:50,983 INFO werkzeug  * Detected change in 'C:\\Users\\POSCOMCMATERIALS\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python311\\site-packages\\sqlalchemy\\orm\\session.py', reloading
-2025-07-30 14:41:50,984 INFO werkzeug  * Detected change in 'C:\\Users\\POSCOMCMATERIALS\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python311\\site-packages\\sqlalchemy\\orm\\state.py', reloading
-2025-07-30 14:41:50,984 INFO werkzeug  * Detected change in 'C:\\Users\\POSCOMCMATERIALS\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python311\\site-packages\\sqlalchemy\\orm\\_typing.py', reloading
-2025-07-30 14:41:50,985 INFO werkzeug  * Detected change in 'C:\\Users\\POSCOMCMATERIALS\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python311\\site-packages\\sqlalchemy\\log.py', reloading
-2025-07-30 14:41:50,985 INFO werkzeug  * Detected change in 'C:\\Users\\POSCOMCMATERIALS\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python311\\site-packages\\sqlalchemy\\sql\\operators.py', reloading
-2025-07-30 14:41:50,986 INFO werkzeug  * Detected change in 'C:\\Users\\POSCOMCMATERIALS\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python311\\site-packages\\flask\\json\\tag.py', reloading
-2025-07-30 14:41:50,987 INFO werkzeug  * Detected change in 'C:\\Users\\POSCOMCMATERIALS\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python311\\site-packages\\jinja2\\environment.py', reloading
-2025-07-30 14:41:50,987 INFO werkzeug  * Detected change in 'C:\\Program Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\\Lib\\io.py', reloading
-2025-07-30 14:41:51,298 INFO werkzeug  * Restarting with watchdog (windowsapi)
-2025-07-30 14:43:04,159 INFO werkzeug [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
- * Running on http://127.0.0.1:8002
-2025-07-30 14:43:04,159 INFO werkzeug [33mPress CTRL+C to quit[0m
-2025-07-30 14:43:04,170 INFO werkzeug  * Restarting with watchdog (windowsapi)
-2025-07-30 14:43:04,705 WARNING werkzeug  * Debugger is active!
-2025-07-30 14:43:04,713 INFO werkzeug  * Debugger PIN: 124-020-770
-2025-07-30 14:43:08,026 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 14:43:08] "GET / HTTP/1.1" 200 -
-2025-07-30 14:43:08,044 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 14:43:08] "GET /api/stats HTTP/1.1" 200 -
-2025-07-30 14:43:11,159 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 14:43:11] "[33mGET /purchasing/requests HTTP/1.1[0m" 404 -
-2025-07-30 14:43:17,504 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 14:43:17] "GET / HTTP/1.1" 200 -
-2025-07-30 14:43:17,522 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 14:43:17] "GET /api/stats HTTP/1.1" 200 -
-2025-07-30 14:43:19,970 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 14:43:19] "[33mGET /purchasing/requests HTTP/1.1[0m" 404 -
-2025-07-30 14:43:21,021 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 14:43:21] "GET / HTTP/1.1" 200 -
-2025-07-30 14:43:21,038 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 14:43:21] "GET /api/stats HTTP/1.1" 200 -
-2025-07-30 14:43:26,016 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 14:43:26] "[35m[1mGET /communication/free HTTP/1.1[0m" 500 -
-2025-07-30 14:43:26,133 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 14:43:26] "GET /communication/free?__debugger__=yes&cmd=resource&f=style.css HTTP/1.1" 200 -
-2025-07-30 14:43:26,137 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 14:43:26] "GET /communication/free?__debugger__=yes&cmd=resource&f=debugger.js HTTP/1.1" 200 -
-2025-07-30 14:43:26,149 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 14:43:26] "GET /communication/free?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1" 200 -
-2025-07-30 14:43:26,186 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 14:43:26] "[36mGET /communication/free?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
-2025-07-30 14:43:52,645 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\database.py', reloading
-2025-07-30 14:43:52,646 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\database.py', reloading
-2025-07-30 14:43:52,876 INFO werkzeug  * Restarting with watchdog (windowsapi)
-2025-07-30 14:43:53,502 WARNING werkzeug  * Debugger is active!
-2025-07-30 14:43:53,521 INFO werkzeug  * Debugger PIN: 124-020-770
-2025-07-30 14:44:09,454 INFO werkzeug [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
- * Running on http://127.0.0.1:8002
-2025-07-30 14:44:09,454 INFO werkzeug [33mPress CTRL+C to quit[0m
-2025-07-30 14:44:09,464 INFO werkzeug  * Restarting with watchdog (windowsapi)
-2025-07-30 14:44:10,001 WARNING werkzeug  * Debugger is active!
-2025-07-30 14:44:10,019 INFO werkzeug  * Debugger PIN: 124-020-770
-2025-07-30 14:44:15,893 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 14:44:15] "GET /communication/free HTTP/1.1" 200 -
-2025-07-30 14:44:23,884 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 14:44:23] "GET /communication/safety_qa HTTP/1.1" 200 -
-2025-07-30 14:45:30,458 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 14:45:30] "GET / HTTP/1.1" 200 -
-2025-07-30 14:45:30,476 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 14:45:30] "GET /api/stats HTTP/1.1" 200 -
-2025-07-30 14:45:36,467 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 14:45:36] "GET /external/contacts HTTP/1.1" 200 -
-2025-07-30 14:45:43,698 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 14:45:43] "[32mPOST /external/contacts/add HTTP/1.1[0m" 302 -
-2025-07-30 14:45:43,705 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 14:45:43] "GET /external/contacts HTTP/1.1" 200 -
-2025-07-30 14:46:24,030 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\database.py', reloading
-2025-07-30 14:46:24,030 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\database.py', reloading
-2025-07-30 14:46:24,040 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\database.py', reloading
-2025-07-30 14:46:24,709 INFO werkzeug  * Restarting with watchdog (windowsapi)
-2025-07-30 14:46:25,247 WARNING werkzeug  * Debugger is active!
-2025-07-30 14:46:25,254 INFO werkzeug  * Debugger PIN: 124-020-770
-2025-07-30 14:46:37,972 INFO werkzeug [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
- * Running on http://127.0.0.1:8002
-2025-07-30 14:46:37,972 INFO werkzeug [33mPress CTRL+C to quit[0m
-2025-07-30 14:46:37,981 INFO werkzeug  * Restarting with watchdog (windowsapi)
-2025-07-30 14:46:38,592 WARNING werkzeug  * Debugger is active!
-2025-07-30 14:46:38,611 INFO werkzeug  * Debugger PIN: 124-020-770
-2025-07-30 14:46:41,621 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 14:46:41] "GET /external/contacts HTTP/1.1" 200 -
-2025-07-30 14:47:05,054 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 14:47:05] "[32mPOST /external/contacts/add HTTP/1.1[0m" 302 -
-2025-07-30 14:47:05,058 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 14:47:05] "GET /external/contacts HTTP/1.1" 200 -
-2025-07-30 14:47:15,055 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 14:47:15] "GET /chemical/msds HTTP/1.1" 200 -
-2025-07-30 14:47:24,863 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 14:47:24] "[32mPOST /chemical/msds/add HTTP/1.1[0m" 302 -
-2025-07-30 14:47:24,871 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 14:47:24] "GET /chemical/msds HTTP/1.1" 200 -
-2025-07-30 14:47:55,527 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\database.py', reloading
-2025-07-30 14:47:55,537 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\database.py', reloading
-2025-07-30 14:47:55,537 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\database.py', reloading
-2025-07-30 14:47:56,064 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\database.py', reloading
-2025-07-30 14:47:56,065 INFO werkzeug  * Detected change in 'D:\\Documents\\Desktop\\programming\\ResearchManagementSystem\\database.py', reloading
-2025-07-30 14:47:56,347 INFO werkzeug  * Restarting with watchdog (windowsapi)
-2025-07-30 14:47:56,882 WARNING werkzeug  * Debugger is active!
-2025-07-30 14:47:56,889 INFO werkzeug  * Debugger PIN: 124-020-770
-2025-07-30 14:48:11,617 INFO werkzeug [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
- * Running on http://127.0.0.1:8002
-2025-07-30 14:48:11,618 INFO werkzeug [33mPress CTRL+C to quit[0m
-2025-07-30 14:48:11,628 INFO werkzeug  * Restarting with watchdog (windowsapi)
-2025-07-30 14:48:12,170 WARNING werkzeug  * Debugger is active!
-2025-07-30 14:48:12,177 INFO werkzeug  * Debugger PIN: 124-020-770
-2025-07-30 14:48:15,032 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 14:48:15] "GET /chemical/msds HTTP/1.1" 200 -
-2025-07-30 14:48:53,254 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 14:48:53] "[32mPOST /chemical/msds/add HTTP/1.1[0m" 302 -
-2025-07-30 14:48:53,257 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 14:48:53] "GET /chemical/msds HTTP/1.1" 200 -
-2025-07-30 14:49:21,391 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 14:49:21] "GET /coal-tar-pitch-log HTTP/1.1" 200 -
-2025-07-30 14:49:48,146 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 14:49:48] "POST /coal-tar-pitch-log/add HTTP/1.1" 200 -
-2025-07-30 14:49:48,154 INFO werkzeug 127.0.0.1 - - [30/Jul/2025 14:49:48] "GET /coal-tar-pitch-log HTTP/1.1" 200 -
+2025-08-07 11:58:01 INFO werkzeug [33mPress CTRL+C to quit[0m
+2025-08-07 11:58:57 INFO app 요청: GET http://127.0.0.1:8002/ - IP: 127.0.0.1
+2025-08-07 11:58:57 INFO app 응답: 200 - GET http://127.0.0.1:8002/
+2025-08-07 11:58:57 INFO werkzeug 127.0.0.1 - - [07/Aug/2025 11:58:57] "GET / HTTP/1.1" 200 -
+2025-08-07 11:58:57 INFO app 요청: GET http://127.0.0.1:8002/api/stats - IP: 127.0.0.1
+2025-08-07 11:58:57 INFO app 응답: 200 - GET http://127.0.0.1:8002/api/stats
+2025-08-07 11:58:57 INFO werkzeug 127.0.0.1 - - [07/Aug/2025 11:58:57] "GET /api/stats HTTP/1.1" 200 -
+2025-08-07 11:58:57 INFO app 요청: GET http://127.0.0.1:8002/favicon.ico - IP: 127.0.0.1
+2025-08-07 11:58:57 ERROR app 예외 발생: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
+Traceback (most recent call last):
+  File "C:\Users\POSCOMCMATERIALS\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\flask\app.py", line 1484, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\POSCOMCMATERIALS\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\flask\app.py", line 1458, in dispatch_request
+    self.raise_routing_exception(req)
+  File "C:\Users\POSCOMCMATERIALS\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\flask\app.py", line 1440, in raise_routing_exception
+    raise request.routing_exception  # type: ignore
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\POSCOMCMATERIALS\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\flask\ctx.py", line 353, in match_request
+    result = self.url_adapter.match(return_rule=True)  # type: ignore
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\POSCOMCMATERIALS\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\werkzeug\routing\map.py", line 655, in match
+    raise NotFound() from None
+werkzeug.exceptions.NotFound: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
+2025-08-07 11:58:57 INFO app 응답: 500 - GET http://127.0.0.1:8002/favicon.ico
+2025-08-07 11:58:57 INFO werkzeug 127.0.0.1 - - [07/Aug/2025 11:58:57] "[35m[1mGET /favicon.ico HTTP/1.1[0m" 500 -
+2025-08-07 11:59:09 INFO app 요청: GET http://127.0.0.1:8002/equipment/reservations - IP: 127.0.0.1
+2025-08-07 11:59:09 INFO app 응답: 200 - GET http://127.0.0.1:8002/equipment/reservations
+2025-08-07 11:59:09 INFO werkzeug 127.0.0.1 - - [07/Aug/2025 11:59:09] "GET /equipment/reservations HTTP/1.1" 200 -
+2025-08-07 11:59:09 INFO app 요청: GET http://127.0.0.1:8002/equipment/api/reservations - IP: 127.0.0.1
+2025-08-07 11:59:09 INFO app 응답: 200 - GET http://127.0.0.1:8002/equipment/api/reservations
+2025-08-07 11:59:09 INFO werkzeug 127.0.0.1 - - [07/Aug/2025 11:59:09] "GET /equipment/api/reservations HTTP/1.1" 200 -
+2025-08-07 11:59:09 INFO app 요청: GET http://127.0.0.1:8002/equipment/api/equipment - IP: 127.0.0.1
+2025-08-07 11:59:09 INFO app 요청: GET http://127.0.0.1:8002/equipment/api/reservations - IP: 127.0.0.1
+2025-08-07 11:59:09 INFO app 응답: 200 - GET http://127.0.0.1:8002/equipment/api/reservations
+2025-08-07 11:59:09 INFO werkzeug 127.0.0.1 - - [07/Aug/2025 11:59:09] "GET /equipment/api/reservations HTTP/1.1" 200 -
+2025-08-07 11:59:09 INFO app 요청: GET http://127.0.0.1:8002/favicon.ico - IP: 127.0.0.1
+2025-08-07 11:59:09 ERROR app 예외 발생: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
+Traceback (most recent call last):
+  File "C:\Users\POSCOMCMATERIALS\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\flask\app.py", line 1484, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\POSCOMCMATERIALS\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\flask\app.py", line 1458, in dispatch_request
+    self.raise_routing_exception(req)
+  File "C:\Users\POSCOMCMATERIALS\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\flask\app.py", line 1440, in raise_routing_exception
+    raise request.routing_exception  # type: ignore
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\POSCOMCMATERIALS\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\flask\ctx.py", line 353, in match_request
+    result = self.url_adapter.match(return_rule=True)  # type: ignore
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\POSCOMCMATERIALS\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\werkzeug\routing\map.py", line 655, in match
+    raise NotFound() from None
+werkzeug.exceptions.NotFound: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
+2025-08-07 11:59:09 INFO app 응답: 200 - GET http://127.0.0.1:8002/equipment/api/equipment
+2025-08-07 11:59:09 INFO app 응답: 500 - GET http://127.0.0.1:8002/favicon.ico
+2025-08-07 11:59:09 INFO werkzeug 127.0.0.1 - - [07/Aug/2025 11:59:09] "GET /equipment/api/equipment HTTP/1.1" 200 -
+2025-08-07 11:59:09 INFO werkzeug 127.0.0.1 - - [07/Aug/2025 11:59:09] "[35m[1mGET /favicon.ico HTTP/1.1[0m" 500 -
+2025-08-07 11:59:09 INFO app 요청: GET http://127.0.0.1:8002/equipment/api/equipment - IP: 127.0.0.1
+2025-08-07 11:59:09 INFO app 응답: 200 - GET http://127.0.0.1:8002/equipment/api/equipment
+2025-08-07 11:59:09 INFO werkzeug 127.0.0.1 - - [07/Aug/2025 11:59:09] "GET /equipment/api/equipment HTTP/1.1" 200 -
+2025-08-07 11:59:19 INFO app 요청: GET http://127.0.0.1:8002/equipment/api/equipment - IP: 127.0.0.1
+2025-08-07 11:59:19 INFO app 응답: 200 - GET http://127.0.0.1:8002/equipment/api/equipment
+2025-08-07 11:59:19 INFO werkzeug 127.0.0.1 - - [07/Aug/2025 11:59:19] "GET /equipment/api/equipment HTTP/1.1" 200 -
+2025-08-07 11:59:37 INFO app 요청: GET http://127.0.0.1:8002/equipment/usage-log - IP: 127.0.0.1
+2025-08-07 11:59:37 INFO app 응답: 200 - GET http://127.0.0.1:8002/equipment/usage-log
+2025-08-07 11:59:37 INFO werkzeug 127.0.0.1 - - [07/Aug/2025 11:59:37] "GET /equipment/usage-log HTTP/1.1" 200 -
+2025-08-07 11:59:37 INFO app 요청: GET http://127.0.0.1:8002/equipment/api/usage-logs - IP: 127.0.0.1
+2025-08-07 11:59:37 INFO app 요청: GET http://127.0.0.1:8002/equipment/api/equipment - IP: 127.0.0.1
+2025-08-07 11:59:37 INFO app 응답: 200 - GET http://127.0.0.1:8002/equipment/api/usage-logs
+2025-08-07 11:59:37 INFO werkzeug 127.0.0.1 - - [07/Aug/2025 11:59:37] "GET /equipment/api/usage-logs HTTP/1.1" 200 -
+2025-08-07 11:59:37 INFO app 요청: GET http://127.0.0.1:8002/favicon.ico - IP: 127.0.0.1
+2025-08-07 11:59:37 ERROR app 예외 발생: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
+Traceback (most recent call last):
+  File "C:\Users\POSCOMCMATERIALS\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\flask\app.py", line 1484, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\POSCOMCMATERIALS\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\flask\app.py", line 1458, in dispatch_request
+    self.raise_routing_exception(req)
+  File "C:\Users\POSCOMCMATERIALS\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\flask\app.py", line 1440, in raise_routing_exception
+    raise request.routing_exception  # type: ignore
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\POSCOMCMATERIALS\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\flask\ctx.py", line 353, in match_request
+    result = self.url_adapter.match(return_rule=True)  # type: ignore
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\POSCOMCMATERIALS\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\werkzeug\routing\map.py", line 655, in match
+    raise NotFound() from None
+werkzeug.exceptions.NotFound: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
+2025-08-07 11:59:37 INFO app 응답: 200 - GET http://127.0.0.1:8002/equipment/api/equipment
+2025-08-07 11:59:37 INFO app 응답: 500 - GET http://127.0.0.1:8002/favicon.ico
+2025-08-07 11:59:37 INFO werkzeug 127.0.0.1 - - [07/Aug/2025 11:59:37] "GET /equipment/api/equipment HTTP/1.1" 200 -
+2025-08-07 11:59:37 INFO werkzeug 127.0.0.1 - - [07/Aug/2025 11:59:37] "[35m[1mGET /favicon.ico HTTP/1.1[0m" 500 -
+2025-08-07 11:59:37 INFO app 요청: GET http://127.0.0.1:8002/equipment/api/equipment - IP: 127.0.0.1
+2025-08-07 11:59:37 INFO app 응답: 200 - GET http://127.0.0.1:8002/equipment/api/equipment
+2025-08-07 11:59:37 INFO werkzeug 127.0.0.1 - - [07/Aug/2025 11:59:37] "GET /equipment/api/equipment HTTP/1.1" 200 -
+2025-08-07 12:23:57 INFO app 요청: GET http://127.0.0.1:8002/equipment/list - IP: 127.0.0.1
+2025-08-07 12:23:57 INFO app 응답: 200 - GET http://127.0.0.1:8002/equipment/list
+2025-08-07 12:23:57 INFO werkzeug 127.0.0.1 - - [07/Aug/2025 12:23:57] "GET /equipment/list HTTP/1.1" 200 -
+2025-08-07 12:23:57 INFO app 요청: GET http://127.0.0.1:8002/equipment/api/equipment - IP: 127.0.0.1
+2025-08-07 12:23:57 INFO app 요청: GET http://127.0.0.1:8002/favicon.ico - IP: 127.0.0.1
+2025-08-07 12:23:57 ERROR app 예외 발생: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
+Traceback (most recent call last):
+  File "C:\Users\POSCOMCMATERIALS\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\flask\app.py", line 1484, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\POSCOMCMATERIALS\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\flask\app.py", line 1458, in dispatch_request
+    self.raise_routing_exception(req)
+  File "C:\Users\POSCOMCMATERIALS\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\flask\app.py", line 1440, in raise_routing_exception
+    raise request.routing_exception  # type: ignore
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\POSCOMCMATERIALS\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\flask\ctx.py", line 353, in match_request
+    result = self.url_adapter.match(return_rule=True)  # type: ignore
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\POSCOMCMATERIALS\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\werkzeug\routing\map.py", line 655, in match
+    raise NotFound() from None
+werkzeug.exceptions.NotFound: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
+2025-08-07 12:23:57 INFO app 응답: 200 - GET http://127.0.0.1:8002/equipment/api/equipment
+2025-08-07 12:23:57 INFO app 응답: 500 - GET http://127.0.0.1:8002/favicon.ico
+2025-08-07 12:23:57 INFO werkzeug 127.0.0.1 - - [07/Aug/2025 12:23:57] "GET /equipment/api/equipment HTTP/1.1" 200 -
+2025-08-07 12:23:57 INFO werkzeug 127.0.0.1 - - [07/Aug/2025 12:23:57] "[35m[1mGET /favicon.ico HTTP/1.1[0m" 500 -
+2025-08-07 12:24:00 INFO app 요청: GET http://127.0.0.1:8002/patents/list - IP: 127.0.0.1
+2025-08-07 12:24:00 INFO app 응답: 200 - GET http://127.0.0.1:8002/patents/list
+2025-08-07 12:24:00 INFO werkzeug 127.0.0.1 - - [07/Aug/2025 12:24:00] "GET /patents/list HTTP/1.1" 200 -
+2025-08-07 12:24:00 INFO app 요청: GET http://127.0.0.1:8002/favicon.ico - IP: 127.0.0.1
+2025-08-07 12:24:00 ERROR app 예외 발생: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
+Traceback (most recent call last):
+  File "C:\Users\POSCOMCMATERIALS\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\flask\app.py", line 1484, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\POSCOMCMATERIALS\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\flask\app.py", line 1458, in dispatch_request
+    self.raise_routing_exception(req)
+  File "C:\Users\POSCOMCMATERIALS\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\flask\app.py", line 1440, in raise_routing_exception
+    raise request.routing_exception  # type: ignore
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\POSCOMCMATERIALS\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\flask\ctx.py", line 353, in match_request
+    result = self.url_adapter.match(return_rule=True)  # type: ignore
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\POSCOMCMATERIALS\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\werkzeug\routing\map.py", line 655, in match
+    raise NotFound() from None
+werkzeug.exceptions.NotFound: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
+2025-08-07 12:24:00 INFO app 응답: 500 - GET http://127.0.0.1:8002/favicon.ico
+2025-08-07 12:24:00 INFO werkzeug 127.0.0.1 - - [07/Aug/2025 12:24:00] "[35m[1mGET /favicon.ico HTTP/1.1[0m" 500 -
+2025-08-07 12:24:06 INFO app 요청: GET http://127.0.0.1:8002/ - IP: 127.0.0.1
+2025-08-07 12:24:06 INFO app 응답: 200 - GET http://127.0.0.1:8002/
+2025-08-07 12:24:06 INFO werkzeug 127.0.0.1 - - [07/Aug/2025 12:24:06] "GET / HTTP/1.1" 200 -
+2025-08-07 12:24:06 INFO app 요청: GET http://127.0.0.1:8002/api/stats - IP: 127.0.0.1
+2025-08-07 12:24:06 INFO app 응답: 200 - GET http://127.0.0.1:8002/api/stats
+2025-08-07 12:24:06 INFO werkzeug 127.0.0.1 - - [07/Aug/2025 12:24:06] "GET /api/stats HTTP/1.1" 200 -
+2025-08-07 12:24:06 INFO app 요청: GET http://127.0.0.1:8002/favicon.ico - IP: 127.0.0.1
+2025-08-07 12:24:06 ERROR app 예외 발생: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
+Traceback (most recent call last):
+  File "C:\Users\POSCOMCMATERIALS\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\flask\app.py", line 1484, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\POSCOMCMATERIALS\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\flask\app.py", line 1458, in dispatch_request
+    self.raise_routing_exception(req)
+  File "C:\Users\POSCOMCMATERIALS\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\flask\app.py", line 1440, in raise_routing_exception
+    raise request.routing_exception  # type: ignore
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\POSCOMCMATERIALS\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\flask\ctx.py", line 353, in match_request
+    result = self.url_adapter.match(return_rule=True)  # type: ignore
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\POSCOMCMATERIALS\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\werkzeug\routing\map.py", line 655, in match
+    raise NotFound() from None
+werkzeug.exceptions.NotFound: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
+2025-08-07 12:24:06 INFO app 응답: 500 - GET http://127.0.0.1:8002/favicon.ico
+2025-08-07 12:24:06 INFO werkzeug 127.0.0.1 - - [07/Aug/2025 12:24:06] "[35m[1mGET /favicon.ico HTTP/1.1[0m" 500 -
+2025-08-07 12:24:26 INFO app 요청: GET http://127.0.0.1:8002/equipment/list - IP: 127.0.0.1
+2025-08-07 12:24:26 INFO app 응답: 200 - GET http://127.0.0.1:8002/equipment/list
+2025-08-07 12:24:26 INFO werkzeug 127.0.0.1 - - [07/Aug/2025 12:24:26] "GET /equipment/list HTTP/1.1" 200 -
+2025-08-07 12:24:26 INFO app 요청: GET http://127.0.0.1:8002/equipment/api/equipment - IP: 127.0.0.1
+2025-08-07 12:24:26 INFO app 요청: GET http://127.0.0.1:8002/favicon.ico - IP: 127.0.0.1
+2025-08-07 12:24:26 ERROR app 예외 발생: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
+Traceback (most recent call last):
+  File "C:\Users\POSCOMCMATERIALS\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\flask\app.py", line 1484, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\POSCOMCMATERIALS\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\flask\app.py", line 1458, in dispatch_request
+    self.raise_routing_exception(req)
+  File "C:\Users\POSCOMCMATERIALS\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\flask\app.py", line 1440, in raise_routing_exception
+    raise request.routing_exception  # type: ignore
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\POSCOMCMATERIALS\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\flask\ctx.py", line 353, in match_request
+    result = self.url_adapter.match(return_rule=True)  # type: ignore
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\POSCOMCMATERIALS\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\werkzeug\routing\map.py", line 655, in match
+    raise NotFound() from None
+werkzeug.exceptions.NotFound: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
+2025-08-07 12:24:26 INFO app 응답: 200 - GET http://127.0.0.1:8002/equipment/api/equipment
+2025-08-07 12:24:26 INFO app 응답: 500 - GET http://127.0.0.1:8002/favicon.ico
+2025-08-07 12:24:26 INFO werkzeug 127.0.0.1 - - [07/Aug/2025 12:24:26] "GET /equipment/api/equipment HTTP/1.1" 200 -
+2025-08-07 12:24:26 INFO werkzeug 127.0.0.1 - - [07/Aug/2025 12:24:26] "[35m[1mGET /favicon.ico HTTP/1.1[0m" 500 -
+2025-08-07 12:24:35 INFO app 요청: POST http://127.0.0.1:8002/equipment/api/equipment/2/delete - IP: 127.0.0.1
+2025-08-07 12:24:35 INFO app 응답: 200 - POST http://127.0.0.1:8002/equipment/api/equipment/2/delete
+2025-08-07 12:24:35 INFO werkzeug 127.0.0.1 - - [07/Aug/2025 12:24:35] "POST /equipment/api/equipment/2/delete HTTP/1.1" 200 -
+2025-08-07 12:24:35 INFO app 요청: GET http://127.0.0.1:8002/equipment/api/equipment - IP: 127.0.0.1
+2025-08-07 12:24:35 INFO app 응답: 200 - GET http://127.0.0.1:8002/equipment/api/equipment
+2025-08-07 12:24:35 INFO werkzeug 127.0.0.1 - - [07/Aug/2025 12:24:35] "GET /equipment/api/equipment HTTP/1.1" 200 -
+2025-08-07 12:24:37 INFO app 요청: POST http://127.0.0.1:8002/equipment/api/equipment/2/delete - IP: 127.0.0.1
+2025-08-07 12:24:37 INFO app 응답: 400 - POST http://127.0.0.1:8002/equipment/api/equipment/2/delete
+2025-08-07 12:24:37 INFO werkzeug 127.0.0.1 - - [07/Aug/2025 12:24:37] "[31m[1mPOST /equipment/api/equipment/2/delete HTTP/1.1[0m" 400 -
+2025-08-07 12:24:40 INFO app 요청: POST http://127.0.0.1:8002/equipment/api/equipment/2/delete - IP: 127.0.0.1
+2025-08-07 12:24:40 INFO app 응답: 400 - POST http://127.0.0.1:8002/equipment/api/equipment/2/delete
+2025-08-07 12:24:40 INFO werkzeug 127.0.0.1 - - [07/Aug/2025 12:24:40] "[31m[1mPOST /equipment/api/equipment/2/delete HTTP/1.1[0m" 400 -
+2025-08-07 12:24:42 INFO app 요청: POST http://127.0.0.1:8002/equipment/api/equipment/3/delete - IP: 127.0.0.1
+2025-08-07 12:24:42 INFO app 응답: 200 - POST http://127.0.0.1:8002/equipment/api/equipment/3/delete
+2025-08-07 12:24:42 INFO werkzeug 127.0.0.1 - - [07/Aug/2025 12:24:42] "POST /equipment/api/equipment/3/delete HTTP/1.1" 200 -
+2025-08-07 12:24:42 INFO app 요청: GET http://127.0.0.1:8002/equipment/api/equipment - IP: 127.0.0.1
+2025-08-07 12:24:42 INFO app 응답: 200 - GET http://127.0.0.1:8002/equipment/api/equipment
+2025-08-07 12:24:42 INFO werkzeug 127.0.0.1 - - [07/Aug/2025 12:24:42] "GET /equipment/api/equipment HTTP/1.1" 200 -
+2025-08-07 12:25:03 INFO app 요청: POST http://127.0.0.1:8002/equipment/api/equipment/2/delete - IP: 127.0.0.1
+2025-08-07 12:25:03 INFO app 응답: 400 - POST http://127.0.0.1:8002/equipment/api/equipment/2/delete
+2025-08-07 12:25:03 INFO werkzeug 127.0.0.1 - - [07/Aug/2025 12:25:03] "[31m[1mPOST /equipment/api/equipment/2/delete HTTP/1.1[0m" 400 -
+2025-08-07 12:25:05 INFO app 요청: GET http://127.0.0.1:8002/equipment/list - IP: 127.0.0.1
+2025-08-07 12:25:05 INFO app 응답: 200 - GET http://127.0.0.1:8002/equipment/list
+2025-08-07 12:25:05 INFO werkzeug 127.0.0.1 - - [07/Aug/2025 12:25:05] "GET /equipment/list HTTP/1.1" 200 -
+2025-08-07 12:25:05 INFO app 요청: GET http://127.0.0.1:8002/equipment/api/equipment - IP: 127.0.0.1
+2025-08-07 12:25:05 INFO app 요청: GET http://127.0.0.1:8002/favicon.ico - IP: 127.0.0.1
+2025-08-07 12:25:05 ERROR app 예외 발생: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
+Traceback (most recent call last):
+  File "C:\Users\POSCOMCMATERIALS\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\flask\app.py", line 1484, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\POSCOMCMATERIALS\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\flask\app.py", line 1458, in dispatch_request
+    self.raise_routing_exception(req)
+  File "C:\Users\POSCOMCMATERIALS\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\flask\app.py", line 1440, in raise_routing_exception
+    raise request.routing_exception  # type: ignore
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\POSCOMCMATERIALS\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\flask\ctx.py", line 353, in match_request
+    result = self.url_adapter.match(return_rule=True)  # type: ignore
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\POSCOMCMATERIALS\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\werkzeug\routing\map.py", line 655, in match
+    raise NotFound() from None
+werkzeug.exceptions.NotFound: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
+2025-08-07 12:25:05 INFO app 응답: 200 - GET http://127.0.0.1:8002/equipment/api/equipment
+2025-08-07 12:25:05 INFO app 응답: 500 - GET http://127.0.0.1:8002/favicon.ico
+2025-08-07 12:25:05 INFO werkzeug 127.0.0.1 - - [07/Aug/2025 12:25:05] "GET /equipment/api/equipment HTTP/1.1" 200 -
+2025-08-07 12:25:05 INFO werkzeug 127.0.0.1 - - [07/Aug/2025 12:25:05] "[35m[1mGET /favicon.ico HTTP/1.1[0m" 500 -
+2025-08-07 12:25:09 INFO app 요청: POST http://127.0.0.1:8002/equipment/api/equipment/4/delete - IP: 127.0.0.1
+2025-08-07 12:25:09 INFO app 응답: 200 - POST http://127.0.0.1:8002/equipment/api/equipment/4/delete
+2025-08-07 12:25:09 INFO werkzeug 127.0.0.1 - - [07/Aug/2025 12:25:09] "POST /equipment/api/equipment/4/delete HTTP/1.1" 200 -
+2025-08-07 12:25:09 INFO app 요청: GET http://127.0.0.1:8002/equipment/api/equipment - IP: 127.0.0.1
+2025-08-07 12:25:09 INFO app 응답: 200 - GET http://127.0.0.1:8002/equipment/api/equipment
+2025-08-07 12:25:09 INFO werkzeug 127.0.0.1 - - [07/Aug/2025 12:25:09] "GET /equipment/api/equipment HTTP/1.1" 200 -
+2025-08-07 12:25:10 INFO app 요청: GET http://127.0.0.1:8002/equipment/list - IP: 127.0.0.1
+2025-08-07 12:25:10 INFO app 응답: 200 - GET http://127.0.0.1:8002/equipment/list
+2025-08-07 12:25:10 INFO werkzeug 127.0.0.1 - - [07/Aug/2025 12:25:10] "GET /equipment/list HTTP/1.1" 200 -
+2025-08-07 12:25:10 INFO app 요청: GET http://127.0.0.1:8002/equipment/api/equipment - IP: 127.0.0.1
+2025-08-07 12:25:10 INFO app 요청: GET http://127.0.0.1:8002/favicon.ico - IP: 127.0.0.1
+2025-08-07 12:25:10 ERROR app 예외 발생: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
+Traceback (most recent call last):
+  File "C:\Users\POSCOMCMATERIALS\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\flask\app.py", line 1484, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\POSCOMCMATERIALS\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\flask\app.py", line 1458, in dispatch_request
+    self.raise_routing_exception(req)
+  File "C:\Users\POSCOMCMATERIALS\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\flask\app.py", line 1440, in raise_routing_exception
+    raise request.routing_exception  # type: ignore
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\POSCOMCMATERIALS\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\flask\ctx.py", line 353, in match_request
+    result = self.url_adapter.match(return_rule=True)  # type: ignore
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\POSCOMCMATERIALS\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\werkzeug\routing\map.py", line 655, in match
+    raise NotFound() from None
+werkzeug.exceptions.NotFound: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
+2025-08-07 12:25:10 INFO app 응답: 200 - GET http://127.0.0.1:8002/equipment/api/equipment
+2025-08-07 12:25:10 INFO app 응답: 500 - GET http://127.0.0.1:8002/favicon.ico
+2025-08-07 12:25:10 INFO werkzeug 127.0.0.1 - - [07/Aug/2025 12:25:10] "GET /equipment/api/equipment HTTP/1.1" 200 -
+2025-08-07 12:25:10 INFO werkzeug 127.0.0.1 - - [07/Aug/2025 12:25:10] "[35m[1mGET /favicon.ico HTTP/1.1[0m" 500 -
+2025-08-07 12:29:29 INFO app 요청: GET http://127.0.0.1:8002/ - IP: 127.0.0.1
+2025-08-07 12:29:29 INFO app 응답: 200 - GET http://127.0.0.1:8002/
+2025-08-07 12:29:29 INFO werkzeug 127.0.0.1 - - [07/Aug/2025 12:29:29] "GET / HTTP/1.1" 200 -
+2025-08-07 12:29:29 INFO app 요청: GET http://127.0.0.1:8002/api/stats - IP: 127.0.0.1
+2025-08-07 12:29:29 INFO app 응답: 200 - GET http://127.0.0.1:8002/api/stats
+2025-08-07 12:29:29 INFO werkzeug 127.0.0.1 - - [07/Aug/2025 12:29:29] "GET /api/stats HTTP/1.1" 200 -
+2025-08-07 12:29:29 INFO app 요청: GET http://127.0.0.1:8002/favicon.ico - IP: 127.0.0.1
+2025-08-07 12:29:29 ERROR app 예외 발생: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
+Traceback (most recent call last):
+  File "C:\Users\POSCOMCMATERIALS\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\flask\app.py", line 1484, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\POSCOMCMATERIALS\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\flask\app.py", line 1458, in dispatch_request
+    self.raise_routing_exception(req)
+  File "C:\Users\POSCOMCMATERIALS\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\flask\app.py", line 1440, in raise_routing_exception
+    raise request.routing_exception  # type: ignore
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\POSCOMCMATERIALS\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\flask\ctx.py", line 353, in match_request
+    result = self.url_adapter.match(return_rule=True)  # type: ignore
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\POSCOMCMATERIALS\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\werkzeug\routing\map.py", line 655, in match
+    raise NotFound() from None
+werkzeug.exceptions.NotFound: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
+2025-08-07 12:29:29 INFO app 응답: 500 - GET http://127.0.0.1:8002/favicon.ico
+2025-08-07 12:29:29 INFO werkzeug 127.0.0.1 - - [07/Aug/2025 12:29:29] "[35m[1mGET /favicon.ico HTTP/1.1[0m" 500 -
+2025-08-07 12:29:34 INFO app 요청: GET http://127.0.0.1:8002/equipment/list - IP: 127.0.0.1
+2025-08-07 12:29:34 INFO app 응답: 200 - GET http://127.0.0.1:8002/equipment/list
+2025-08-07 12:29:34 INFO werkzeug 127.0.0.1 - - [07/Aug/2025 12:29:34] "GET /equipment/list HTTP/1.1" 200 -
+2025-08-07 12:29:34 INFO app 요청: GET http://127.0.0.1:8002/equipment/api/equipment - IP: 127.0.0.1
+2025-08-07 12:29:34 INFO app 요청: GET http://127.0.0.1:8002/favicon.ico - IP: 127.0.0.1
+2025-08-07 12:29:34 INFO app 응답: 200 - GET http://127.0.0.1:8002/equipment/api/equipment
+2025-08-07 12:29:34 ERROR app 예외 발생: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
+Traceback (most recent call last):
+  File "C:\Users\POSCOMCMATERIALS\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\flask\app.py", line 1484, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\POSCOMCMATERIALS\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\flask\app.py", line 1458, in dispatch_request
+    self.raise_routing_exception(req)
+  File "C:\Users\POSCOMCMATERIALS\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\flask\app.py", line 1440, in raise_routing_exception
+    raise request.routing_exception  # type: ignore
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\POSCOMCMATERIALS\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\flask\ctx.py", line 353, in match_request
+    result = self.url_adapter.match(return_rule=True)  # type: ignore
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\POSCOMCMATERIALS\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\werkzeug\routing\map.py", line 655, in match
+    raise NotFound() from None
+werkzeug.exceptions.NotFound: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
+2025-08-07 12:29:34 INFO werkzeug 127.0.0.1 - - [07/Aug/2025 12:29:34] "GET /equipment/api/equipment HTTP/1.1" 200 -
+2025-08-07 12:29:34 INFO app 응답: 500 - GET http://127.0.0.1:8002/favicon.ico
+2025-08-07 12:29:34 INFO werkzeug 127.0.0.1 - - [07/Aug/2025 12:29:34] "[35m[1mGET /favicon.ico HTTP/1.1[0m" 500 -
+2025-08-07 12:29:46 INFO app 요청: POST http://127.0.0.1:8002/equipment/api/equipment/add - IP: 127.0.0.1
+2025-08-07 12:29:46 INFO app 응답: 200 - POST http://127.0.0.1:8002/equipment/api/equipment/add
+2025-08-07 12:29:46 INFO werkzeug 127.0.0.1 - - [07/Aug/2025 12:29:46] "POST /equipment/api/equipment/add HTTP/1.1" 200 -
+2025-08-07 12:29:46 INFO app 요청: GET http://127.0.0.1:8002/equipment/api/equipment - IP: 127.0.0.1
+2025-08-07 12:29:46 INFO app 응답: 200 - GET http://127.0.0.1:8002/equipment/api/equipment
+2025-08-07 12:29:46 INFO werkzeug 127.0.0.1 - - [07/Aug/2025 12:29:46] "GET /equipment/api/equipment HTTP/1.1" 200 -
+2025-08-07 12:29:48 INFO app 요청: GET http://127.0.0.1:8002/equipment/list - IP: 127.0.0.1
+2025-08-07 12:29:48 INFO app 응답: 200 - GET http://127.0.0.1:8002/equipment/list
+2025-08-07 12:29:48 INFO werkzeug 127.0.0.1 - - [07/Aug/2025 12:29:48] "GET /equipment/list HTTP/1.1" 200 -
+2025-08-07 12:29:48 INFO app 요청: GET http://127.0.0.1:8002/equipment/api/equipment - IP: 127.0.0.1
+2025-08-07 12:29:48 INFO app 요청: GET http://127.0.0.1:8002/favicon.ico - IP: 127.0.0.1
+2025-08-07 12:29:48 ERROR app 예외 발생: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
+Traceback (most recent call last):
+  File "C:\Users\POSCOMCMATERIALS\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\flask\app.py", line 1484, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\POSCOMCMATERIALS\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\flask\app.py", line 1458, in dispatch_request
+    self.raise_routing_exception(req)
+  File "C:\Users\POSCOMCMATERIALS\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\flask\app.py", line 1440, in raise_routing_exception
+    raise request.routing_exception  # type: ignore
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\POSCOMCMATERIALS\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\flask\ctx.py", line 353, in match_request
+    result = self.url_adapter.match(return_rule=True)  # type: ignore
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\POSCOMCMATERIALS\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\werkzeug\routing\map.py", line 655, in match
+    raise NotFound() from None
+werkzeug.exceptions.NotFound: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
+2025-08-07 12:29:48 INFO app 응답: 200 - GET http://127.0.0.1:8002/equipment/api/equipment
+2025-08-07 12:29:48 INFO app 응답: 500 - GET http://127.0.0.1:8002/favicon.ico
+2025-08-07 12:29:48 INFO werkzeug 127.0.0.1 - - [07/Aug/2025 12:29:48] "GET /equipment/api/equipment HTTP/1.1" 200 -
+2025-08-07 12:29:48 INFO werkzeug 127.0.0.1 - - [07/Aug/2025 12:29:48] "[35m[1mGET /favicon.ico HTTP/1.1[0m" 500 -
+2025-08-07 12:30:20 INFO app 요청: POST http://127.0.0.1:8002/equipment/api/equipment/5/delete - IP: 127.0.0.1
+2025-08-07 12:30:20 INFO app 응답: 200 - POST http://127.0.0.1:8002/equipment/api/equipment/5/delete
+2025-08-07 12:30:20 INFO werkzeug 127.0.0.1 - - [07/Aug/2025 12:30:20] "POST /equipment/api/equipment/5/delete HTTP/1.1" 200 -
+2025-08-07 12:30:20 INFO app 요청: GET http://127.0.0.1:8002/equipment/api/equipment - IP: 127.0.0.1
+2025-08-07 12:30:20 INFO app 응답: 200 - GET http://127.0.0.1:8002/equipment/api/equipment
+2025-08-07 12:30:20 INFO werkzeug 127.0.0.1 - - [07/Aug/2025 12:30:20] "GET /equipment/api/equipment HTTP/1.1" 200 -
+2025-08-07 12:30:22 INFO app 요청: GET http://127.0.0.1:8002/equipment/list - IP: 127.0.0.1
+2025-08-07 12:30:22 INFO app 응답: 200 - GET http://127.0.0.1:8002/equipment/list
+2025-08-07 12:30:22 INFO werkzeug 127.0.0.1 - - [07/Aug/2025 12:30:22] "GET /equipment/list HTTP/1.1" 200 -
+2025-08-07 12:30:22 INFO app 요청: GET http://127.0.0.1:8002/equipment/api/equipment - IP: 127.0.0.1
+2025-08-07 12:30:22 INFO app 요청: GET http://127.0.0.1:8002/favicon.ico - IP: 127.0.0.1
+2025-08-07 12:30:22 ERROR app 예외 발생: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
+Traceback (most recent call last):
+  File "C:\Users\POSCOMCMATERIALS\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\flask\app.py", line 1484, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\POSCOMCMATERIALS\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\flask\app.py", line 1458, in dispatch_request
+    self.raise_routing_exception(req)
+  File "C:\Users\POSCOMCMATERIALS\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\flask\app.py", line 1440, in raise_routing_exception
+    raise request.routing_exception  # type: ignore
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\POSCOMCMATERIALS\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\flask\ctx.py", line 353, in match_request
+    result = self.url_adapter.match(return_rule=True)  # type: ignore
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\POSCOMCMATERIALS\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\werkzeug\routing\map.py", line 655, in match
+    raise NotFound() from None
+werkzeug.exceptions.NotFound: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
+2025-08-07 12:30:22 INFO app 응답: 200 - GET http://127.0.0.1:8002/equipment/api/equipment
+2025-08-07 12:30:22 INFO app 응답: 500 - GET http://127.0.0.1:8002/favicon.ico
+2025-08-07 12:30:22 INFO werkzeug 127.0.0.1 - - [07/Aug/2025 12:30:22] "GET /equipment/api/equipment HTTP/1.1" 200 -
+2025-08-07 12:30:22 INFO werkzeug 127.0.0.1 - - [07/Aug/2025 12:30:22] "[35m[1mGET /favicon.ico HTTP/1.1[0m" 500 -
+2025-08-07 12:30:23 INFO app 요청: GET http://127.0.0.1:8002/ - IP: 127.0.0.1
+2025-08-07 12:30:23 INFO app 응답: 200 - GET http://127.0.0.1:8002/
+2025-08-07 12:30:23 INFO werkzeug 127.0.0.1 - - [07/Aug/2025 12:30:23] "GET / HTTP/1.1" 200 -
+2025-08-07 12:30:23 INFO app 요청: GET http://127.0.0.1:8002/api/stats - IP: 127.0.0.1
+2025-08-07 12:30:23 INFO app 응답: 200 - GET http://127.0.0.1:8002/api/stats
+2025-08-07 12:30:23 INFO werkzeug 127.0.0.1 - - [07/Aug/2025 12:30:23] "GET /api/stats HTTP/1.1" 200 -
+2025-08-07 12:30:23 INFO app 요청: GET http://127.0.0.1:8002/favicon.ico - IP: 127.0.0.1
+2025-08-07 12:30:23 ERROR app 예외 발생: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
+Traceback (most recent call last):
+  File "C:\Users\POSCOMCMATERIALS\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\flask\app.py", line 1484, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\POSCOMCMATERIALS\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\flask\app.py", line 1458, in dispatch_request
+    self.raise_routing_exception(req)
+  File "C:\Users\POSCOMCMATERIALS\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\flask\app.py", line 1440, in raise_routing_exception
+    raise request.routing_exception  # type: ignore
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\POSCOMCMATERIALS\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\flask\ctx.py", line 353, in match_request
+    result = self.url_adapter.match(return_rule=True)  # type: ignore
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\POSCOMCMATERIALS\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\werkzeug\routing\map.py", line 655, in match
+    raise NotFound() from None
+werkzeug.exceptions.NotFound: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
+2025-08-07 12:30:23 INFO app 응답: 500 - GET http://127.0.0.1:8002/favicon.ico
+2025-08-07 12:30:23 INFO werkzeug 127.0.0.1 - - [07/Aug/2025 12:30:23] "[35m[1mGET /favicon.ico HTTP/1.1[0m" 500 -
+2025-08-07 12:30:30 INFO app 요청: GET http://127.0.0.1:8002/equipment/reservations - IP: 127.0.0.1
+2025-08-07 12:30:30 INFO app 응답: 200 - GET http://127.0.0.1:8002/equipment/reservations
+2025-08-07 12:30:30 INFO werkzeug 127.0.0.1 - - [07/Aug/2025 12:30:30] "GET /equipment/reservations HTTP/1.1" 200 -
+2025-08-07 12:30:30 INFO app 요청: GET http://127.0.0.1:8002/equipment/api/reservations - IP: 127.0.0.1
+2025-08-07 12:30:30 INFO app 응답: 200 - GET http://127.0.0.1:8002/equipment/api/reservations
+2025-08-07 12:30:30 INFO werkzeug 127.0.0.1 - - [07/Aug/2025 12:30:30] "GET /equipment/api/reservations HTTP/1.1" 200 -
+2025-08-07 12:30:30 INFO app 요청: GET http://127.0.0.1:8002/equipment/api/equipment - IP: 127.0.0.1
+2025-08-07 12:30:30 INFO app 요청: GET http://127.0.0.1:8002/equipment/api/reservations - IP: 127.0.0.1
+2025-08-07 12:30:30 INFO app 응답: 200 - GET http://127.0.0.1:8002/equipment/api/reservations
+2025-08-07 12:30:30 INFO werkzeug 127.0.0.1 - - [07/Aug/2025 12:30:30] "GET /equipment/api/reservations HTTP/1.1" 200 -
+2025-08-07 12:30:30 INFO app 응답: 200 - GET http://127.0.0.1:8002/equipment/api/equipment
+2025-08-07 12:30:30 INFO werkzeug 127.0.0.1 - - [07/Aug/2025 12:30:30] "GET /equipment/api/equipment HTTP/1.1" 200 -
+2025-08-07 12:30:30 INFO app 요청: GET http://127.0.0.1:8002/equipment/api/equipment - IP: 127.0.0.1
+2025-08-07 12:30:30 INFO app 요청: GET http://127.0.0.1:8002/favicon.ico - IP: 127.0.0.1
+2025-08-07 12:30:30 ERROR app 예외 발생: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
+Traceback (most recent call last):
+  File "C:\Users\POSCOMCMATERIALS\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\flask\app.py", line 1484, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\POSCOMCMATERIALS\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\flask\app.py", line 1458, in dispatch_request
+    self.raise_routing_exception(req)
+  File "C:\Users\POSCOMCMATERIALS\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\flask\app.py", line 1440, in raise_routing_exception
+    raise request.routing_exception  # type: ignore
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\POSCOMCMATERIALS\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\flask\ctx.py", line 353, in match_request
+    result = self.url_adapter.match(return_rule=True)  # type: ignore
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\POSCOMCMATERIALS\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\werkzeug\routing\map.py", line 655, in match
+    raise NotFound() from None
+werkzeug.exceptions.NotFound: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
+2025-08-07 12:30:30 INFO app 응답: 200 - GET http://127.0.0.1:8002/equipment/api/equipment
+2025-08-07 12:30:30 INFO app 응답: 500 - GET http://127.0.0.1:8002/favicon.ico
+2025-08-07 12:30:30 INFO werkzeug 127.0.0.1 - - [07/Aug/2025 12:30:30] "GET /equipment/api/equipment HTTP/1.1" 200 -
+2025-08-07 12:30:30 INFO werkzeug 127.0.0.1 - - [07/Aug/2025 12:30:30] "[35m[1mGET /favicon.ico HTTP/1.1[0m" 500 -
+2025-08-07 12:40:56 INFO app 요청: GET http://127.0.0.1:8002/ - IP: 127.0.0.1
+2025-08-07 12:40:56 INFO app 응답: 200 - GET http://127.0.0.1:8002/
+2025-08-07 12:40:56 INFO werkzeug 127.0.0.1 - - [07/Aug/2025 12:40:56] "GET / HTTP/1.1" 200 -
+2025-08-07 12:40:56 INFO app 요청: GET http://127.0.0.1:8002/api/stats - IP: 127.0.0.1
+2025-08-07 12:40:56 INFO app 응답: 200 - GET http://127.0.0.1:8002/api/stats
+2025-08-07 12:40:56 INFO app 요청: GET http://127.0.0.1:8002/favicon.ico - IP: 127.0.0.1
+2025-08-07 12:40:56 INFO werkzeug 127.0.0.1 - - [07/Aug/2025 12:40:56] "GET /api/stats HTTP/1.1" 200 -
+2025-08-07 12:40:56 ERROR app 예외 발생: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
+Traceback (most recent call last):
+  File "C:\Users\POSCOMCMATERIALS\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\flask\app.py", line 1484, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\POSCOMCMATERIALS\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\flask\app.py", line 1458, in dispatch_request
+    self.raise_routing_exception(req)
+  File "C:\Users\POSCOMCMATERIALS\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\flask\app.py", line 1440, in raise_routing_exception
+    raise request.routing_exception  # type: ignore
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\POSCOMCMATERIALS\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\flask\ctx.py", line 353, in match_request
+    result = self.url_adapter.match(return_rule=True)  # type: ignore
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\POSCOMCMATERIALS\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\werkzeug\routing\map.py", line 655, in match
+    raise NotFound() from None
+werkzeug.exceptions.NotFound: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
+2025-08-07 12:40:56 INFO app 응답: 500 - GET http://127.0.0.1:8002/favicon.ico
+2025-08-07 12:40:56 INFO werkzeug 127.0.0.1 - - [07/Aug/2025 12:40:56] "[35m[1mGET /favicon.ico HTTP/1.1[0m" 500 -

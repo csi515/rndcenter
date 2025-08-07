@@ -1,12 +1,12 @@
 {% extends "base.html" %}
 
-{% block title %}작업절차서 및 위험성평가 - R&D 센터 관리시스템{% endblock %}
+{% block title %}작업 목록 - R&D 센터 관리시스템{% endblock %}
 
 {% block content %}
 <div class="row">
     <div class="col-12">
         <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2><i class="fas fa-file-alt"></i> 작업절차서 및 위험성평가</h2>
+            <h2><i class="fas fa-file-alt"></i> 작업 목록</h2>
             <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addProcedureModal">
                 <i class="fas fa-plus"></i> 절차서 추가
             </button>
@@ -23,13 +23,13 @@
             </div>
             <div class="col-md-6">
                 <div class="input-group">
-                    <select class="form-select" id="categoryFilter">
-                        <option value="">전체 카테고리</option>
-                        <option value="실험절차">실험절차</option>
-                        <option value="장비운영">장비운영</option>
-                        <option value="안전관리">안전관리</option>
-                        <option value="위험성평가">위험성평가</option>
-                        <option value="응급처치">응급처치</option>
+                    <select class="form-select" id="yearFilter">
+                        <option value="">전체 연도</option>
+                        <option value="2025">2025년</option>
+                        <option value="2024">2024년</option>
+                        <option value="2023">2023년</option>
+                        <option value="2022">2022년</option>
+                        <option value="2021">2021년</option>
                     </select>
                     <button class="btn btn-outline-secondary" type="button">
                         <i class="fas fa-filter"></i>
@@ -44,14 +44,13 @@
                 <thead>
                     <tr>
                         <th>제목</th>
-                        <th>카테고리</th>
                         <th>설명</th>
                         <th>버전(연도)</th>
                         <th>작성자</th>
                         <th>검토일</th>
                         <th>상태</th>
-                        <th>절차서 링크</th>
-                        <th>위험성평가 링크</th>
+                        <th>절차서</th>
+                        <th>위험성평가</th>
                         <th>액션</th>
                     </tr>
                 </thead>
@@ -59,11 +58,6 @@
                     {% for procedure in procedures %}
                     <tr data-id="{{ procedure.id }}">
                         <td>{{ procedure.title }}</td>
-                        <td>
-                            <span class="badge {% if procedure.category == '위험성평가' %}bg-danger{% elif procedure.category == '안전관리' %}bg-warning{% else %}bg-info{% endif %}">
-                                {{ procedure.category }}
-                            </span>
-                        </td>
                         <td>{{ procedure.description[:50] }}{% if procedure.description|length > 50 %}...{% endif %}</td>
                         <td>{{ procedure.version }}년</td>
                         <td>{{ procedure.created_by }}</td>
@@ -75,8 +69,8 @@
                         </td>
                         <td>
                             {% if procedure.procedure_link %}
-                            <a href="{{ procedure.procedure_link }}" target="_blank" class="btn btn-sm btn-outline-primary">
-                                <i class="fas fa-file-alt"></i> 절차서
+                            <a href="{{ procedure.procedure_link }}" target="_blank" class="btn btn-sm btn-outline-primary" title="절차서">
+                                <i class="fas fa-file-alt"></i>
                             </a>
                             {% else %}
                             <span class="text-muted">-</span>
@@ -84,15 +78,15 @@
                         </td>
                         <td>
                             {% if procedure.risk_assessment_link %}
-                            <a href="{{ procedure.risk_assessment_link }}" target="_blank" class="btn btn-sm btn-outline-danger">
-                                <i class="fas fa-exclamation-triangle"></i> 위험성평가
+                            <a href="{{ procedure.risk_assessment_link }}" target="_blank" class="btn btn-sm btn-outline-danger" title="위험성평가">
+                                <i class="fas fa-exclamation-triangle"></i>
                             </a>
                             {% else %}
                             <span class="text-muted">-</span>
                             {% endif %}
                         </td>
                         <td>
-                            <button class="btn btn-sm btn-outline-primary" onclick="editProcedure({{ procedure.id }})" title="수정">
+                            <button class="btn btn-sm btn-outline-primary" data-procedure-id="{{ procedure.id }}" onclick="editProcedure(this.dataset.procedureId)" title="수정">
                                 <i class="fas fa-edit"></i>
                             </button>
                         </td>
@@ -117,12 +111,19 @@
                 </div>
                 <div class="modal-body">
                     <div class="row">
-                        <div class="col-md-8 mb-3">
+                        <div class="col-md-6 mb-3">
                             <label class="form-label">제목 *</label>
                             <input type="text" class="form-control" name="title" required>
                         </div>
-                        <div class="col-md-4 mb-3">
-                            <!-- 카테고리 입력란 제거 -->
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">카테고리</label>
+                            <select class="form-select" name="category">
+                                <option value="실험절차">실험절차</option>
+                                <option value="장비운영">장비운영</option>
+                                <option value="안전관리">안전관리</option>
+                                <option value="위험성평가">위험성평가</option>
+                                <option value="응급처치">응급처치</option>
+                            </select>
                         </div>
                     </div>
                     <div class="mb-3">
@@ -132,7 +133,12 @@
                     <div class="row">
                         <div class="col-md-4 mb-3">
                             <label class="form-label">버전(연도)</label>
-                            <input type="text" class="form-control" name="version" placeholder="예: 2025" pattern="[0-9]{4}" title="연도 4자리로 입력" required>
+                            <select class="form-select" name="version">
+                                <option value="">선택하세요</option>
+                                {% for year in range(current_year, current_year-9, -1) %}
+                                <option value="{{ year }}">{{ year }}년</option>
+                                {% endfor %}
+                            </select>
                         </div>
                         <div class="col-md-4 mb-3">
                             <label class="form-label">작성자 *</label>
@@ -225,7 +231,12 @@
                     <div class="row mb-3">
                         <div class="col-md-4">
                             <label for="editVersion" class="form-label">버전(연도)</label>
-                            <input type="text" class="form-control" id="editVersion" name="version" placeholder="예: 2025" pattern="[0-9]{4}" title="연도 4자리로 입력" required>
+                            <select class="form-select" id="editVersion" name="version">
+                                <option value="">선택하세요</option>
+                                {% for year in range(current_year, current_year-9, -1) %}
+                                <option value="{{ year }}">{{ year }}년</option>
+                                {% endfor %}
+                            </select>
                         </div>
                         <div class="col-md-4">
                             <label for="editCreatedBy" class="form-label">작성자</label>
@@ -324,8 +335,8 @@ function viewProcedure(procedure) {
 // Edit procedure function
 function editProcedure(procedureId) {
     // Find by ID in procedures array passed from backend
-    const procedures = {{ procedures|tojson }};
-    const procedure = procedures.find(p => p.id === procedureId);
+    const procedures = JSON.parse('{{ procedures|tojson|safe }}');
+    const procedure = procedures.find(p => p.id === parseInt(procedureId));
     if (procedure) {
         fillEditForm(procedure);
     } else {
@@ -347,14 +358,17 @@ function fillEditForm(procedure) {
     new bootstrap.Modal(document.getElementById('editProcedureModal')).show();
 }
 
-// Category filter
-document.getElementById('categoryFilter').addEventListener('change', function() {
-    const selectedCategory = this.value.toLowerCase();
+// Year filter
+document.getElementById('yearFilter').addEventListener('change', function() {
+    const selectedYear = this.value;
     const tableRows = document.querySelectorAll('#proceduresTable tbody tr');
     
     tableRows.forEach(row => {
-        const category = row.cells[1].textContent.toLowerCase();
-        if (selectedCategory === '' || category.includes(selectedCategory)) {
+        const yearCell = row.cells[2]; // 버전(연도) 열
+        const yearText = yearCell.textContent.trim();
+        const year = yearText.replace('년', '');
+        
+        if (selectedYear === '' || year === selectedYear) {
             row.style.display = '';
         } else {
             row.style.display = 'none';

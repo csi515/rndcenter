@@ -535,6 +535,10 @@ function saveAccident(accidentId) {
             showNotification(data.message || '사고 정보가 성공적으로 수정되었습니다.', 'success');
             editingRow = null;
             loadAccidents();
+            // 페이지 자동 새로고침
+            setTimeout(() => {
+                location.reload();
+            }, 1000);
         } else {
             showNotification(data.message || '사고 정보 수정 중 오류가 발생했습니다.', 'danger');
         }
@@ -563,6 +567,10 @@ function deleteAccident(accidentId) {
         if (data.success) {
             showNotification(data.message || '사고 보고서가 성공적으로 삭제되었습니다.', 'success');
             loadAccidents();
+            // 페이지 자동 새로고침
+            setTimeout(() => {
+                location.reload();
+            }, 1000);
         } else {
             showNotification(data.message || '사고 삭제 중 오류가 발생했습니다.', 'danger');
         }

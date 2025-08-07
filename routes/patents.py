@@ -39,6 +39,7 @@ def patent_list():
             'amendment_link': p.amendment_link,
             'publication_link': p.publication_link,
             'registration_review_link': p.registration_review_link,
+            'notes': p.notes,
             'created_date': p.created_date.strftime('%Y-%m-%d') if p.created_date else ''
         })
     return render_template('patents/list.html', patents=patents_list)
@@ -83,6 +84,7 @@ def add_patent():
             amendment_link=request.form.get('amendment_link'),
             publication_link=request.form.get('publication_link'),
             registration_review_link=request.form.get('registration_review_link'),
+            notes=request.form.get('notes'),
             created_date=datetime.now()
         )
         db.session.add(patent)
@@ -135,6 +137,7 @@ def update_patent(patent_id):
         patent.amendment_link = request.form.get('amendment_link')
         patent.publication_link = request.form.get('publication_link')
         patent.registration_review_link = request.form.get('registration_review_link')
+        patent.notes = request.form.get('notes')
         
         db.session.commit()
         flash('특허 정보가 성공적으로 수정되었습니다.', 'success')

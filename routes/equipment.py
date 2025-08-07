@@ -1,129 +1,20 @@
+"""
+장비 예약 및 사용일지 관련 라우트
+(장비 CRUD 기능은 equipment_api.py와 equipment_pages.py로 분리됨)
+"""
 from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify
 from datetime import datetime, date
 from database import db, Equipment, Reservation, UsageLog
+from utils.date_utils import parse_date, format_date
+from utils.response_utils import json_success_response, json_error_response
 import csv
 
 equipment_bp = Blueprint('equipment', __name__)
 
-def parse_date(date_str):
-    """문자열을 date 객체로 변환하는 헬퍼 함수"""
-    if not date_str:
-        return None
-    try:
-        return datetime.strptime(date_str, "%Y-%m-%d").date()
-    except ValueError:
-        return None
-
-@equipment_bp.route('/list')
-def equipment_list():
-    equipment = Equipment.query.order_by(Equipment.created_date.desc()).all()
-    equipment_list = []
-    for e in equipment:
-        equipment_list.append({
-            'id': e.id,
-            'equipment_id': e.equipment_id,
-            'name': e.name,
-            'model': e.model,
-            'manufacturer': e.manufacturer,
-            'location': e.location,
-            'status': e.status,
-            'purchase_date': e.purchase_date.strftime('%Y-%m-%d') if e.purchase_date else '',
-            'maintenance_date': e.maintenance_date.strftime('%Y-%m-%d') if e.maintenance_date else '',
-            'notes': e.notes,
-            'created_date': e.created_date.strftime('%Y-%m-%d') if e.created_date else ''
-        })
-    return render_template('equipment/list.html', equipment=equipment_list)
-
-@equipment_bp.route('/add', methods=['POST'])
-def add_equipment():
-    try:
-        equipment = Equipment(
-            equipment_id=datetime.now().strftime('%Y%m%d%H%M%S'),
-            name=request.form.get('name'),
-            model=request.form.get('model'),
-            manufacturer=request.form.get('manufacturer'),
-            location=request.form.get('location'),
-            status=request.form.get('status', '사용 가능'),
-            purchase_date=parse_date(request.form.get('purchase_date')),
-            maintenance_date=parse_date(request.form.get('maintenance_date')),
-            notes=request.form.get('notes', ''),
-            created_date=datetime.now()
-        )
-        db.session.add(equipment)
-        db.session.commit()
-        flash('장비가 성공적으로 추가되었습니다.', 'success')
-    except Exception as e:
-        db.session.rollback()
-        flash(f'장비 추가 중 오류가 발생했습니다: {str(e)}', 'error')
-    return redirect(url_for('equipment.equipment_list'))
-
-@equipment_bp.route('/update/<int:equipment_id>', methods=['POST'])
-def update_equipment(equipment_id):
-    try:
-        equipment = Equipment.query.get_or_404(equipment_id)
-        
-        # 필수 필드 검증
-        if not request.form.get('name'):
-            flash('장비명은 필수 입력 항목입니다.', 'error')
-            return redirect(url_for('equipment.equipment_list'))
-
-        equipment.name = request.form.get('name')
-        equipment.model = request.form.get('model')
-        equipment.manufacturer = request.form.get('manufacturer')
-        equipment.location = request.form.get('location')
-        equipment.status = request.form.get('status', '사용 가능')
-        equipment.purchase_date = parse_date(request.form.get('purchase_date'))
-        equipment.maintenance_date = parse_date(request.form.get('maintenance_date'))
-        equipment.notes = request.form.get('notes', '')
-        
-        db.session.commit()
-        flash('장비 정보가 성공적으로 수정되었습니다.', 'success')
-    except Exception as e:
-        db.session.rollback()
-        flash(f'장비 정보 수정 중 오류가 발생했습니다: {str(e)}', 'error')
-    return redirect(url_for('equipment.equipment_list'))
-
-@equipment_bp.route('/delete/<int:equipment_id>', methods=['POST'])
-def delete_equipment(equipment_id):
-    try:
-        equipment = Equipment.query.get_or_404(equipment_id)
-        
-        # 관련 예약이 있는지 확인
-        active_reservations = Reservation.query.filter_by(equipment_name=equipment.name, status='예약').count()
-        if active_reservations > 0:
-            flash('활성 예약이 있는 장비는 삭제할 수 없습니다.', 'error')
-            return redirect(url_for('equipment.equipment_list'))
-        
-        db.session.delete(equipment)
-        db.session.commit()
-        flash('장비가 성공적으로 삭제되었습니다.', 'success')
-    except Exception as e:
-        db.session.rollback()
-        flash(f'장비 삭제 중 오류가 발생했습니다: {str(e)}', 'error')
-    return redirect(url_for('equipment.equipment_list'))
-
-@equipment_bp.route('/list')
-def equipment_list_page():
-    equipment_list = Equipment.query.all()
-    return render_template('equipment/list_page.html', equipment=equipment_list)
-
-@equipment_bp.route('/reservations')
-def reservations_page():
-    equipment_list = Equipment.query.filter(Equipment.status.in_(['사용 가능', '사용가능'])).all()
-    return render_template('equipment/reservations_page.html', equipment=equipment_list)
-
-@equipment_bp.route('/usage-log')
-def usage_log_page():
-    """사용일지 페이지"""
-    return render_template('equipment/usage_log_page.html')
-
-@equipment_bp.route('/all-in-one')
-def equipment_management():
-    """장비 관리 통합 페이지 (기존)"""
-    return render_template('equipment/management.html')
-
+# 예약 관련 라우트들
 @equipment_bp.route('/api/reservations')
 def api_reservations():
+    """예약 목록 API"""
     try:
         reservations = Reservation.query.order_by(Reservation.start_date.desc()).all()
         result = []
@@ -137,17 +28,17 @@ def api_reservations():
                 'equipment_name': r.equipment_name,
                 'reserver': r.reserver,
                 'purpose': r.purpose,
-                'start_date': r.start_date.strftime('%Y-%m-%d') if r.start_date else '',
-                'end_date': r.end_date.strftime('%Y-%m-%d') if r.end_date else '',
+                'start_date': format_date(r.start_date),
+                'end_date': format_date(r.end_date),
                 'start_time': r.start_time.strftime('%H:%M') if r.start_time else '',
                 'end_time': r.end_time.strftime('%H:%M') if r.end_time else '',
                 'status': r.status,
                 'notes': r.notes,
-                'created_date': r.created_date.strftime('%Y-%m-%d') if r.created_date else ''
+                'created_date': format_date(r.created_date)
             })
-        return jsonify({'success': True, 'reservations': result})
+        return json_success_response({'reservations': result})
     except Exception as e:
-        return jsonify({'success': False, 'error': str(e)})
+        return json_error_response(str(e))
 
 def get_equipment_color(equipment_name):
     """Get consistent color for equipment"""
@@ -156,6 +47,7 @@ def get_equipment_color(equipment_name):
 
 @equipment_bp.route('/reservations/add', methods=['POST'])
 def add_reservation():
+    """예약 추가 (폼 기반)"""
     try:
         data = request.get_json() if request.is_json else request.form
         
@@ -202,250 +94,178 @@ def add_reservation():
         new_reservation.end_date = end_date
         new_reservation.start_time = start_time
         new_reservation.end_time = end_time
-        new_reservation.status = '예약'
+        new_reservation.status = data.get('status', '예약')
         new_reservation.notes = data.get('notes', '')
+        new_reservation.created_date = datetime.now()
         
         db.session.add(new_reservation)
         db.session.commit()
         
-        if request.is_json:
-            return jsonify({'success': True, 'message': '예약이 생성되었습니다.'})
-        else:
-            flash('장비 예약이 성공적으로 완료되었습니다.', 'success')
-            return redirect(url_for('equipment.reservations'))
-    
+        flash('예약이 성공적으로 추가되었습니다.', 'success')
+        return redirect(url_for('equipment.reservations_page'))
+        
     except Exception as e:
         db.session.rollback()
-        if request.is_json:
-            return jsonify({'success': False, 'message': f'예약 생성 중 오류가 발생했습니다: {str(e)}'}), 500
-        else:
-            flash(f'장비 예약 중 오류가 발생했습니다: {str(e)}', 'error')
-            return redirect(url_for('equipment.reservations'))
+        flash(f'예약 추가 중 오류가 발생했습니다: {str(e)}', 'error')
+        return redirect(url_for('equipment.reservations_page'))
 
 @equipment_bp.route('/reservations/update/<int:reservation_id>', methods=['POST'])
 def update_reservation(reservation_id):
+    """예약 수정 (폼 기반)"""
     try:
         reservation = Reservation.query.get_or_404(reservation_id)
         data = request.get_json() if request.is_json else request.form
         
-        # Update reservation details
+        # Parse dates and times
         if data.get('start'):
             start_str = str(data.get('start'))
             if start_str and start_str.endswith('Z'):
                 start_str = start_str.replace('Z', '+00:00')
             start_datetime = datetime.fromisoformat(start_str)
-            reservation.start_date = start_datetime.date()
-            reservation.start_time = start_datetime.time()
+            start_date = start_datetime.date()
+            start_time = start_datetime.time()
+        else:
+            start_date_str = data.get('start_date')
+            if start_date_str:
+                start_date = datetime.strptime(str(start_date_str), '%Y-%m-%d').date()
+            else:
+                raise ValueError("Start date is required")
+            
+            start_time_str = data.get('start_time')
+            start_time = datetime.strptime(str(start_time_str), '%H:%M').time() if start_time_str else None
         
         if data.get('end'):
             end_str = str(data.get('end'))
             if end_str and end_str.endswith('Z'):
                 end_str = end_str.replace('Z', '+00:00')
             end_datetime = datetime.fromisoformat(end_str)
-            reservation.end_date = end_datetime.date()
-            reservation.end_time = end_datetime.time()
+            end_date = end_datetime.date()
+            end_time = end_datetime.time()
+        else:
+            end_date_str = data.get('end_date')
+            if end_date_str:
+                end_date = datetime.strptime(str(end_date_str), '%Y-%m-%d').date()
+            else:
+                end_date = start_date
+                
+            end_time_str = data.get('end_time')
+            end_time = datetime.strptime(str(end_time_str), '%H:%M').time() if end_time_str else None
         
-        if data.get('equipment_name'):
-            reservation.equipment_name = data.get('equipment_name')
-        if data.get('reserver'):
-            reservation.reserver = data.get('reserver')
-        if data.get('purpose'):
-            reservation.purpose = data.get('purpose')
-        if data.get('notes'):
-            reservation.notes = data.get('notes')
+        reservation.equipment_name = data.get('equipment_name')
+        reservation.reserver = data.get('reserver')
+        reservation.purpose = data.get('purpose', '')
+        reservation.start_date = start_date
+        reservation.end_date = end_date
+        reservation.start_time = start_time
+        reservation.end_time = end_time
+        reservation.status = data.get('status', '예약')
+        reservation.notes = data.get('notes', '')
         
         db.session.commit()
         
-        if request.is_json:
-            return jsonify({'success': True, 'message': '예약이 수정되었습니다.'})
-        else:
-            flash('예약이 성공적으로 수정되었습니다.', 'success')
-            return redirect(url_for('equipment.reservations'))
-    
+        flash('예약이 성공적으로 수정되었습니다.', 'success')
+        return redirect(url_for('equipment.reservations_page'))
+        
     except Exception as e:
         db.session.rollback()
-        if request.is_json:
-            return jsonify({'success': False, 'message': f'예약 수정 중 오류가 발생했습니다: {str(e)}'}), 500
-        else:
-            flash(f'예약 수정 중 오류가 발생했습니다: {str(e)}', 'error')
-            return redirect(url_for('equipment.reservations'))
+        flash(f'예약 수정 중 오류가 발생했습니다: {str(e)}', 'error')
+        return redirect(url_for('equipment.reservations_page'))
 
 @equipment_bp.route('/reservations/delete/<int:reservation_id>', methods=['POST', 'DELETE'])
 def delete_reservation(reservation_id):
+    """예약 삭제"""
     try:
         reservation = Reservation.query.get_or_404(reservation_id)
         db.session.delete(reservation)
         db.session.commit()
         
-        if request.is_json:
-            return jsonify({'success': True, 'message': '예약이 삭제되었습니다.'})
-        else:
-            flash('예약이 성공적으로 삭제되었습니다.', 'success')
-            return redirect(url_for('equipment.reservations'))
-    
+        flash('예약이 성공적으로 삭제되었습니다.', 'success')
+        return redirect(url_for('equipment.reservations_page'))
+        
     except Exception as e:
         db.session.rollback()
-        if request.is_json:
-            return jsonify({'success': False, 'message': f'예약 삭제 중 오류가 발생했습니다: {str(e)}'}), 500
-        else:
-            flash(f'예약 삭제 중 오류가 발생했습니다: {str(e)}', 'error')
-            return redirect(url_for('equipment.reservations'))
+        flash(f'예약 삭제 중 오류가 발생했습니다: {str(e)}', 'error')
+        return redirect(url_for('equipment.reservations_page'))
 
+# 사용일지 관련 라우트들
 @equipment_bp.route('/usage_log')
 def usage_log():
-    usage_logs = UsageLog.query.order_by(UsageLog.usage_date.desc(), UsageLog.start_time.asc()).all()
-    return render_template('equipment/usage_log.html', usage_logs=usage_logs)
+    """사용일지 페이지 (기존)"""
+    return render_template('equipment/usage_log_page.html')
 
 @equipment_bp.route('/usage_log/add', methods=['POST'])
 def add_usage_log():
+    """사용일지 추가 (폼 기반)"""
     try:
-        usage_log = UsageLog(
-            equipment_name=request.form.get('equipment_name'),
-            user=request.form.get('user_name'),
-            usage_date=datetime.strptime(request.form.get('usage_date'), '%Y-%m-%d').date() if request.form.get('usage_date') else None,
-            start_time=datetime.strptime(request.form.get('start_time'), '%H:%M').time() if request.form.get('start_time') else None,
-            end_time=datetime.strptime(request.form.get('end_time'), '%H:%M').time() if request.form.get('end_time') else None,
-            purpose=request.form.get('purpose'),
-            notes=request.form.get('notes', ''),
-            issues=request.form.get('issues', ''),
-            created_date=datetime.now()
-        )
-        db.session.add(usage_log)
-        db.session.commit()
-        flash('사용일지가 성공적으로 작성되었습니다.', 'success')
-    except Exception as e:
-        db.session.rollback()
-        flash('사용일지 작성 중 오류가 발생했습니다: {}'.format(str(e)), 'error')
-    return redirect(url_for('equipment.usage_log'))
-
-# 통합 장비 관리 페이지
-@equipment_bp.route('/management')
-def equipment_management_old():
-    return render_template('equipment/management.html')
-
-# 장비 API 엔드포인트
-@equipment_bp.route('/api/equipment')
-def api_equipment():
-    try:
-        equipment_list = Equipment.query.order_by(Equipment.created_date.desc()).all()
-        equipment_data = []
-        for e in equipment_list:
-            equipment_data.append({
-                'id': e.id,
-                'name': e.name,
-                'model': e.model,
-                'manufacturer': e.manufacturer,
-                'location': e.location,
-                'status': e.status,
-                'asset_number': getattr(e, 'asset_number', ''),
-                'purchase_date': e.purchase_date.strftime('%Y-%m-%d') if e.purchase_date else '',
-                'maintenance_date': e.maintenance_date.strftime('%Y-%m-%d') if e.maintenance_date else '',
-                'notes': e.notes,
-                'created_date': e.created_date.strftime('%Y-%m-%d') if e.created_date else ''
-            })
-        return jsonify({'success': True, 'equipment': equipment_data})
-    except Exception as e:
-        return jsonify({'success': False, 'error': str(e)})
-
-@equipment_bp.route('/api/equipment/add', methods=['POST'])
-def api_add_equipment():
-    data = request.get_json()
-    new_row = {
-        'id': datetime.now().strftime('%Y%m%d%H%M%S'),
-        'name': data['name'],
-        'model': data.get('model', ''),
-        'manufacturer': data.get('manufacturer', ''),
-        'location': data.get('location', ''),
-        'status': data.get('status', '사용 가능'),
-        'asset_number': data.get('asset_number', ''),
-        'purchase_date': data.get('purchase_date', ''),
-        'maintenance_date': data.get('maintenance_date', ''),
-        'notes': data.get('notes', ''),
-        'created_date': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-    }
-    try:
-        # SQLAlchemy 모델로 데이터 추가
-        equipment = Equipment(**new_row)
-        db.session.add(equipment)
-        db.session.commit()
-        return jsonify({'success': True})
-    except Exception as e:
-        db.session.rollback()
-        return jsonify({'success': False, 'error': str(e)})
-
-@equipment_bp.route('/api/equipment/<int:equipment_id>/update', methods=['POST'])
-def api_update_equipment(equipment_id):
-    """장비 수정 API"""
-    try:
-        equipment = Equipment.query.get_or_404(equipment_id)
-        data = request.get_json()
+        data = request.get_json() if request.is_json else request.form
         
-        equipment.name = data['name']
-        equipment.model = data.get('model')
-        equipment.manufacturer = data.get('manufacturer')
-        equipment.serial_number = data.get('serial_number')
-        equipment.location = data.get('location')
-        equipment.manager = data.get('manager')
-        equipment.status = data.get('status', '사용가능')
-        equipment.purchase_date = parse_date(data.get('purchase_date'))
-        equipment.purchase_price = float(data['purchase_price']) if data.get('purchase_price') else None
-        equipment.maintenance_date = parse_date(data.get('maintenance_date'))
-        equipment.warranty_expiry = parse_date(data.get('warranty_expiry'))
-        equipment.specifications = data.get('specifications')
-        equipment.notes = data.get('notes')
+        new_log = UsageLog()
+        new_log.equipment_name = data.get('equipment_name')
+        new_log.user = data.get('user')
+        new_log.usage_date = parse_date(data.get('usage_date'))
+        new_log.start_time = datetime.strptime(data.get('start_time'), '%H:%M').time() if data.get('start_time') else None
+        new_log.end_time = datetime.strptime(data.get('end_time'), '%H:%M').time() if data.get('end_time') else None
+        new_log.purpose = data.get('purpose', '')
+        new_log.notes = data.get('notes', '')
+        new_log.condition_before = data.get('condition_before', '')
+        new_log.condition_after = data.get('condition_after', '')
+        new_log.issues = data.get('issues', '')
+        new_log.created_date = datetime.now()
         
+        db.session.add(new_log)
         db.session.commit()
         
-        return jsonify({'success': True})
+        flash('사용일지가 성공적으로 추가되었습니다.', 'success')
+        return redirect(url_for('equipment.usage_log'))
+        
     except Exception as e:
         db.session.rollback()
-        return jsonify({'error': str(e)}), 500
+        flash(f'사용일지 추가 중 오류가 발생했습니다: {str(e)}', 'error')
+        return redirect(url_for('equipment.usage_log'))
 
-@equipment_bp.route('/api/equipment/<int:equipment_id>/delete', methods=['POST'])
-def api_delete_equipment(equipment_id):
-    """장비 삭제 API"""
-    try:
-        equipment = Equipment.query.get_or_404(equipment_id)
-        
-        # 관련 예약이 있는지 확인
-        active_reservations = Reservation.query.filter_by(equipment_name=equipment.name, status='예약').count()
-        if active_reservations > 0:
-            return jsonify({'error': '활성 예약이 있는 장비는 삭제할 수 없습니다.'}), 400
-        
-        db.session.delete(equipment)
-        db.session.commit()
-        
-        return jsonify({'success': True})
-    except Exception as e:
-        db.session.rollback()
-        return jsonify({'error': str(e)}), 500
-
-# 예약 API 엔드포인트  
+# API 라우트들
 @equipment_bp.route('/api/reservations/add', methods=['POST'])
 def api_add_reservation():
+    """예약 추가 API"""
     try:
         data = request.get_json()
-        equipment = Equipment.query.get(data['equipment_id'])
-        if not equipment:
-            return jsonify({'success': False, 'error': '장비를 찾을 수 없습니다.'}), 400
-        reservation = Reservation(
-            equipment_name=equipment.name,
-            reserver=data['reserver'],
-            purpose=data['purpose'],
-            start_date=datetime.strptime(data['start_date'], '%Y-%m-%d').date(),
-            end_date=datetime.strptime(data['end_date'], '%Y-%m-%d').date(),
-            start_time=datetime.strptime(data['start_time'], '%H:%M').time() if data.get('start_time') else None,
-            end_time=datetime.strptime(data['end_time'], '%H:%M').time() if data.get('end_time') else None,
-            status='예약',
+        
+        # equipment_id가 있으면 equipment_name으로 변환
+        equipment_name = data.get('equipment_name')
+        if data.get('equipment_id'):
+            equipment = Equipment.query.get(data.get('equipment_id'))
+            if equipment:
+                equipment_name = equipment.name
+            else:
+                return json_error_response("존재하지 않는 장비입니다.")
+        
+        # Parse dates and times
+        start_date = parse_date(data.get('start_date'))
+        end_date = parse_date(data.get('end_date'))
+        start_time = datetime.strptime(data.get('start_time'), '%H:%M').time() if data.get('start_time') else None
+        end_time = datetime.strptime(data.get('end_time'), '%H:%M').time() if data.get('end_time') else None
+        
+        new_reservation = Reservation(
+            equipment_name=equipment_name,
+            reserver=data.get('reserver'),
+            purpose=data.get('purpose', ''),
+            start_date=start_date,
+            end_date=end_date,
+            start_time=start_time,
+            end_time=end_time,
+            status=data.get('status', '예약'),
             notes=data.get('notes', ''),
             created_date=datetime.now()
         )
-        db.session.add(reservation)
+        
+        db.session.add(new_reservation)
         db.session.commit()
-        return jsonify({'success': True, 'id': reservation.id})
+        
+        return json_success_response(message="예약이 성공적으로 추가되었습니다.")
+        
     except Exception as e:
         db.session.rollback()
-        return jsonify({'success': False, 'error': str(e)})
+        return json_error_response(f"예약 추가 중 오류가 발생했습니다: {str(e)}")
 
 @equipment_bp.route('/api/reservations/<int:reservation_id>/update', methods=['POST'])
 def api_update_reservation_new(reservation_id):
@@ -454,149 +274,143 @@ def api_update_reservation_new(reservation_id):
         reservation = Reservation.query.get_or_404(reservation_id)
         data = request.get_json()
         
-        # 장비 정보 조회
-        equipment = Equipment.query.get(data['equipment_id'])
-        if not equipment:
-            return jsonify({'error': '장비를 찾을 수 없습니다.'}), 400
+        # equipment_id가 있으면 equipment_name으로 변환
+        equipment_name = data.get('equipment_name')
+        if data.get('equipment_id'):
+            equipment = Equipment.query.get(data.get('equipment_id'))
+            if equipment:
+                equipment_name = equipment.name
+            else:
+                return json_error_response("존재하지 않는 장비입니다.")
         
-        old_equipment_name = reservation.equipment_name
-        old_user = reservation.reserver
-        old_date = reservation.start_date
+        # Parse dates and times
+        start_date = parse_date(data.get('start_date'))
+        end_date = parse_date(data.get('end_date'))
+        start_time = datetime.strptime(data.get('start_time'), '%H:%M').time() if data.get('start_time') else None
+        end_time = datetime.strptime(data.get('end_time'), '%H:%M').time() if data.get('end_time') else None
         
-        reservation.equipment_name = equipment.name
-        reservation.reserver = data['reserver']
-        reservation.purpose = data['purpose']
-        reservation.start_date = datetime.strptime(data['start_date'], '%Y-%m-%d').date()
-        reservation.end_date = datetime.strptime(data['end_date'], '%Y-%m-%d').date()
-        reservation.start_time = datetime.strptime(data['start_time'], '%H:%M').time() if data.get('start_time') else None
-        reservation.end_time = datetime.strptime(data['end_time'], '%H:%M').time() if data.get('end_time') else None
+        reservation.equipment_name = equipment_name
+        reservation.reserver = data.get('reserver')
+        reservation.purpose = data.get('purpose', '')
+        reservation.start_date = start_date
+        reservation.end_date = end_date
+        reservation.start_time = start_time
+        reservation.end_time = end_time
+        reservation.status = data.get('status', '예약')
+        reservation.notes = data.get('notes', '')
         
         db.session.commit()
         
-        # 연관된 사용일지도 업데이트
-        usage_log = UsageLog.query.filter_by(
-            equipment_name=old_equipment_name,
-            user=old_user,
-            usage_date=old_date
-        ).first()
+        return json_success_response(message="예약이 성공적으로 수정되었습니다.")
         
-        if usage_log:
-            usage_log.equipment_name = equipment.name
-            usage_log.user = data['reserver']
-            usage_log.usage_date = reservation.start_date
-            usage_log.start_time = reservation.start_time
-            usage_log.end_time = reservation.end_time
-            usage_log.purpose = data['purpose']
-            db.session.commit()
-        
-        return jsonify({'success': True})
     except Exception as e:
         db.session.rollback()
-        return jsonify({'error': str(e)}), 500
+        return json_error_response(f"예약 수정 중 오류가 발생했습니다: {str(e)}")
 
 @equipment_bp.route('/api/reservations/<int:reservation_id>/delete', methods=['POST'])
 def api_delete_reservation_new(reservation_id):
     """예약 삭제 API"""
     try:
         reservation = Reservation.query.get_or_404(reservation_id)
-        
-        # 연관된 사용일지도 삭제
-        usage_logs = UsageLog.query.filter_by(
-            equipment_name=reservation.equipment_name,
-            user=reservation.reserver,
-            usage_date=reservation.start_date
-        ).all()
-        
-        for log in usage_logs:
-            db.session.delete(log)
-        
         db.session.delete(reservation)
         db.session.commit()
         
-        return jsonify({'success': True})
+        return json_success_response(message="예약이 성공적으로 삭제되었습니다.")
+        
     except Exception as e:
         db.session.rollback()
-        return jsonify({'error': str(e)}), 500
+        return json_error_response(f"예약 삭제 중 오류가 발생했습니다: {str(e)}")
 
 @equipment_bp.route('/api/usage-logs/add', methods=['POST'])
 def api_add_usage_log():
+    """사용일지 추가 API"""
     try:
         data = request.get_json()
-        usage_log = UsageLog(
-            equipment_name=data['equipment_name'],
-            user=data['user'],
-            usage_date=datetime.strptime(data['usage_date'], '%Y-%m-%d').date(),
-            start_time=datetime.strptime(data['start_time'], '%H:%M').time() if data.get('start_time') else None,
-            end_time=datetime.strptime(data['end_time'], '%H:%M').time() if data.get('end_time') else None,
-            purpose=data['purpose'],
-            condition_before=data.get('condition_before', '정상'),
-            condition_after=data.get('condition_after', '정상'),
+        
+        new_log = UsageLog(
+            equipment_name=data.get('equipment_name'),
+            user=data.get('user'),
+            usage_date=parse_date(data.get('usage_date')),
+            start_time=datetime.strptime(data.get('start_time'), '%H:%M').time() if data.get('start_time') else None,
+            end_time=datetime.strptime(data.get('end_time'), '%H:%M').time() if data.get('end_time') else None,
+            purpose=data.get('purpose', ''),
+            notes=data.get('notes', ''),
+            condition_before=data.get('condition_before', ''),
+            condition_after=data.get('condition_after', ''),
             issues=data.get('issues', ''),
             created_date=datetime.now()
         )
-        db.session.add(usage_log)
+        
+        db.session.add(new_log)
         db.session.commit()
-        return jsonify({'success': True, 'id': usage_log.id})
+        
+        return json_success_response(message="사용일지가 성공적으로 추가되었습니다.")
+        
     except Exception as e:
         db.session.rollback()
-        return jsonify({'success': False, 'error': str(e)})
+        return json_error_response(f"사용일지 추가 중 오류가 발생했습니다: {str(e)}")
 
-# 사용일지 API 엔드포인트
 @equipment_bp.route('/api/usage-logs')
 def api_usage_logs():
-    """사용일지 목록 API (DB 기반)"""
+    """사용일지 목록 API"""
     try:
-        usage_logs = UsageLog.query.order_by(UsageLog.usage_date.desc(), UsageLog.start_time.asc()).all()
-        logs_data = []
-        for log in usage_logs:
-            logs_data.append({
-                'id': str(log.id),
+        logs = UsageLog.query.order_by(UsageLog.usage_date.desc()).all()
+        result = []
+        for log in logs:
+            result.append({
+                'id': log.id,
                 'equipment_name': log.equipment_name,
                 'user': log.user,
-                'usage_date': log.usage_date.strftime('%Y-%m-%d') if log.usage_date else '',
+                'usage_date': format_date(log.usage_date),
                 'start_time': log.start_time.strftime('%H:%M') if log.start_time else '',
                 'end_time': log.end_time.strftime('%H:%M') if log.end_time else '',
-                'purpose': log.purpose or '',
-                'condition_before': getattr(log, 'condition_before', '정상') or '정상',
-                'condition_after': getattr(log, 'condition_after', '정상') or '정상',
-                'issues': log.issues or ''
+                'purpose': log.purpose,
+                'notes': log.notes,
+                'condition_before': log.condition_before,
+                'condition_after': log.condition_after,
+                'issues': log.issues,
+                'created_date': format_date(log.created_date)
             })
-        return jsonify({'success': True, 'logs': logs_data})
+        return json_success_response({'logs': result})
     except Exception as e:
-        return jsonify({'success': False, 'error': str(e)})
+        return json_error_response(str(e))
 
 @equipment_bp.route('/api/usage-logs/<log_id>/update', methods=['POST'])
 def api_update_usage_log(log_id):
     """사용일지 수정 API"""
     try:
-        usage_log = UsageLog.query.get_or_404(log_id)
+        log = UsageLog.query.get_or_404(log_id)
         data = request.get_json()
         
-        usage_log.condition_before = data.get('condition_before', '정상')
-        usage_log.condition_after = data.get('condition_after', '정상')
-        usage_log.issues = data.get('issues', '')
-        usage_log.equipment_name = data.get('equipment_name')
-        usage_log.user = data.get('user')
-        usage_log.usage_date = datetime.strptime(data['usage_date'], '%Y-%m-%d').date() if data.get('usage_date') else usage_log.usage_date
-        usage_log.start_time = datetime.strptime(data['start_time'], '%H:%M').time() if data.get('start_time') else usage_log.start_time
-        usage_log.end_time = datetime.strptime(data['end_time'], '%H:%M').time() if data.get('end_time') else usage_log.end_time
-        usage_log.purpose = data.get('purpose')
+        log.equipment_name = data.get('equipment_name')
+        log.user = data.get('user')
+        log.usage_date = parse_date(data.get('usage_date'))
+        log.start_time = datetime.strptime(data.get('start_time'), '%H:%M').time() if data.get('start_time') else None
+        log.end_time = datetime.strptime(data.get('end_time'), '%H:%M').time() if data.get('end_time') else None
+        log.purpose = data.get('purpose', '')
+        log.notes = data.get('notes', '')
+        log.condition_before = data.get('condition_before', '')
+        log.condition_after = data.get('condition_after', '')
+        log.issues = data.get('issues', '')
         
         db.session.commit()
         
-        return jsonify({'success': True})
+        return json_success_response(message="사용일지가 성공적으로 수정되었습니다.")
+        
     except Exception as e:
         db.session.rollback()
-        return jsonify({'success': False, 'error': str(e)})
+        return json_error_response(f"사용일지 수정 중 오류가 발생했습니다: {str(e)}")
 
 @equipment_bp.route('/api/usage-logs/<log_id>/delete', methods=['POST'])
 def api_delete_usage_log(log_id):
     """사용일지 삭제 API"""
     try:
-        usage_log = UsageLog.query.get_or_404(log_id)
-        db.session.delete(usage_log)
+        log = UsageLog.query.get_or_404(log_id)
+        db.session.delete(log)
         db.session.commit()
-        return jsonify({'success': True})
+        
+        return json_success_response(message="사용일지가 성공적으로 삭제되었습니다.")
+        
     except Exception as e:
         db.session.rollback()
-        return jsonify({'success': False, 'error': str(e)})
+        return json_error_response(f"사용일지 삭제 중 오류가 발생했습니다: {str(e)}")

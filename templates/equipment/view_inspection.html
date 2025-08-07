@@ -1,0 +1,244 @@
+{% extends "base.html" %}
+
+{% block title %}점검 기록 상세 - R&D 센터 관리시스템{% endblock %}
+
+{% block extra_css %}
+<style>
+    .info-section {
+        background-color: #f8f9fa;
+        border-radius: 0.5rem;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .info-section h6 {
+        color: #495057;
+        margin-bottom: 1rem;
+        border-bottom: 2px solid #dee2e6;
+        padding-bottom: 0.5rem;
+    }
+    
+    .info-table {
+        margin-bottom: 0;
+    }
+    
+    .info-table th {
+        width: 30%;
+        font-weight: 600;
+        color: #495057;
+        border: none;
+        padding: 0.5rem 0;
+    }
+    
+    .info-table td {
+        border: none;
+        padding: 0.5rem 0;
+    }
+    
+    .badge {
+        font-size: 0.75rem;
+        padding: 0.375rem 0.75rem;
+        border-radius: 0.375rem;
+    }
+    
+    .bg-danger {
+        background-color: #dc3545 !important;
+        color: white !important;
+    }
+    
+    .bg-warning {
+        background-color: #ffc107 !important;
+        color: #212529 !important;
+    }
+    
+    .bg-success {
+        background-color: #198754 !important;
+        color: white !important;
+    }
+    
+    .bg-info {
+        background-color: #0dcaf0 !important;
+        color: white !important;
+    }
+    
+    .content-card {
+        background-color: white;
+        border: 1px solid #dee2e6;
+        border-radius: 0.5rem;
+        padding: 1rem;
+        margin-bottom: 1rem;
+    }
+    
+    .content-card h6 {
+        color: #495057;
+        margin-bottom: 0.75rem;
+        font-weight: 600;
+    }
+    
+    .btn-group-actions {
+        display: flex;
+        gap: 0.5rem;
+        justify-content: flex-end;
+    }
+    
+    .metadata {
+        background-color: #e9ecef;
+        border-radius: 0.375rem;
+        padding: 0.75rem;
+        margin-top: 1rem;
+    }
+    
+    .metadata small {
+        color: #6c757d;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2><i class="fas fa-clipboard-check"></i> 점검 기록 상세</h2>
+            <div class="btn-group-actions">
+                <a href="{{ url_for('equipment_inspection.edit_inspection', inspection_id=inspection.id) }}" 
+                   class="btn btn-warning">
+                    <i class="fas fa-edit"></i> 수정
+                </a>
+                <a href="{{ url_for('equipment_inspection.inspection_list') }}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> 목록으로
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <!-- 기본 정보 섹션 -->
+        <div class="info-section">
+            <h6><i class="fas fa-info-circle"></i> 기본 정보</h6>
+            <table class="table info-table">
+                <tr>
+                    <th>장비명:</th>
+                    <td><strong>{{ inspection.equipment.name }}</strong></td>
+                </tr>
+                <tr>
+                    <th>장비 ID:</th>
+                    <td>{{ inspection.equipment.equipment_id }}</td>
+                </tr>
+                <tr>
+                    <th>점검일:</th>
+                    <td>{{ inspection.inspection_date.strftime('%Y년 %m월 %d일') }}</td>
+                </tr>
+                <tr>
+                    <th>점검자:</th>
+                    <td>{{ inspection.inspector }}</td>
+                </tr>
+                <tr>
+                    <th>점검 유형:</th>
+                    <td>
+                        <span class="badge bg-info">{{ inspection.inspection_type }}</span>
+                    </td>
+                </tr>
+                <tr>
+                    <th>점검 결과:</th>
+                    <td>
+                        {% if inspection.result == '정상' %}
+                            <span class="badge bg-success">{{ inspection.result }}</span>
+                        {% elif inspection.result == '이상발견' %}
+                            <span class="badge bg-warning">{{ inspection.result }}</span>
+                        {% else %}
+                            <span class="badge bg-danger">{{ inspection.result }}</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                <tr>
+                    <th>다음 점검일:</th>
+                    <td>
+                        {% if inspection.next_inspection_date %}
+                            {{ inspection.next_inspection_date.strftime('%Y년 %m월 %d일') }}
+                        {% else %}
+                            <span class="text-muted">미정</span>
+                        {% endif %}
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <!-- 상태 정보 섹션 -->
+        <div class="info-section">
+            <h6><i class="fas fa-tools"></i> 상태 정보</h6>
+            <table class="table info-table">
+                <tr>
+                    <th>점검 전 상태:</th>
+                    <td>
+                        {% if inspection.condition_before %}
+                            {{ inspection.condition_before }}
+                        {% else %}
+                            <span class="text-muted">기록 없음</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                <tr>
+                    <th>점검 후 상태:</th>
+                    <td>
+                        {% if inspection.condition_after %}
+                            {{ inspection.condition_after }}
+                        {% else %}
+                            <span class="text-muted">기록 없음</span>
+                        {% endif %}
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <!-- 발견사항 섹션 -->
+        <div class="content-card">
+            <h6><i class="fas fa-search"></i> 발견사항</h6>
+            {% if inspection.findings %}
+                <p class="mb-0">{{ inspection.findings|replace('\n', '<br>')|safe }}</p>
+            {% else %}
+                <p class="text-muted mb-0">발견사항이 없습니다.</p>
+            {% endif %}
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <!-- 조치사항 섹션 -->
+        <div class="content-card">
+            <h6><i class="fas fa-tasks"></i> 조치사항</h6>
+            {% if inspection.actions_taken %}
+                <p class="mb-0">{{ inspection.actions_taken|replace('\n', '<br>')|safe }}</p>
+            {% else %}
+                <p class="text-muted mb-0">조치사항이 없습니다.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+{% if inspection.notes %}
+<div class="row">
+    <div class="col-12">
+        <!-- 기타 메모 섹션 -->
+        <div class="content-card">
+            <h6><i class="fas fa-sticky-note"></i> 기타 메모</h6>
+            <p class="mb-0">{{ inspection.notes|replace('\n', '<br>')|safe }}</p>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- 메타데이터 -->
+<div class="metadata">
+    <small>
+        <i class="fas fa-clock"></i> 
+        생성일: {{ inspection.created_date.strftime('%Y년 %m월 %d일 %H:%M') }}
+    </small>
+</div>
+{% endblock %} 

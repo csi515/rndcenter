@@ -2,12 +2,62 @@
 
 {% block title %}장비 목록 - R&D 센터 관리시스템{% endblock %}
 
+{% block extra_css %}
+<style>
+    /* 점검 상태에 따른 행 색상 */
+    .table-danger {
+        background-color: rgba(220, 53, 69, 0.1) !important;
+    }
+    
+    .table-warning {
+        background-color: rgba(255, 193, 7, 0.1) !important;
+    }
+    
+    /* 점검 상태 배지 스타일 */
+    .badge {
+        font-size: 0.75rem;
+        padding: 0.375rem 0.75rem;
+        border-radius: 0.375rem;
+    }
+    
+    .bg-danger {
+        background-color: #dc3545 !important;
+        color: white !important;
+    }
+    
+    .bg-warning {
+        background-color: #ffc107 !important;
+        color: #212529 !important;
+    }
+    
+    .bg-success {
+        background-color: #198754 !important;
+        color: white !important;
+    }
+    
+    /* 테이블 호버 효과 */
+    .table tbody tr:hover {
+        background-color: rgba(0, 123, 255, 0.05) !important;
+    }
+    
+    /* 점검 지연 행 강조 */
+    .table-danger:hover {
+        background-color: rgba(220, 53, 69, 0.15) !important;
+    }
+    
+    /* 점검 필요 행 강조 */
+    .table-warning:hover {
+        background-color: rgba(255, 193, 7, 0.15) !important;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
 <div class="row">
     <div class="col-12">
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h2><i class="fas fa-tools"></i> 장비 목록</h2>
-            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addEquipmentModal">
+            <button class="btn btn-primary" onclick="equipmentManager.addEquipment()">
                 <i class="fas fa-plus"></i> 장비 추가
             </button>
         </div>
@@ -29,14 +79,14 @@
                         <th>제조사</th>
                         <th>위치</th>
                         <th>상태</th>
-                        <th>구매일</th>
-                        <th>최근 점검일</th>
+                        <th>점검 상태</th>
+                        <th>다음 점검일</th>
                         <th>액션</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for equip in equipment %}
-                    <tr>
+                    <tr class="{% if equip.inspection_status == '점검지연' %}table-danger{% elif equip.inspection_status == '점검필요' %}table-warning{% endif %}">
                         <td>{{ equip.name }}</td>
                         <td>{{ equip.model }}</td>
                         <td>{{ equip.manufacturer }}</td>
@@ -46,8 +96,12 @@
                                 {{ equip.status }}
                             </span>
                         </td>
-                        <td>{{ equip.purchase_date }}</td>
-                        <td>{{ equip.maintenance_date }}</td>
+                        <td>
+                            <span class="badge {% if equip.inspection_status == '점검지연' %}bg-danger{% elif equip.inspection_status == '점검필요' %}bg-warning text-dark{% else %}bg-success{% endif %}">
+                                {{ equip.inspection_status or '정상' }}
+                            </span>
+                        </td>
+                        <td>{{ equip.next_inspection_date or '-' }}</td>
                         <td>
                             <button class="btn btn-sm btn-outline-primary edit-equipment-btn" data-id="{{ equip.id }}" data-equipment='{{ equip|tojson|escape }}' title="수정">
                                 <i class="fas fa-edit"></i>
@@ -64,40 +118,41 @@
     </div>
 </div>
 
-<!-- Add Equipment Modal -->
-<div class="modal fade" id="addEquipmentModal" tabindex="-1">
+<!-- Unified Equipment Modal -->
+<div class="modal fade" id="equipmentModal" tabindex="-1">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
-            <form method="POST" action="{{ url_for('equipment.add_equipment') }}">
+            <form method="POST" id="equipmentForm">
                 <div class="modal-header">
-                    <h5 class="modal-title">장비 추가</h5>
+                    <h5 class="modal-title" id="equipmentModalTitle">장비 추가</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
+                    <input type="hidden" id="equipmentId" name="equipment_id">
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label class="form-label">장비명 *</label>
-                            <input type="text" class="form-control" name="name" required>
+                            <input type="text" class="form-control" name="name" id="equipmentName" required>
                         </div>
                         <div class="col-md-6 mb-3">
                             <label class="form-label">모델</label>
-                            <input type="text" class="form-control" name="model">
+                            <input type="text" class="form-control" name="model" id="equipmentModel">
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label class="form-label">제조사</label>
-                            <input type="text" class="form-control" name="manufacturer">
+                            <input type="text" class="form-control" name="manufacturer" id="equipmentManufacturer">
                         </div>
                         <div class="col-md-6 mb-3">
                             <label class="form-label">위치</label>
-                            <input type="text" class="form-control" name="location">
+                            <input type="text" class="form-control" name="location" id="equipmentLocation">
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label class="form-label">상태</label>
-                            <select class="form-select" name="status">
+                            <select class="form-select" name="status" id="equipmentStatus">
                                 <option value="사용 가능">사용 가능</option>
                                 <option value="점검 중">점검 중</option>
                                 <option value="수리 중">수리 중</option>
@@ -106,84 +161,38 @@
                         </div>
                         <div class="col-md-6 mb-3">
                             <label class="form-label">구매일</label>
-                            <input type="date" class="form-control" name="purchase_date">
+                            <input type="date" class="form-control" name="purchase_date" id="equipmentPurchaseDate">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">최근 점검일</label>
+                            <input type="date" class="form-control" name="maintenance_date" id="equipmentMaintenanceDate">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">점검 주기 (일)</label>
+                            <input type="number" class="form-control" name="inspection_cycle_days" id="equipmentInspectionCycle" value="365" min="1" max="3650">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">마지막 점검일</label>
+                            <input type="date" class="form-control" name="last_inspection_date" id="equipmentLastInspectionDate">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">다음 점검 예정일</label>
+                            <input type="date" class="form-control" name="next_inspection_date" id="equipmentNextInspectionDate" readonly>
                         </div>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">최근 점검일</label>
-                        <input type="date" class="form-control" name="maintenance_date">
-                    </div>
-                    <div class="mb-3">
                         <label class="form-label">비고</label>
-                        <textarea class="form-control" name="notes" rows="3"></textarea>
+                        <textarea class="form-control" name="notes" id="equipmentNotes" rows="3"></textarea>
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
-                    <button type="submit" class="btn btn-primary">추가</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-
-<!-- Edit Equipment Modal -->
-<div class="modal fade" id="editEquipmentModal" tabindex="-1">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <form method="POST" id="editEquipmentForm">
-                <div class="modal-header">
-                    <h5 class="modal-title">장비 수정</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">장비명 *</label>
-                            <input type="text" class="form-control" name="name" id="editName" required>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">모델</label>
-                            <input type="text" class="form-control" name="model" id="editModel">
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">제조사</label>
-                            <input type="text" class="form-control" name="manufacturer" id="editManufacturer">
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">위치</label>
-                            <input type="text" class="form-control" name="location" id="editLocation">
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">상태</label>
-                            <select class="form-select" name="status" id="editStatus">
-                                <option value="사용 가능">사용 가능</option>
-                                <option value="점검 중">점검 중</option>
-                                <option value="수리 중">수리 중</option>
-                                <option value="사용 불가">사용 불가</option>
-                            </select>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">구매일</label>
-                            <input type="date" class="form-control" name="purchase_date" id="editPurchaseDate">
-                        </div>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">최근 점검일</label>
-                        <input type="date" class="form-control" name="maintenance_date" id="editMaintenanceDate">
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">비고</label>
-                        <textarea class="form-control" name="notes" id="editNotes" rows="3"></textarea>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
-                    <button type="submit" class="btn btn-primary">수정</button>
+                    <button type="button" class="btn btn-danger" id="deleteEquipmentBtn" style="display: none;">삭제</button>
+                    <button type="submit" class="btn btn-primary" id="equipmentSubmitBtn">추가</button>
                 </div>
             </form>
         </div>
@@ -192,64 +201,9 @@
 {% endblock %}
 
 {% block extra_js %}
-<script>
-// 장비 수정 모달 열기
-function editEquipment(id, equipment) {
-    document.getElementById('editEquipmentForm').action = `/equipment/update/${id}`;
-    document.getElementById('editName').value = equipment.name || '';
-    document.getElementById('editModel').value = equipment.model || '';
-    document.getElementById('editManufacturer').value = equipment.manufacturer || '';
-    document.getElementById('editLocation').value = equipment.location || '';
-    document.getElementById('editStatus').value = equipment.status || '사용 가능';
-    document.getElementById('editPurchaseDate').value = equipment.purchase_date || '';
-    document.getElementById('editMaintenanceDate').value = equipment.maintenance_date || '';
-    document.getElementById('editNotes').value = equipment.notes || '';
-    
-    new bootstrap.Modal(document.getElementById('editEquipmentModal')).show();
-}
-
-// 장비 삭제 확인
-function deleteEquipment(id, name) {
-    if (confirm(`정말로 "${name}" 장비를 삭제하시겠습니까?`)) {
-        fetch(`/equipment/delete/${id}`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            }
-        })
-        .then(response => {
-            if (response.ok) {
-                location.reload();
-            } else {
-                alert('장비 삭제 중 오류가 발생했습니다.');
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('장비 삭제 중 오류가 발생했습니다.');
-        });
-    }
-}
-
-// 이벤트 리스너 등록
-document.addEventListener('DOMContentLoaded', function() {
-    // 수정 버튼 이벤트
-    document.querySelectorAll('.edit-equipment-btn').forEach(btn => {
-        btn.onclick = function() {
-            const id = btn.getAttribute('data-id');
-            const equipment = JSON.parse(btn.getAttribute('data-equipment'));
-            editEquipment(id, equipment);
-        };
-    });
-
-    // 삭제 버튼 이벤트
-    document.querySelectorAll('.delete-equipment-btn').forEach(btn => {
-        btn.onclick = function() {
-            const id = btn.getAttribute('data-id');
-            const name = btn.getAttribute('data-name');
-            deleteEquipment(id, name);
-        };
-    });
-});
-</script>
+<!-- 공통 JavaScript 모듈 -->
+<script src="{{ url_for('static', filename='js/common/modal.js') }}"></script>
+<script src="{{ url_for('static', filename='js/common/api.js') }}"></script>
+<!-- 장비 관리 JavaScript -->
+<script src="{{ url_for('static', filename='js/equipment/equipment-manager.js') }}"></script>
 {% endblock %}

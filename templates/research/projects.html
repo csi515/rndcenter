@@ -60,7 +60,18 @@
                         <td>{{ project.participants }}</td>
                         <td>
                             <button class="btn btn-sm btn-outline-primary" 
-                                    onclick="editProject({{ project.id }}, '{{ project.name|e }}', '{{ project.description|e }}', '{{ project.start_date|e }}', '{{ project.end_date|e }}', '{{ project.status|e }}', '{{ project.participants|e }}')">
+                                    data-project-id="{{ project.id }}"
+                                    data-project-name="{{ project.name|e }}"
+                                    data-project-description="{{ project.description|e }}"
+                                    data-project-start-date="{{ project.start_date|e }}"
+                                    data-project-end-date="{{ project.end_date|e }}"
+                                    data-project-status="{{ project.status|e }}"
+                                    data-project-participants="{{ project.participants|e }}"
+                                    data-project-q1-report="{{ project.q1_report_link|e }}"
+                                    data-project-q2-report="{{ project.q2_report_link|e }}"
+                                    data-project-q3-report="{{ project.q3_report_link|e }}"
+                                    data-project-q4-report="{{ project.q4_report_link|e }}"
+                                    onclick="editProject(this)">
                                 <i class="fas fa-edit"></i>
                             </button>
                             <a href="{{ url_for('research.delete_project', project_id=project.id) }}" 
@@ -119,6 +130,47 @@
                         <label class="form-label">참여자</label>
                         <input type="text" class="form-control" name="participants" placeholder="참여자명을 쉼표로 구분">
                     </div>
+                    
+                    <!-- 분기별 보고서 링크 -->
+                    <div class="mb-3">
+                        <h6 class="form-label">분기별 보고서 링크</h6>
+                        <div class="row">
+                            <div class="col-md-6 mb-2">
+                                <div class="input-group">
+                                    <input type="url" class="form-control" name="q1_report_link" placeholder="1Q 보고서 링크">
+                                    <button type="button" class="btn btn-outline-secondary" onclick="previewLink('q1_report_link')">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-2">
+                                <div class="input-group">
+                                    <input type="url" class="form-control" name="q2_report_link" placeholder="2Q 보고서 링크">
+                                    <button type="button" class="btn btn-outline-secondary" onclick="previewLink('q2_report_link')">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-2">
+                                <div class="input-group">
+                                    <input type="url" class="form-control" name="q3_report_link" placeholder="3Q 보고서 링크">
+                                    <button type="button" class="btn btn-outline-secondary" onclick="previewLink('q3_report_link')">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-2">
+                                <div class="input-group">
+                                    <input type="url" class="form-control" name="q4_report_link" placeholder="4Q 보고서 링크">
+                                    <button type="button" class="btn btn-outline-secondary" onclick="previewLink('q4_report_link')">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
@@ -171,6 +223,47 @@
                         <label class="form-label">참여자</label>
                         <input type="text" class="form-control" name="participants" id="editParticipants" placeholder="참여자명을 쉼표로 구분">
                     </div>
+                    
+                    <!-- 분기별 보고서 링크 -->
+                    <div class="mb-3">
+                        <h6 class="form-label">분기별 보고서 링크</h6>
+                        <div class="row">
+                            <div class="col-md-6 mb-2">
+                                <div class="input-group">
+                                    <input type="url" class="form-control" name="q1_report_link" id="editQ1ReportLink" placeholder="1Q 보고서 링크">
+                                    <button type="button" class="btn btn-outline-secondary" onclick="previewLink('editQ1ReportLink')">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-2">
+                                <div class="input-group">
+                                    <input type="url" class="form-control" name="q2_report_link" id="editQ2ReportLink" placeholder="2Q 보고서 링크">
+                                    <button type="button" class="btn btn-outline-secondary" onclick="previewLink('editQ2ReportLink')">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-2">
+                                <div class="input-group">
+                                    <input type="url" class="form-control" name="q3_report_link" id="editQ3ReportLink" placeholder="3Q 보고서 링크">
+                                    <button type="button" class="btn btn-outline-secondary" onclick="previewLink('editQ3ReportLink')">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-2">
+                                <div class="input-group">
+                                    <input type="url" class="form-control" name="q4_report_link" id="editQ4ReportLink" placeholder="4Q 보고서 링크">
+                                    <button type="button" class="btn btn-outline-secondary" onclick="previewLink('editQ4ReportLink')">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
@@ -184,16 +277,50 @@
 
 {% block extra_js %}
 <script>
-function editProject(id, name, description, startDate, endDate, status, participants) {
-    document.getElementById('editProjectForm').action = `/research/projects/update/${id}`;
-    document.getElementById('editName').value = name || '';
-    document.getElementById('editDescription').value = description || '';
-    document.getElementById('editStartDate').value = startDate || '';
-    document.getElementById('editEndDate').value = endDate || '';
-    document.getElementById('editStatus').value = status || '';
-    document.getElementById('editParticipants').value = participants || '';
+function editProject(button) {
+    const data = button.dataset;
+    document.getElementById('editProjectForm').action = `/research/projects/update/${data.projectId}`;
+    document.getElementById('editName').value = data.projectName || '';
+    document.getElementById('editDescription').value = data.projectDescription || '';
+    document.getElementById('editStartDate').value = data.projectStartDate || '';
+    document.getElementById('editEndDate').value = data.projectEndDate || '';
+    document.getElementById('editStatus').value = data.projectStatus || '';
+    document.getElementById('editParticipants').value = data.projectParticipants || '';
+    document.getElementById('editQ1ReportLink').value = data.projectQ1Report || '';
+    document.getElementById('editQ2ReportLink').value = data.projectQ2Report || '';
+    document.getElementById('editQ3ReportLink').value = data.projectQ3Report || '';
+    document.getElementById('editQ4ReportLink').value = data.projectQ4Report || '';
     
     new bootstrap.Modal(document.getElementById('editProjectModal')).show();
+}
+
+// 링크 미리보기 함수
+function previewLink(inputName) {
+    let input;
+    // 먼저 name으로 찾고, 없으면 id로 찾기
+    input = document.querySelector(`input[name="${inputName}"]`);
+    if (!input) {
+        input = document.getElementById(inputName);
+    }
+    
+    if (!input) {
+        alert('입력 필드를 찾을 수 없습니다.');
+        return;
+    }
+    
+    const url = input.value.trim();
+    
+    if (!url) {
+        alert('링크를 먼저 입력해주세요.');
+        return;
+    }
+    
+    if (!url.startsWith('http://') && !url.startsWith('https://')) {
+        alert('올바른 URL을 입력해주세요. (http:// 또는 https://로 시작)');
+        return;
+    }
+    
+    window.open(url, '_blank');
 }
 
 // Search functionality

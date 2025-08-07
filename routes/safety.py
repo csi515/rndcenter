@@ -391,7 +391,10 @@ def procedures():
             'risk_assessment_link': proc.risk_assessment_link
         })
     
-    return render_template('safety/procedures.html', procedures=procedures)
+    # 현재 연도 계산
+    current_year = datetime.now().year
+    
+    return render_template('safety/procedures.html', procedures=procedures, current_year=current_year)
 
 @safety_bp.route('/procedures/update', methods=['POST'])
 def update_procedure():

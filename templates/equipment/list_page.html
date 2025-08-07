@@ -2,6 +2,56 @@
 
 {% block title %}장비 목록{% endblock %}
 
+{% block extra_css %}
+<style>
+    /* 점검 상태에 따른 행 색상 */
+    .table-danger {
+        background-color: rgba(220, 53, 69, 0.1) !important;
+    }
+    
+    .table-warning {
+        background-color: rgba(255, 193, 7, 0.1) !important;
+    }
+    
+    /* 점검 상태 배지 스타일 */
+    .badge {
+        font-size: 0.75rem;
+        padding: 0.375rem 0.75rem;
+        border-radius: 0.375rem;
+    }
+    
+    .bg-danger {
+        background-color: #dc3545 !important;
+        color: white !important;
+    }
+    
+    .bg-warning {
+        background-color: #ffc107 !important;
+        color: #212529 !important;
+    }
+    
+    .bg-success {
+        background-color: #198754 !important;
+        color: white !important;
+    }
+    
+    /* 테이블 호버 효과 */
+    .table tbody tr:hover {
+        background-color: rgba(0, 123, 255, 0.05) !important;
+    }
+    
+    /* 점검 지연 행 강조 */
+    .table-danger:hover {
+        background-color: rgba(220, 53, 69, 0.15) !important;
+    }
+    
+    /* 점검 필요 행 강조 */
+    .table-warning:hover {
+        background-color: rgba(255, 193, 7, 0.15) !important;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
 <div class="container-fluid">
     <div class="row">
@@ -28,6 +78,8 @@
                                     <th>위치</th>
                                     <th>담당자</th>
                                     <th>상태</th>
+                                    <th>점검 상태</th>
+                                    <th>다음 점검일</th>
                                     <th>작업</th>
                                 </tr>
                             </thead>
@@ -173,6 +225,26 @@
                                 <input type="date" class="form-control" id="equipmentWarrantyExpiry">
                             </div>
                         </div>
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label class="form-label">점검 주기 (일)</label>
+                                <input type="number" class="form-control" id="equipmentInspectionCycle" value="365" min="1" max="3650">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label class="form-label">마지막 점검일</label>
+                                <input type="date" class="form-control" id="equipmentLastInspectionDate">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label class="form-label">다음 점검 예정일</label>
+                                <input type="date" class="form-control" id="equipmentNextInspectionDate" readonly>
+                            </div>
+                        </div>
                     </div>
                     <div class="form-group mb-3">
                         <label class="form-label">사양 및 특징</label>
@@ -291,7 +363,29 @@ let equipmentList = [];
 // 페이지 로드 시 초기화
 document.addEventListener('DOMContentLoaded', function() {
     loadEquipmentData();
+    
+    // 점검 주기 계산 이벤트 리스너 추가
+    document.getElementById('equipmentInspectionCycle').addEventListener('change', calculateNextInspectionDate);
+    document.getElementById('equipmentLastInspectionDate').addEventListener('change', calculateNextInspectionDate);
 });
+
+// 다음 점검일 자동 계산
+function calculateNextInspectionDate() {
+    const cycleDays = parseInt(document.getElementById('equipmentInspectionCycle').value) || 365;
+    const lastInspectionDate = document.getElementById('equipmentLastInspectionDate').value;
+    
+    if (lastInspectionDate) {
+        const lastDate = new Date(lastInspectionDate);
+        const nextDate = new Date(lastDate);
+        nextDate.setDate(lastDate.getDate() + cycleDays);
+        
+        // YYYY-MM-DD 형식으로 변환
+        const nextDateStr = nextDate.toISOString().split('T')[0];
+        document.getElementById('equipmentNextInspectionDate').value = nextDateStr;
+    } else {
+        document.getElementById('equipmentNextInspectionDate').value = '';
+    }
+}
 
 // 장비 데이터 로드
 async function loadEquipmentData() {
@@ -325,7 +419,7 @@ function renderEquipmentTable(equipment) {
     if (equipment.length === 0) {
         html = `
         <tr>
-            <td colspan="8" class="text-center text-muted py-4">
+            <td colspan="11" class="text-center text-muted py-4">
                 <i class="fas fa-box-open fa-2x mb-2"></i><br>
                 등록된 장비가 없습니다.<br>
                 <button class="btn btn-primary mt-2" onclick="addEquipment()">
@@ -335,8 +429,16 @@ function renderEquipmentTable(equipment) {
         </tr>`;
     } else {
         equipment.forEach(eq => {
+            // 점검 상태에 따른 색상 클래스 결정
+            const inspectionStatusClass = getInspectionStatusClass(eq.inspection_status);
+            const inspectionStatusText = eq.inspection_status || '정상';
+            
+            // 다음 점검일 포맷팅
+            const nextInspectionDate = eq.next_inspection_date ? 
+                new Date(eq.next_inspection_date).toLocaleDateString('ko-KR') : '-';
+            
             html += `
-            <tr>
+            <tr class="${inspectionStatusClass}">
                 <td>${eq.equipment_id || '-'}</td>
                 <td>
                     ${(typeof eq.asset_number !== 'undefined' && eq.asset_number && eq.asset_number.trim()) ? eq.asset_number : '-'}
@@ -350,6 +452,10 @@ function renderEquipmentTable(equipment) {
                     <span class="status-badge status-${eq.status ? eq.status.replace(/\s+/g, '') : 'unknown'}">${eq.status || '알 수 없음'}</span>
                 </td>
                 <td>
+                    <span class="badge ${getInspectionBadgeClass(eq.inspection_status)}">${inspectionStatusText}</span>
+                </td>
+                <td>${nextInspectionDate}</td>
+                <td>
                     <button class="btn btn-sm btn-outline-primary me-1" onclick="editEquipment(${eq.id})">
                         <i class="fas fa-edit"></i>
                     </button>
@@ -362,6 +468,32 @@ function renderEquipmentTable(equipment) {
     }
     
     tbody.innerHTML = html;
+}
+
+// 점검 상태에 따른 행 색상 클래스 반환
+function getInspectionStatusClass(status) {
+    switch(status) {
+        case '점검지연':
+            return 'table-danger';
+        case '점검필요':
+            return 'table-warning';
+        case '정상':
+        default:
+            return '';
+    }
+}
+
+// 점검 상태에 따른 배지 클래스 반환
+function getInspectionBadgeClass(status) {
+    switch(status) {
+        case '점검지연':
+            return 'bg-danger';
+        case '점검필요':
+            return 'bg-warning text-dark';
+        case '정상':
+        default:
+            return 'bg-success';
+    }
 }
 
 // 장비 추가 모달 열기
@@ -453,6 +585,9 @@ function editEquipment(id) {
     document.getElementById('equipmentPrice').value = equipment.purchase_price || '';
     document.getElementById('equipmentMaintenanceDate').value = equipment.maintenance_date || '';
     document.getElementById('equipmentWarrantyExpiry').value = equipment.warranty_expiry || '';
+    document.getElementById('equipmentInspectionCycle').value = equipment.inspection_cycle_days || 365;
+    document.getElementById('equipmentLastInspectionDate').value = equipment.last_inspection_date || '';
+    document.getElementById('equipmentNextInspectionDate').value = equipment.next_inspection_date || '';
     document.getElementById('equipmentSpecifications').value = equipment.specifications || '';
     document.getElementById('equipmentNotes').value = equipment.notes || '';
     document.getElementById('deleteEquipmentBtn').style.display = 'inline-block';
@@ -478,6 +613,9 @@ async function saveEquipment() {
         purchase_price: document.getElementById('equipmentPrice').value,
         maintenance_date: document.getElementById('equipmentMaintenanceDate').value,
         warranty_expiry: document.getElementById('equipmentWarrantyExpiry').value,
+        inspection_cycle_days: document.getElementById('equipmentInspectionCycle').value,
+        last_inspection_date: document.getElementById('equipmentLastInspectionDate').value,
+        next_inspection_date: document.getElementById('equipmentNextInspectionDate').value,
         specifications: document.getElementById('equipmentSpecifications').value,
         notes: document.getElementById('equipmentNotes').value
     };
@@ -522,6 +660,10 @@ async function saveEquipment() {
             alert('저장되었습니다.');
             bootstrap.Modal.getInstance(document.getElementById('equipmentModal')).hide();
             loadEquipmentData();
+            // 페이지 자동 새로고침
+            setTimeout(() => {
+                location.reload();
+            }, 500);
         } else {
             alert('오류: ' + (result.error || '저장에 실패했습니다.'));
         }
@@ -561,6 +703,10 @@ async function deleteEquipment(id) {
                     bootstrap.Modal.getInstance(document.getElementById('equipmentModal')).hide();
                 }
                 loadEquipmentData();
+                // 페이지 자동 새로고침
+                setTimeout(() => {
+                    location.reload();
+                }, 500);
             } else {
                 alert('오류: ' + (result.error || '삭제에 실패했습니다.'));
             }

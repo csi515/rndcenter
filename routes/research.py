@@ -72,6 +72,10 @@ def add_project():
     start_date = request.form.get('start_date')
     end_date = request.form.get('end_date')
     participants = request.form.get('participants')
+    q1_report_link = request.form.get('q1_report_link')
+    q2_report_link = request.form.get('q2_report_link')
+    q3_report_link = request.form.get('q3_report_link')
+    q4_report_link = request.form.get('q4_report_link')
 
     # 필수 필드 검증
     if not name:
@@ -87,6 +91,10 @@ def add_project():
             start_date=datetime.strptime(start_date, '%Y-%m-%d') if start_date else None,
             end_date=datetime.strptime(end_date, '%Y-%m-%d') if end_date else None,
             participants=participants,
+            q1_report_link=q1_report_link,
+            q2_report_link=q2_report_link,
+            q3_report_link=q3_report_link,
+            q4_report_link=q4_report_link,
             created_date=datetime.now()
         )
         db.session.add(project)
@@ -242,6 +250,10 @@ def update_project(project_id):
     if end_date:
         project.end_date = datetime.strptime(end_date, '%Y-%m-%d')
     project.participants = request.form.get('participants', project.participants)
+    project.q1_report_link = request.form.get('q1_report_link', project.q1_report_link)
+    project.q2_report_link = request.form.get('q2_report_link', project.q2_report_link)
+    project.q3_report_link = request.form.get('q3_report_link', project.q3_report_link)
+    project.q4_report_link = request.form.get('q4_report_link', project.q4_report_link)
     db.session.commit()
     return redirect(url_for('research.projects'))
 

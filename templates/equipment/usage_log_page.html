@@ -4,7 +4,7 @@
 
 {% block extra_css %}
 <style>
-    /* 드롭다운 클릭 문제 해결을 위한 강력한 CSS */
+    /* 드롭다운 화살표 중복 문제 해결 */
     .form-select {
         position: relative !important;
         z-index: 1000 !important;
@@ -14,9 +14,14 @@
         border: 1px solid #ced4da !important;
         border-radius: 0.375rem !important;
         padding: 0.375rem 2.25rem 0.375rem 0.75rem !important;
-        appearance: menulist !important;
-        -webkit-appearance: menulist !important;
-        -moz-appearance: menulist !important;
+        /* 브라우저 기본 화살표 제거 */
+        appearance: none !important;
+        -webkit-appearance: none !important;
+        -moz-appearance: none !important;
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m1 6 7 7 7-7'/%3e%3c/svg%3e") !important;
+        background-repeat: no-repeat !important;
+        background-position: right 0.75rem center !important;
+        background-size: 16px 12px !important;
     }
     
     .form-select:hover {
@@ -52,6 +57,7 @@
         z-index: 0 !important;
     }
     
+    /* 상태 배지 개선 */
     .status-badge {
         padding: 0.25rem 0.5rem;
         border-radius: 0.375rem;
@@ -68,6 +74,92 @@
         background-color: #ffebe9;
         color: #cf222e;
     }
+    
+    /* 모달 디자인 개선 */
+    .modal-content {
+        border-radius: 0.75rem;
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    }
+    
+    .modal-header {
+        border-bottom: 1px solid #dee2e6;
+        background-color: #f8f9fa;
+        border-radius: 0.75rem 0.75rem 0 0;
+    }
+    
+    .modal-footer {
+        border-top: 1px solid #dee2e6;
+        background-color: #f8f9fa;
+        border-radius: 0 0 0.75rem 0.75rem;
+    }
+    
+    /* 폼 레이블 개선 */
+    .form-label {
+        font-weight: 600;
+        color: #495057;
+        margin-bottom: 0.5rem;
+    }
+    
+    /* 버튼 디자인 개선 */
+    .btn-primary {
+        background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+        border: none;
+        border-radius: 0.5rem;
+        padding: 0.5rem 1.5rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+    }
+    
+    .btn-secondary {
+        background: linear-gradient(135deg, #6c757d 0%, #545b62 100%);
+        border: none;
+        border-radius: 0.5rem;
+        padding: 0.5rem 1.5rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-secondary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(108, 117, 125, 0.3);
+    }
+    
+    /* 테이블 디자인 개선 */
+    .table {
+        border-radius: 0.5rem;
+        overflow: hidden;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+    
+    .table thead th {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        border-bottom: 2px solid #dee2e6;
+        font-weight: 600;
+        color: #495057;
+        padding: 1rem 0.75rem;
+    }
+    
+    .table tbody tr:hover {
+        background-color: rgba(0, 123, 255, 0.05);
+        transition: background-color 0.2s ease;
+    }
+    
+    /* 페이지 제목 개선 */
+    .page-title {
+        color: #2c3e50;
+        font-weight: 700;
+        margin-bottom: 1.5rem;
+    }
+    
+    .page-title i {
+        color: #007bff;
+        margin-right: 0.5rem;
+    }
 </style>
 {% endblock %}
 
@@ -76,7 +168,7 @@
     <div class="row">
         <div class="col-12">
             <div class="d-flex justify-content-between align-items-center mb-4">
-                <h2><i class="fas fa-clipboard-list me-2"></i>사용일지</h2>
+                <h2 class="page-title"><i class="fas fa-clipboard-list"></i>사용일지</h2>
                 <button class="btn btn-primary" id="openUsageLogModalBtn">
                     <i class="fas fa-plus"></i> 사용일지 작성
                 </button>
@@ -335,7 +427,9 @@ async function loadUsageLogsData() {
         const data = await response.json();
         
         if (data.success) {
-            renderNewUsageLogTable(data.logs);
+            // API 응답 구조에 맞게 수정: data.data.logs
+            const logsList = data.data?.logs || data.logs || [];
+            renderNewUsageLogTable(logsList);
         }
     } catch (error) {
         console.error('사용일지 로드 중 오류:', error);
@@ -346,25 +440,44 @@ async function loadEquipmentForUsage() {
     try {
         const response = await fetch('/equipment/api/equipment');
         const data = await response.json();
+        console.log('사용일지 장비 API 응답:', data); // 디버깅용
+        
         const select = document.getElementById('usageEquipment');
         const filterSelect = document.getElementById('filterEquipment');
-        select.disabled = false; // 항상 활성화
+        select.disabled = false;
+        
         let html = '<option value="">장비를 선택하세요</option>';
         let filterHtml = '<option value="">전체 장비</option>';
-        if (data.success && data.equipment && data.equipment.length > 0) {
-            data.equipment.forEach(equipment => {
-                // 상태가 '사용가능'인 장비만 선택 가능하게
-                const isUsable = equipment.status === '사용가능' || equipment.status === '사용 가능';
-                html += `<option value="${equipment.name}"${isUsable ? '' : ' disabled'}>${equipment.name} (${equipment.asset_number || '-'})</option>`;
-                filterHtml += `<option value="${equipment.name}">${equipment.name} (${equipment.asset_number || '-'})</option>`;
+        
+        // API 응답 구조에 맞게 수정: data.data.equipment
+        const equipmentList = data.data?.equipment || data.equipment || [];
+        
+        if (data.success && equipmentList && equipmentList.length > 0) {
+            console.log('사용일지 장비 개수:', equipmentList.length); // 디버깅용
+            equipmentList.forEach(equipment => {
+                console.log('사용일지 장비 정보:', equipment); // 디버깅용
+                
+                // 모든 장비를 표시하되, 사용 불가능한 장비는 비활성화
+                const isUsable = !equipment.status || 
+                                equipment.status === '사용가능' || 
+                                equipment.status === '사용 가능' || 
+                                equipment.status === '사용가능' ||
+                                equipment.status === '정상';
+                const statusText = equipment.status || '상태 없음';
+                
+                html += `<option value="${equipment.name}"${isUsable ? '' : ' disabled'}>${equipment.name} (${equipment.model || '모델명 없음'}) - ${statusText}</option>`;
+                filterHtml += `<option value="${equipment.name}">${equipment.name} (${equipment.model || '모델명 없음'}) - ${statusText}</option>`;
             });
         } else {
+            console.log('사용일지 장비 데이터가 없거나 잘못된 형식:', data); // 디버깅용
             html += '<option value="" disabled>등록된 장비 없음</option>';
             filterHtml += '<option value="" disabled>등록된 장비 없음</option>';
         }
+        
         select.innerHTML = html;
         filterSelect.innerHTML = filterHtml;
     } catch (error) {
+        console.error('사용일지 장비 목록 로드 오류:', error);
         const select = document.getElementById('usageEquipment');
         const filterSelect = document.getElementById('filterEquipment');
         select.innerHTML = '<option value="" disabled>장비 목록 로드 오류</option>';
@@ -450,6 +563,11 @@ async function saveNewUsageLog() {
             if (backdrop) {
                 backdrop.remove();
             }
+            
+            // 페이지 자동 새로고침
+            setTimeout(() => {
+                location.reload();
+            }, 500);
         } else {
             alert('오류: ' + (result.error || '저장에 실패했습니다.'));
         }
@@ -470,7 +588,8 @@ async function loadUsageLogsDataFiltered(equipment, month) {
         const response = await fetch('/equipment/api/usage-logs');
         const data = await response.json();
         if (data.success) {
-            let logs = data.logs;
+            // API 응답 구조에 맞게 수정: data.data.logs
+            let logs = data.data?.logs || data.logs || [];
             if (equipment) {
                 logs = logs.filter(log => log.equipment_name === equipment);
             }
@@ -524,6 +643,10 @@ function deleteUsageLog(logId) {
         if (result.success) {
             alert('삭제되었습니다.');
             loadUsageLogsData();
+            // 페이지 자동 새로고침
+            setTimeout(() => {
+                location.reload();
+            }, 500);
         } else {
             alert('삭제 실패: ' + (result.error || '오류'));
         }
@@ -537,7 +660,9 @@ function editUsageLog(logId) {
     .then(res => res.json())
     .then(data => {
         if (!data.success) throw new Error('데이터 로드 실패');
-        const log = data.logs.find(l => l.id == logId);
+        // API 응답 구조에 맞게 수정: data.data.logs
+        const logsList = data.data?.logs || data.logs || [];
+        const log = logsList.find(l => l.id == logId);
         if (!log) throw new Error('사용일지 없음');
         // 모달 열고 값 채우기
         document.getElementById('usageEquipment').value = log.equipment_name;
@@ -590,6 +715,11 @@ function editUsageLog(logId) {
                     if (backdrop) {
                         backdrop.remove();
                     }
+                    
+                    // 페이지 자동 새로고침
+                    setTimeout(() => {
+                        location.reload();
+                    }, 500);
                 } else {
                     alert('수정 실패: ' + (result.error || '오류'));
                 }

@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, jsonify
 from database import db
-from database import Project, Equipment, Reservation, InventoryItem, Patent
+from database import Project, Equipment, Reservation, Patent
 from datetime import datetime, timedelta
 from sqlalchemy import func
 
@@ -17,7 +17,7 @@ def dashboard():
     total_reservations = Reservation.query.count()
     
     # 재고 중 수량이 10 이하인 항목 수
-    low_inventory_items = InventoryItem.query.filter(InventoryItem.quantity < 10).count()
+    low_inventory_items = 0
     
     stats = {
         'total_projects': total_projects,
